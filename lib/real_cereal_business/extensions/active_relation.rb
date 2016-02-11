@@ -1,5 +1,7 @@
-#NOTE:: strive for minimal method footprint over strict OO because this mixes into Rails Core
+require 'active_support/all'
 require 'active_record/relation'
+
+#NOTE:: strive for minimal method footprint over strict OO because this mixes into Rails Core
 module RealCerealBusiness
   module Extensions
     module ActiveRelation
@@ -14,8 +16,8 @@ module RealCerealBusiness
       # @param options [Hash]
       # @return [JSON]
       def as_json_with_real_cereal_business_caching(options = nil)
-        if options.present? && options.key?(::RealCerealBusiness.json_attribute_key) &&
-            (serializer = ::RealCerealBusiness::ResourceManager.new.serializer_for(self.klass)).present?
+        if options.present? && options.key?(RealCerealBusiness.json_attribute_key) &&
+            (serializer = RealCerealBusiness::ResourceManager.new.serializer_for(self.klass)).present?
           collection = PerformanceMonitor.measure(:active_record) { to_a }
           serializer.association_cache.perform(collection) do
             collection.as_json(options)

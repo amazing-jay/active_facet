@@ -5,7 +5,7 @@ module RealCerealBusiness
       #class_attribute :resource_manager, instance_accessor: false
 
       #def self.register serializer_class, resource_class, attribute_name
-        #::RealCerealBusiness::ResourceManager.build(resource_class)[attribute_name] = serializer_class
+        #RealCerealBusiness::ResourceManager.build(resource_class)[attribute_name] = serializer_class
       #end
     end
   end

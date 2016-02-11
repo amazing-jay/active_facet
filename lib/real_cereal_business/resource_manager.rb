@@ -125,7 +125,7 @@ module RealCerealBusiness
     def lookup_serializer(lookups, strict)
       lookups.uniq.each do |lookup|
         klass = "::Honest::Serializers::#{lookup}".safe_constantize
-        return klass if klass.present? && (!strict || klass.ancestors.include?(::RealCerealBusiness::Serializer::Base))
+        return klass if klass.present? && (!strict || klass.ancestors.include?(RealCerealBusiness::Serializer::Base))
       end
       nil
     end

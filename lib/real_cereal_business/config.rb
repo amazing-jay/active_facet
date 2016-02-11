@@ -87,7 +87,7 @@ module RealCerealBusiness
     # @param block [Block] to call for each field
     # @return [Hash] injection of block results
     def field_set_itterator(field_set)
-      raise ::RealCerealBusiness::Errors::ConfigurationError.new(::RealCerealBusiness::Errors::ConfigurationError::COMPILED_ERROR_MSG) unless compiled
+      raise RealCerealBusiness::Errors::ConfigurationError.new(RealCerealBusiness::Errors::ConfigurationError::COMPILED_ERROR_MSG) unless compiled
       internal_field_set_itterator(dealias_field_set!(default_field_set(field_set))[:fields], Proc.new)
     end
 

@@ -17,7 +17,7 @@ module RealCerealBusiness
     # @return [Hash]
     def perform(collection)
       #TODO --jdc this short circuits this entire feature set, is there any point to using it, or time to sunset?
-      ::RealCerealBusiness.preload_associations ? perform!(collection) { yield } : yield
+      RealCerealBusiness.preload_associations ? perform!(collection) { yield } : yield
     end
 
     # Preload assocation for all records in cached collection

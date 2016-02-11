@@ -53,8 +53,8 @@ module RealCerealBusiness
         # @option as [MIXED] a nested field_set collection
         def expose(field_set_name, options = {})
           field_set_name = field_set_name.to_sym
-          raise ::RealCerealBusiness::Errors::ConfigurationError.new(::RealCerealBusiness::Errors::ConfigurationError::ALL_ATTRIBUTES_ERROR_MSG) if field_set_name == :all_attributes
-          raise ::RealCerealBusiness::Errors::ConfigurationError.new(::RealCerealBusiness::Errors::ConfigurationError::ALL_FIELDS_ERROR_MSG) if field_set_name == :all
+          raise RealCerealBusiness::Errors::ConfigurationError.new(RealCerealBusiness::Errors::ConfigurationError::ALL_ATTRIBUTES_ERROR_MSG) if field_set_name == :all_attributes
+          raise RealCerealBusiness::Errors::ConfigurationError.new(RealCerealBusiness::Errors::ConfigurationError::ALL_FIELDS_ERROR_MSG) if field_set_name == :all
           config.alias_field_set(field_set_name, options.key?(:as) ? options[:as] : field_set_name)
         end
 
@@ -78,7 +78,7 @@ module RealCerealBusiness
         # Memoized class getter
         # @return [Config]
         def config
-          @config ||= ::RealCerealBusiness::Config.new
+          @config ||= RealCerealBusiness::Config.new
         end
 
       end
@@ -135,7 +135,7 @@ module RealCerealBusiness
       # @param attribute [Hash] subset of the values returned by {resource.as_json}
       # @return [ActiveRecord] resource
       def from_hash(resource, attributes)
-        ::RealCerealBusiness::Serializer::Facade.new(self,resource).from_hash(attributes)
+        RealCerealBusiness::Serializer::Facade.new(self,resource).from_hash(attributes)
       end
 
       # This method returns a JSON of hash values representing the resource(s)
@@ -144,7 +144,7 @@ module RealCerealBusiness
       # @return [JSON] representing the resource
       def as_json(resources, options = {})
         resource_itterator(resources) do |resource|
-          ::RealCerealBusiness::Serializer::Facade.new(self, resource, options).as_json
+          RealCerealBusiness::Serializer::Facade.new(self, resource, options).as_json
         end
       end
 
@@ -181,7 +181,7 @@ module RealCerealBusiness
           #return nil if field isn't an association
           if reflection = get_association_reflection(field)
             #return nil if association doesn't have a custom class
-            @association_serializers[field] = ::RealCerealBusiness::ResourceManager.new.serializer_for(reflection.klass)
+            @association_serializers[field] = RealCerealBusiness::ResourceManager.new.serializer_for(reflection.klass)
           end
         end
         @association_serializers[field]
@@ -192,7 +192,7 @@ module RealCerealBusiness
       # @return [Class | nil]
       def get_custom_serializer_class(attribute)
         @custom_serializers ||= {}
-        @custom_serializers[attribute] ||= ::RealCerealBusiness::ResourceManager.new.attribute_serializer_class_for(resource_class, attribute)
+        @custom_serializers[attribute] ||= RealCerealBusiness::ResourceManager.new.attribute_serializer_class_for(resource_class, attribute)
       end
 
       # Determines if public attribute maps to a private relation
@@ -218,10 +218,10 @@ module RealCerealBusiness
       def initialize
         ::PerformanceMonitor.measure("--ignore, memoized in production:: initialize_field_sets") do
           config.compile! self
-          @association_cache = ::RealCerealBusiness::AssociationCache.new(self)
+          @association_cache = RealCerealBusiness::AssociationCache.new(self)
         end
       rescue SystemStackError => e
-        raise ::RealCerealBusiness::Errors::ConfigurationError.new(::RealCerealBusiness::Errors::ConfigurationError::STACK_ERROR_MSG)
+        raise RealCerealBusiness::Errors::ConfigurationError.new(RealCerealBusiness::Errors::ConfigurationError::STACK_ERROR_MSG)
       end
 
       # Itterates a resource collection invoking block
@@ -255,7 +255,7 @@ module RealCerealBusiness
       # @param index [Integer] recursive cursor
       # @return [Class]
       def constantize_resource_class(names, index)
-        raise ::RealCerealBusiness::Errors::ConfigurationError.new(::RealCerealBusiness::Errors::ConfigurationError::RESOURCE_ERROR_MSG) if names.blank? || -index > names.size
+        raise RealCerealBusiness::Errors::ConfigurationError.new(RealCerealBusiness::Errors::ConfigurationError::RESOURCE_ERROR_MSG) if names.blank? || -index > names.size
         klass = names[index..-1].join("::").safe_constantize
         klass = constantize_resource_class(names, index-1) unless klass.present? && klass < ActiveRecord::Base
         klass

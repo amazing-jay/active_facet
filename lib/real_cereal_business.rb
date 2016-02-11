@@ -12,6 +12,7 @@ require 'real_cereal_business/document_cache'
 require 'real_cereal_business/filter'
 require 'real_cereal_business/resource_manager'
 require 'real_cereal_business/version'
+require 'performance_monitor'
 
 module RealCerealBusiness
   mattr_accessor :json_attribute_key,
@@ -41,22 +42,22 @@ module RealCerealBusiness
   self.preload_associations           = false
   self.cache_enabled                  = false
   self.default_cache_options          = { expires_in: 5.minutes }
-  self.document_cache                 = ::RealCerealBusiness::DocumentCache
+  self.document_cache                 = RealCerealBusiness::DocumentCache
 
   def self.configure
     yield(self)
   end
 
   def self.global_filter(name)
-    ::RealCerealBusiness::Extensions::ActiveRecord.filters[name] = Proc.new
+    RealCerealBusiness::Extensions::ActiveRecord.filters[name] = Proc.new
   end
 
   def self.resource_mapper
-    ::RealCerealBusiness::ResourceManager.resource_mapper = Proc.new
+    RealCerealBusiness::ResourceManager.resource_mapper = Proc.new
   end
 end
 
-ActiveRecord::Base.send :include, ::RealCerealBusiness::Extensions::ActiveRecord
-ActiveRecord::Relation.send :include, ::RealCerealBusiness::Extensions::ActiveRelation
+ActiveRecord::Base.send :include, RealCerealBusiness::Extensions::ActiveRecord
+ActiveRecord::Relation.send :include, RealCerealBusiness::Extensions::ActiveRelation
 
 

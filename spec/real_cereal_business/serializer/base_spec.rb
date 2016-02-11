@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe RealCerealBusiness::Serializer::Base do
 
-  include Support::RealCerealBusiness::TestHarnessHelper
+  include TestHarness
 
   let(:resource_serializer_class) { build_resource_serializer_class }
   let(:association_serializer_class) { build_association_serializer_class }
@@ -156,11 +156,11 @@ describe RealCerealBusiness::Serializer::Base do
 
     context "all" do
       let(:field_set_name) { :all }
-      it { expect{subject}.to raise_error(::RealCerealBusiness::Errors::ConfigurationError,::RealCerealBusiness::Errors::ConfigurationError::ALL_FIELDS_ERROR_MSG) }
+      it { expect{subject}.to raise_error(RealCerealBusiness::Errors::ConfigurationError,RealCerealBusiness::Errors::ConfigurationError::ALL_FIELDS_ERROR_MSG) }
     end
     context "all_attributes" do
       let(:field_set_name) { :all_attributes }
-      it { expect{subject}.to raise_error(::RealCerealBusiness::Errors::ConfigurationError,::RealCerealBusiness::Errors::ConfigurationError::ALL_ATTRIBUTES_ERROR_MSG) }
+      it { expect{subject}.to raise_error(RealCerealBusiness::Errors::ConfigurationError,RealCerealBusiness::Errors::ConfigurationError::ALL_ATTRIBUTES_ERROR_MSG) }
     end
   end
 
@@ -225,27 +225,27 @@ describe RealCerealBusiness::Serializer::Base do
 
     describe ".from_hash" do
       before do
-        allow_any_instance_of(::RealCerealBusiness::Serializer::Facade).to receive(:from_hash) { |attributes| attributes }
+        allow_any_instance_of(RealCerealBusiness::Serializer::Facade).to receive(:from_hash) { |attributes| attributes }
       end
       subject { instance.from_hash(resource, { foo: :bar }) }
       it { expect(subject).to eq({ foo: :bar }) }
-      it { expect(::RealCerealBusiness::Serializer::Facade).to receive(:new).once }
+      it { expect(RealCerealBusiness::Serializer::Facade).to receive(:new).once }
     end
 
     describe ".as_json" do
       before do
-        allow_any_instance_of(::RealCerealBusiness::Serializer::Facade).to receive(:as_json) { { foo: :bar } }
+        allow_any_instance_of(RealCerealBusiness::Serializer::Facade).to receive(:as_json) { { foo: :bar } }
       end
       subject { instance.as_json(resouces, options) }
       let(:options) { {a: :b} }
       let(:resouces) { resource }
       it { expect(subject).to eq({ foo: :bar }) }
-      it { expect(::RealCerealBusiness::Serializer::Facade).to receive(:new).once }
+      it { expect(RealCerealBusiness::Serializer::Facade).to receive(:new).once }
 
       context 'collection' do
         let(:resouces) { [resource, resource] }
         it { expect(subject).to eq([{ foo: :bar }, { foo: :bar }]) }
-        it { expect(::RealCerealBusiness::Serializer::Facade).to receive(:new).twice }
+        it { expect(RealCerealBusiness::Serializer::Facade).to receive(:new).twice }
       end
     end
 

@@ -114,7 +114,7 @@ describe RealCerealBusiness::Config do
     context "uncompiled" do
       let(:field_set) { :a }
       let(:prehook) { }
-      it { expect{subject}.to raise_error(::RealCerealBusiness::Errors::ConfigurationError, ::RealCerealBusiness::Errors::ConfigurationError::COMPILED_ERROR_MSG)}
+      it { expect{subject}.to raise_error(RealCerealBusiness::Errors::ConfigurationError, RealCerealBusiness::Errors::ConfigurationError::COMPILED_ERROR_MSG)}
     end
 
     context "dirty compiled" do
@@ -123,7 +123,7 @@ describe RealCerealBusiness::Config do
         instance.compile!(serializer)
         instance.alias_field_set(:bar, :bar )
       }
-      it { expect{subject}.to raise_error(::RealCerealBusiness::Errors::ConfigurationError, ::RealCerealBusiness::Errors::ConfigurationError::COMPILED_ERROR_MSG)}
+      it { expect{subject}.to raise_error(RealCerealBusiness::Errors::ConfigurationError, RealCerealBusiness::Errors::ConfigurationError::COMPILED_ERROR_MSG)}
     end
 
     context "symbol" do

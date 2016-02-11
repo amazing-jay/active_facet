@@ -2,19 +2,19 @@ require 'spec_helper'
 
 describe RealCerealBusiness::Serializer::Facade do
 
-  include Support::RealCerealBusiness::TestHarnessHelper
+  include TestHarness
 
   # before do
-  #   allow(::RealCerealBusiness::ResourceManager.new).to receive(:resource_map) { |resource_class|
+  #   allow(RealCerealBusiness::ResourceManager.new).to receive(:resource_map) { |resource_class|
 
   #   }
   # end
 
   # around(:each) do |example|
-  #   mapper = ::RealCerealBusiness::ResourceManager.resource_mapper
-  #   ::RealCerealBusiness::ResourceManager.resource_mapper::RealCerealBusiness::ResourceManager.method(:default_resource_mapper)
+  #   mapper = RealCerealBusiness::ResourceManager.resource_mapper
+  #   RealCerealBusiness::ResourceManager.resource_mapperRealCerealBusiness::ResourceManager.method(:default_resource_mapper)
   #   example.run
-  #   ::RealCerealBusiness::ResourceManager.resource_mapper = mapper
+  #   RealCerealBusiness::ResourceManager.resource_mapper = mapper
   # end
 
   let(:resource_serializer_class) { build_resource_serializer_class }
@@ -25,15 +25,15 @@ describe RealCerealBusiness::Serializer::Facade do
   let(:resource) { test_resource_class.new(explicit_attr: 'hello', implicit_attr: 'mcfly') }
   let(:instance) { described_class.new(serializer, resource, options) }
   #TODO remove group_includes after moving to gem
-  let(:options) { { ::RealCerealBusiness.opts_key => opts, group_includes: fields } }
+  let(:options) { { RealCerealBusiness.opts_key => opts, group_includes: fields } }
   let(:opts) {
     {
-      ::RealCerealBusiness.fields_key => fields,
-      ::RealCerealBusiness.field_overrides_key => field_overrides,
-      ::RealCerealBusiness.version_key => version,
-      ::RealCerealBusiness.filters_key => filters
+      RealCerealBusiness.fields_key => fields,
+      RealCerealBusiness.field_overrides_key => field_overrides,
+      RealCerealBusiness.version_key => version,
+      RealCerealBusiness.filters_key => filters
     }
-}
+  }
   let(:fields) { :fields }
   let(:field_overrides) { :field_overrides }
   let(:version) { :version }
@@ -66,7 +66,7 @@ describe RealCerealBusiness::Serializer::Facade do
   end
 
   describe ".as_json" do
-        # ::RealCerealBusiness.document_cache.fetch(self) { serialize! }
+        # RealCerealBusiness.document_cache.fetch(self) { serialize! }
   end
   describe ".from_hash(attributes)" do
         # hydrate! deep_copy(attributes)
@@ -173,7 +173,7 @@ describe RealCerealBusiness::Serializer::Facade do
         #     ::PerformanceMonitor.measure("attribute retrieval wrapper", self.class.name, scope, (resource.is_a?(Array) ? resource : resource.id)) do
         #       begin
         #         json[scope] = get_resource_attribute scope, nested_scopes if allowed_field?(scope)
-        #       rescue ::RealCerealBusiness::Errors::AttributeError => e
+        #       rescue RealCerealBusiness::Errors::AttributeError => e
         #         # Deliberately do nothing. Ignore scopes that do not map to resource methods (or aliases)
         #       end
         #     end
@@ -218,7 +218,7 @@ describe RealCerealBusiness::Serializer::Facade do
     subject { instance.send(:get_resource_attribute!, field) }
     let(:field) { :field }
     context "missing" do
-      it { expect{subject}.to raise_error(::RealCerealBusiness::Errors::AttributeError) }
+      it { expect{subject}.to raise_error(RealCerealBusiness::Errors::AttributeError) }
     end
 
     context "private" do

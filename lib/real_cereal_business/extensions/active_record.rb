@@ -1,3 +1,6 @@
+require 'active_support/all'
+require 'active_record'
+
 #NOTE:: strive for minimal method footprint over strict OO because this mixes into Rails Core
 module RealCerealBusiness
   module Extensions
@@ -8,7 +11,7 @@ module RealCerealBusiness
       self.filters = {}
 
       included do
-        ::RealCerealBusiness::Extensions::ActiveRecord.filters.each do |filter_name, filter_method|
+        RealCerealBusiness::Extensions::ActiveRecord.filters.each do |filter_name, filter_method|
           scope_filter filter_name, &filter_method
         end
       end
@@ -17,15 +20,15 @@ module RealCerealBusiness
       # @param attributes [Hash]
       # @return [ActiveRecord]
       def hydrate!(attributes)
-        ::RealCerealBusiness::ResourceManager.new.serializer_for(self.class).from_hash(self, attributes)
+        RealCerealBusiness::ResourceManager.new.serializer_for(self.class).from_hash(self, attributes)
       end
 
       # Overrides default serializer behavior when :group_includes option is present
       # @param options [Hash]
       # @return [JSON]
       def as_json(options = nil)
-        if options.present? && options.key?(::RealCerealBusiness.json_attribute_key) &&
-            (serializer = ::RealCerealBusiness::ResourceManager.new.serializer_for(self.class)).present?
+        if options.present? && options.key?(RealCerealBusiness.json_attribute_key) &&
+            (serializer = RealCerealBusiness::ResourceManager.new.serializer_for(self.class)).present?
           serializer.association_cache.perform([self]) do
             serializer.as_json(self, options)
           end
@@ -41,7 +44,7 @@ module RealCerealBusiness
         def scope_filters(filter_values = nil)
           filter_values = (filter_values || {}).with_indifferent_access
           registered_scope_filters.inject(scoped) do |result, (k,v)|
-            filter = ::RealCerealBusiness::ResourceManager.new.resource_map(self).detect { |map_entry|
+            filter = RealCerealBusiness::ResourceManager.new.resource_map(self).detect { |map_entry|
               filter_values.keys.include? "#{k}_#{map_entry}"
             }
             args = filter_values["#{k}_#{filter}"] || filter_values[k]
@@ -76,7 +79,7 @@ module RealCerealBusiness
         # @param groups [Object]
         # @return [ProxyCollection]
         def group_includes(groups = :basic)
-          includes ::RealCerealBusiness::ResourceManager.new.serializer_for(self).scoped_includes(groups)
+          includes RealCerealBusiness::ResourceManager.new.serializer_for(self).scoped_includes(groups)
         end
 
         private

@@ -11,7 +11,7 @@ module RealCerealBusiness
       return yield unless cacheable?(serializer)
 
       cache_key = digest_key(serializer)
-      force = options[:force] || serializer.opts[::RealCerealBusiness.cache_force_key]
+      force = options[:force] || serializer.opts[RealCerealBusiness.cache_force_key]
 
       # didn't use Rails.cache.fetch(cache_key, because it be slower with interprelation
       #TODO --jdc fetch larger documents and pluck field_overrides
@@ -19,7 +19,7 @@ module RealCerealBusiness
         JSON.parse Rails.cache.fetch(cache_key)
       else
         result = yield
-        Rails.cache.write(cache_key, result.to_json, ::RealCerealBusiness::default_cache_options.merge(options))
+        Rails.cache.write(cache_key, result.to_json, RealCerealBusiness::default_cache_options.merge(options))
         result
       end
     end
@@ -37,7 +37,7 @@ module RealCerealBusiness
     # @param serializer [Facade] to inspect
     # @return [Boolean]
     def self.cacheable?(serializer)
-      ::RealCerealBusiness.cache_enabled
+      RealCerealBusiness.cache_enabled
     end
   end
 end

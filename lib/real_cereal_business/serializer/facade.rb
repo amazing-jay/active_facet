@@ -16,19 +16,19 @@ module RealCerealBusiness
         self.serializer       = serializer
         self.resource         = resource
         self.options          = options
-        self.opts             = options[::RealCerealBusiness.opts_key] || {}
+        self.opts             = options[RealCerealBusiness.opts_key] || {}
 
         #TODO --jdc depricate and enable
         # search project for group_includes and replace
-        #self.fields          = opts[::RealCerealBusiness.fields_key]
+        #self.fields          = opts[RealCerealBusiness.fields_key]
         self.fields           = options[:group_includes]
-        self.field_overrides  = opts[::RealCerealBusiness.field_overrides_key] || {}
-        self.overrides        = ::RealCerealBusiness::ResourceManager.new.resource_map(resource_class).inject({}) { |overrides, map_entry|
+        self.field_overrides  = opts[RealCerealBusiness.field_overrides_key] || {}
+        self.overrides        = RealCerealBusiness::ResourceManager.new.resource_map(resource_class).inject({}) { |overrides, map_entry|
           overrides.merge(field_overrides[map_entry] || {})
         }
 
-        self.version          = opts[::RealCerealBusiness.version_key]
-        self.filters          = opts[::RealCerealBusiness.filters_key]
+        self.version          = opts[RealCerealBusiness.version_key]
+        self.filters          = opts[RealCerealBusiness.filters_key]
       end
 
       # This method returns a JSON of hash values representing the resource
@@ -36,7 +36,7 @@ module RealCerealBusiness
       # @param opts [Hash] collection of values required that are not available in lexical scope
       # @return [JSON] representing the values returned by {resource.serialize} method
       def as_json
-        ::RealCerealBusiness.document_cache.fetch(self) { serialize! }
+        RealCerealBusiness.document_cache.fetch(self) { serialize! }
       end
 
       # @return [String] a cache key that can be used to identify this resource
@@ -104,7 +104,7 @@ module RealCerealBusiness
             ::PerformanceMonitor.measure("attribute retrieval wrapper", self.class.name, scope, (resource.is_a?(Array) ? resource : resource.id)) do
               begin
                 json[scope] = get_resource_attribute scope, nested_scopes if allowed_field?(scope)
-              rescue ::RealCerealBusiness::Errors::AttributeError => e
+              rescue RealCerealBusiness::Errors::AttributeError => e
                 # Deliberately do nothing. Ignore scopes that do not map to resource methods (or aliases)
               end
             end
@@ -153,7 +153,7 @@ module RealCerealBusiness
       # @param attribute [Symbol] identifies
       # @return [Object]
       def get_resource_attribute!(attribute)
-        raise ::RealCerealBusiness::Errors::AttributeError.new("#{resource.class.name}.#{attribute} missing") unless ::PerformanceMonitor.measure(:attribute_reflection, self.class.name, attribute, (resource.is_a?(Array) ? resource : resource.id)) do
+        raise RealCerealBusiness::Errors::AttributeError.new("#{resource.class.name}.#{attribute} missing") unless ::PerformanceMonitor.measure(:attribute_reflection, self.class.name, attribute, (resource.is_a?(Array) ? resource : resource.id)) do
           resource.respond_to?(attribute,true)
         end
         ::PerformanceMonitor.measure(resource.is_a?(ActiveRecord::Base) && resource.class.attribute_names.include?(attribute.to_s) ? "native attribute" : "virtual attribute", self.class.name, attribute, (resource.is_a?(Array) ? resource : resource.id)) do
