@@ -1,4 +1,17 @@
-require "real_cereal_business/version"
+require 'real_cereal_business/attribute_serializer/base'
+require 'real_cereal_business/errors/attribute_error'
+require 'real_cereal_business/errors/configuration_error'
+require 'real_cereal_business/extensions/active_record'
+require 'real_cereal_business/extensions/active_relation'
+require 'real_cereal_business/serializer/base'
+require 'real_cereal_business/serializer/facade'
+require 'real_cereal_business/association_cache'
+require 'real_cereal_business/attribute_manager'
+require 'real_cereal_business/config'
+require 'real_cereal_business/document_cache'
+require 'real_cereal_business/filter'
+require 'real_cereal_business/resource_manager'
+require 'real_cereal_business/version'
 
 module RealCerealBusiness
   mattr_accessor :json_attribute_key,
