@@ -1,86 +1,15 @@
-#TODO --jdc remove this hack after decoupling serializers from filesystem
-module TestHarness
+require 'test_harness/test_mixin'
+require 'test_harness/test_resource_a'
+require 'test_harness/test_resource_b'
 
-  class TestTableless < ActiveRecord::Base
-    def self.columns() @columns ||= []; end
-
-    def self.column(name, sql_type = nil, default = nil, null = true)
-      columns << ActiveRecord::ConnectionAdapters::Column.new(name.to_s, default, sql_type.to_s, null)
-    end
-
-    # Override the save method to prevent exceptions.
-    def save(validate = true)
-      validate ? valid? : true
-    end
-  end
-
-  #declaration first
-  class TestResource < TestTableless
-  end
-
-  class TestAssocation < TestTableless
-  end
-
-  module TestObj
-    extend ActiveSupport::Concern
-
-    included do
-      attr_accessor :explicit_attr,
-        :implicit_attr,
-        :custom_attr,
-        :nested_accessor,
-        :dynamic_accessor,
-        :private_accessor,
-        :aliased_accessor,
-        :from_accessor,
-        :to_accessor,
-        :compound_accessor,
-        :nested_compound_accessor,
-        :unexposed_attr
-
-      belongs_to :parent, class_name: TestResource.name
-      has_one :child, class_name: TestResource.name
-      belongs_to :owner, class_name: TestAssocation.name
-      has_many :delegates, class_name: TestAssocation.name
-      has_many :others, class_name: TestAssocation.name
-      has_many :extras, class_name: TestAssocation.name
-    end
-
-    def method_missing(method_sym, *arguments, &block)
-      if method_sym == :dynamic_attr
-        return dynamic_accessor
-      elsif method_sym == :dynamic_attr=
-        self.dynamic_accessor = arguments[0]
-      end
-    end
-
-    private
-
-    def private_attr
-      private_accessor
-    end
-
-    def private_attr=(value)
-      self.private_accessor = value
-    end
-  end
-
-  #reopen class to avoid declaration sequence loop
-  class TestResource
-    include TestObj
-  end
-
-  class TestAssocation < TestTableless
-    include TestObj
-  end
-
+module TestHarnessHelper
 
   def test_resource_class
-    TestHarness::TestResource
+    TestHarness::TestResourceA
   end
 
   def test_association_class
-    TestHarness::TestAssocation
+    TestHarness::TestResourceB
   end
 
   def build_resource_serializer_class
@@ -89,11 +18,11 @@ module TestHarness
 
       #TODO --jdc remove this hack after decoupling serializers from filesystem
       def self.name
-        'TestHarness::TestResourceSerializer'
+        'TestHarness::TestResourceBSerializer'
       end
 
       def resource_class
-        TestHarness::TestResource
+        TestHarness::TestResourceA
       end
     }
   end
@@ -104,11 +33,11 @@ module TestHarness
 
       #TODO --jdc remove this hack after decoupling serializers from filesystem
       def self.name
-        'TestHarness::TestAssocationSerializer'
+        'TestHarness::TestResourceBSerializer'
       end
 
       def resource_class
-        TestHarness::TestAssocation
+        TestHarness::TestResourceB
       end
     }
   end

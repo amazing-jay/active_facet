@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe RealCerealBusiness::Serializer::Base do
 
-  include TestHarness
+  include TestHarnessHelper
 
   let(:resource_serializer_class) { build_resource_serializer_class }
   let(:association_serializer_class) { build_association_serializer_class }

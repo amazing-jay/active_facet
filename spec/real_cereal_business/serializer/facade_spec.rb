@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe RealCerealBusiness::Serializer::Facade do
 
-  include TestHarness
+  include TestHarnessHelper
 
   # before do
   #   allow(RealCerealBusiness::ResourceManager.new).to receive(:resource_map) { |resource_class|

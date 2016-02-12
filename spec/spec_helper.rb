@@ -1,3 +1,4 @@
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 require 'real_cereal_business'
-require 'test_harness'
+require 'test_harness/spec_helper'
+require 'pry'
