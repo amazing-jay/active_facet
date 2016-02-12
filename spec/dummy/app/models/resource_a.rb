@@ -1,3 +1,3 @@
 class ResourceA < ActiveRecord::Base
-  include ModelMixin
+  include ::ModelMixin
 end

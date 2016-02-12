@@ -15,13 +15,13 @@ module ModelMixin
       :nested_compound_accessor,
       :unexposed_attr
 
-    belongs_to :parent, class_name: 'TestResourceA'
-    has_one :child, class_name: 'TestResourceA'
+    belongs_to :parent, class_name: '::ResourceA'
+    has_one :child, class_name: '::ResourceA'
 
-    belongs_to :owner, class_name: 'TestResourceB'
-    has_many :delegates, class_name: 'TestResourceB'
-    has_many :others, class_name: 'TestResourceB'
-    has_many :extras, class_name: 'TestResourceB'
+    belongs_to :owner, class_name: '::ResourceB'
+    has_many :delegates, class_name: '::ResourceB'
+    has_many :others, class_name: '::ResourceB'
+    has_many :extras, class_name: '::ResourceB'
   end
 
   def method_missing(method_sym, *arguments, &block)

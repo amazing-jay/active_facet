@@ -1,15 +1,11 @@
-require 'test_harness/test_mixin'
-require 'test_harness/test_resource_a'
-require 'test_harness/test_resource_b'
-
 module TestHarnessHelper
 
   def test_resource_class
-    TestHarness::TestResourceA
+    ::ResourceA
   end
 
   def test_association_class
-    TestHarness::TestResourceB
+    ::ResourceB
   end
 
   def build_resource_serializer_class
@@ -18,11 +14,11 @@ module TestHarnessHelper
 
       #TODO --jdc remove this hack after decoupling serializers from filesystem
       def self.name
-        'TestHarness::TestResourceBSerializer'
+        '::ResourceBSerializer'
       end
 
       def resource_class
-        TestHarness::TestResourceA
+        ::ResourceA
       end
     }
   end
@@ -33,11 +29,11 @@ module TestHarnessHelper
 
       #TODO --jdc remove this hack after decoupling serializers from filesystem
       def self.name
-        'TestHarness::TestResourceBSerializer'
+        '::ResourceBSerializer'
       end
 
       def resource_class
-        TestHarness::TestResourceB
+        ::ResourceB
       end
     }
   end
