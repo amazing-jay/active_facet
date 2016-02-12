@@ -102,7 +102,7 @@ describe RealCerealBusiness::Serializer::Facade do
     end
     context "ommitted" do
       let(:field_overrides) { { test_resource_class.name.tableize => {implicit_attr: true} } }
-      it { expect(subject).to be false }
+      it { expect(subject).to be nil }
     end
   end
 
@@ -303,7 +303,7 @@ describe RealCerealBusiness::Serializer::Facade do
     it { expect(subject.compound_accessor).to eq('hydrated_compound_attr') }
     it { expect(subject.nested_compound_accessor['compound_accessor']).to eq('hydrated_nested_compound_attr') }
     it { expect(subject.implicit_attr).to eq(:implicit_attr) }
-    it { expect(subject.unexposed_attr).to be_nil }
+    it { expect(subject.unexposed_attr).to be nil }
     it { expect(subject.extras).to be_empty }
     it { expect(subject.others).to be_empty }
   end

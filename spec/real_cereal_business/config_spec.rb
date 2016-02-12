@@ -34,8 +34,8 @@ describe RealCerealBusiness::Config do
 
   describe ".initialize" do
     it { expect(subject.compiled).to              be false }
-    it { expect(subject.serializer).to            be_nil }
-    it { expect(subject.normalized_field_sets).to be_nil }
+    it { expect(subject.serializer).to            be nil }
+    it { expect(subject.normalized_field_sets).to be nil }
     it { expect(subject.transforms_from).to       eq({}) }
     it { expect(subject.transforms_to).to         eq({}) }
     it { expect(subject.serializers).to           eq({}) }

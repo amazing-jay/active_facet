@@ -272,7 +272,7 @@ describe RealCerealBusiness::Serializer::Base do
 
       context "field" do
         let(:field) { :explicit_attr }
-        it { expect(subject).to be_nil }
+        it { expect(subject).to be nil }
       end
     end
 
@@ -290,7 +290,7 @@ describe RealCerealBusiness::Serializer::Base do
 
       context "attribute" do
         let(:field) { :explicit_attr }
-        it { expect(subject).to be_nil }
+        it { expect(subject).to be nil }
       end
     end
 
@@ -303,7 +303,7 @@ describe RealCerealBusiness::Serializer::Base do
 
       context "unregistered" do
         let(:field) { :unregistered }
-        it { expect(subject).to be_nil }
+        it { expect(subject).to be nil }
       end
     end
 
