@@ -2,19 +2,6 @@ module ModelMixin
   extend ActiveSupport::Concern
 
   included do
-    attr_accessor :explicit_attr,
-      :implicit_attr,
-      :custom_attr,
-      :nested_accessor,
-      :dynamic_accessor,
-      :private_accessor,
-      :aliased_accessor,
-      :from_accessor,
-      :to_accessor,
-      :compound_accessor,
-      :nested_compound_accessor,
-      :unexposed_attr
-
     belongs_to :parent, class_name: '::ResourceA'
     has_one :child, class_name: '::ResourceA'
 

@@ -12,7 +12,6 @@ module TestHarnessHelper
     Class.new {
       include RealCerealBusiness::Serializer::Base
 
-      #TODO --jdc remove this hack after decoupling serializers from filesystem
       def self.name
         'ResourceBSerializer'
       end
@@ -27,7 +26,6 @@ module TestHarnessHelper
     Class.new {
       include RealCerealBusiness::Serializer::Base
 
-      #TODO --jdc remove this hack after decoupling serializers from filesystem
       def self.name
         'ResourceBSerializer'
       end
