@@ -2,6 +2,7 @@
 ENV["RAILS_ENV"] ||= 'test'
 require File.expand_path("../dummy/config/environment", __FILE__)
 require 'real_cereal_business'
+require 'rapido'
 require 'pry'
 
 # Requires supporting ruby files with custom matchers and macros, etc, in
@@ -12,6 +13,10 @@ require 'pry'
 # end with _spec.rb. You can configure this pattern with with the --pattern
 # option on the command line or in ~/.rspec, .rspec or `.rspec-local`.
 Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
+
+RSpec.enable_rapido
+
+#Rails.backtrace_cleaner.remove_silencers!
 
 #RSpec.configure do |config|
   # ## Mock Framework
