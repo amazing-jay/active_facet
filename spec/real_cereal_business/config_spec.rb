@@ -33,7 +33,7 @@ describe RealCerealBusiness::Config do
   end
 
   describe ".initialize" do
-    it { expect(subject.compiled).to              be_false }
+    it { expect(subject.compiled).to              be false }
     it { expect(subject.serializer).to            be_nil }
     it { expect(subject.normalized_field_sets).to be_nil }
     it { expect(subject.transforms_from).to       eq({}) }
@@ -68,7 +68,7 @@ describe RealCerealBusiness::Config do
       instance.alias_field_set :test, [:a, {b: :c}, {d: :e}]
     end
 
-    it { expect(subject.compiled).to be_true }
+    it { expect(subject.compiled).to be true }
     it { expect(subject.serializer).to eq(serializer) }
     it { expect(subject.normalized_field_sets).to eq({"all"=>{"fields"=>{"a"=>{}, "b"=>{"c"=>{}}, "d"=>{"e"=>{}}}, "attributes"=>{"d"=>{"e"=>{}}}}, "test"=>{"fields"=>{"a"=>{}, "b"=>{"c"=>{}}, "d"=>{"e"=>{}}}, "attributes"=>{"d"=>{"e"=>{}}}}}) }
 

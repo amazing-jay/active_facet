@@ -90,19 +90,19 @@ describe RealCerealBusiness::Serializer::Facade do
   describe ".allowed_field?" do
     subject { instance.send(:allowed_field?, :explicit_attr) }
     context "implicit" do
-      it { expect(subject).to be_true }
+      it { expect(subject).to be true }
     end
     context "explicit" do
       let(:field_overrides) { { test_resource_class.name.tableize => {explicit_attr: true, implicit_attr: true} } }
-      it { expect(subject).to be_true }
+      it { expect(subject).to be true }
     end
     context "denied" do
       let(:field_overrides) { { test_resource_class.name.tableize => {explicit_attr: false, implicit_attr: true} } }
-      it { expect(subject).to be_false }
+      it { expect(subject).to be false }
     end
     context "ommitted" do
       let(:field_overrides) { { test_resource_class.name.tableize => {implicit_attr: true} } }
-      it { expect(subject).to be_false }
+      it { expect(subject).to be false }
     end
   end
 
@@ -114,20 +114,20 @@ describe RealCerealBusiness::Serializer::Facade do
       allow(resource).to receive(:persisted?) { persisted }
     end
     context "persisted relation" do
-      it { expect(subject).to be_true }
+      it { expect(subject).to be true }
     end
     context "persisted attribute" do
       let(:exp) { :explicit_attr }
-      it { expect(subject).to be_false }
+      it { expect(subject).to be false }
     end
     context "unpersisted attribute" do
       let(:exp) { :explicit_attr }
       let(:persisted) { false }
-      it { expect(subject).to be_false }
+      it { expect(subject).to be false }
     end
     context "unpersisted relation" do
       let(:persisted) { false }
-      it { expect(subject).to be_false }
+      it { expect(subject).to be false }
     end
   end
 
@@ -135,21 +135,21 @@ describe RealCerealBusiness::Serializer::Facade do
     let(:exp) { ActiveRecord::Relation.new(nil,nil) }
     subject { instance.send(:is_active_relation?, exp) }
     context "active relation" do
-      it { expect(subject).to be_true }
+      it { expect(subject).to be true }
     end
     context "array" do
       let(:exp) { [] }
-      it { expect(subject).to be_false }
+      it { expect(subject).to be false }
       context "proxy" do
         before do
           class << exp; def scoped; true; end; end
         end
-        it { expect(subject).to be_true }
+        it { expect(subject).to be true }
       end
     end
     context "else" do
       let(:exp) { :explicit_attr }
-      it { expect(subject).to be_false }
+      it { expect(subject).to be false }
     end
   end
 

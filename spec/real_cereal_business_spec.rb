@@ -6,6 +6,6 @@ describe RealCerealBusiness do
     expect(RealCerealBusiness::VERSION).not_to be nil
   end
 
-  pending 'class to be implemented'
+  skip 'class to be implemented'
 
 end

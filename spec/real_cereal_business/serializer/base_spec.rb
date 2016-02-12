@@ -13,11 +13,11 @@ describe RealCerealBusiness::Serializer::Base do
 
   describe "#new" do
     context "instanciation should compile shared config" do
-      it { expect(resource_serializer_class.config.compiled).to be_false }
+      it { expect(resource_serializer_class.config.compiled).to be false }
       context 'instance' do
         subject { instance }
         it { expect{subject}.to_not raise_error }
-        it { expect(resource_serializer_class.config.compiled).to be_true}
+        it { expect(resource_serializer_class.config.compiled).to be true}
         it { expect(resource_serializer_class.config).to eq(subject.config)}
       end
     end
@@ -115,7 +115,7 @@ describe RealCerealBusiness::Serializer::Base do
     end
 
     context("relations") do
-      pending "should raise error if envoked on a relation"
+      skip "should raise error if envoked on a relation"
     end
   end
 
@@ -127,7 +127,7 @@ describe RealCerealBusiness::Serializer::Base do
       subject
     end
 
-    it { expect(config.extensions[attribute]).to be_true }
+    it { expect(config.extensions[attribute]).to be true }
     it { expect(config.serializers[attribute]).to eq(attribute.to_sym) }
   end
 
@@ -311,17 +311,17 @@ describe RealCerealBusiness::Serializer::Base do
       subject { instance.is_association?(field) }
       context "registered" do
         let(:field) { :parent }
-        it { expect(subject).to be_true }
+        it { expect(subject).to be true }
       end
 
       context "unregistered" do
         let(:field) { :extras }
-        it { expect(subject).to be_true }
+        it { expect(subject).to be true }
       end
 
       context "attribute" do
         let(:field) { :explicit_attr }
-        it { expect(subject).to be_false }
+        it { expect(subject).to be false }
       end
     end
 

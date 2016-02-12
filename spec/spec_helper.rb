@@ -16,9 +16,10 @@ Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
 
 RSpec.enable_rapido
 
-#Rails.backtrace_cleaner.remove_silencers!
+Rails.backtrace_cleaner.remove_silencers!
 
-#RSpec.configure do |config|
+RSpec.configure do |config|
+
   # ## Mock Framework
   #
   # If you prefer to use mocha, flexmock or RR, uncomment the appropriate line:
@@ -26,6 +27,10 @@ RSpec.enable_rapido
   # config.mock_with :mocha
   # config.mock_with :flexmock
   # config.mock_with :rr
+
+  config.mock_with :rspec do |mocks|
+    mocks.yield_receiver_to_any_instance_implementation_blocks = false
+  end
 
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
   # config.fixture_path = "#{::Rails.root}/spec/fixtures"
@@ -60,4 +65,4 @@ RSpec.enable_rapido
   # The different available types are documented in the features, such as in
   # https://relishapp.com/rspec/rspec-rails/v/3-0/docs
   # config.infer_spec_type_from_file_location!
-#end
+end
