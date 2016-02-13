@@ -29,9 +29,7 @@ module RealCerealBusiness
       def as_json(options = nil)
         if options.present? && options.key?(RealCerealBusiness.json_attribute_key) &&
             (serializer = RealCerealBusiness::ResourceManager.new.serializer_for(self.class)).present?
-          serializer.association_cache.perform([self]) do
-            serializer.as_json(self, options)
-          end
+          serializer.as_json(self, options)
         else
           super(options)
         end

@@ -33,6 +33,10 @@ Gem::Specification.new do |s|
   s.add_development_dependency "rspec-rails"
   s.add_development_dependency "test-unit"
   #s.add_development_dependency "rspec-json_expectations"
+  s.add_development_dependency "factory_girl_rails"
+  s.add_development_dependency "database_cleaner"
+  s.add_development_dependency "ffaker"
+
   #Nicer rspec formatting
   s.add_development_dependency "fivemat"
   s.add_development_dependency "fuubar"

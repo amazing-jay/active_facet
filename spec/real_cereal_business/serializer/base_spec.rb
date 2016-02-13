@@ -184,9 +184,10 @@ describe RealCerealBusiness::Serializer::Base do
     end
 
     describe ".scoped_includes" do
+      #TODO --jdc fix so that relations get dealiased (others should be in this set)
       subject { instance.scoped_includes(field_set) }
-      let(:field_set) { [{delegates: :one, alias_relation: :one}, :deep_relations, :extras] }
-      it { expect(subject).to eq([:delegates, :child, :owner, :extras, {:parent=>:child}]) }
+      let(:field_set) { [{children: :one, alias_relation: :one}, :deep_relations, :extras] }
+      it { expect(subject).to eq([:children, :master, :extras, {:parent=>:children}]) }
     end
 
     describe ".exposed_aliases" do
@@ -202,13 +203,13 @@ describe RealCerealBusiness::Serializer::Base do
       context "all fields" do
         #TODO --jdc fix so that relations get dealiased (alias_relation should not be in this set)
         let(:include_relations) { true }
-        it { expect(subject).to eq([:alias_attr, :alias_relation, :child, :compound_attr, :custom_attr, :delegates, :dynamic_attr, :explicit_attr, :from_attr, :implicit_attr, :nested_attr, :nested_compound_attr, :others, :owner, :parent, :private_attr, :to_attr]) }
+        it { expect(subject).to eq([:alias_attr, :alias_relation, :children, :compound_attr, :custom_attr, :dynamic_attr, :explicit_attr, :extras, :from_attr, :implicit_attr, :leader, :master, :nested_attr, :nested_compound_attr, :others, :parent, :private_attr, :to_attr]) }
       end
 
       context "all nested" do
         let(:include_relations) { true }
         let(:include_nested_field_sets) { true }
-        it { expect(subject).to eq({"explicit_attr"=>{}, "implicit_attr"=>{}, "dynamic_attr"=>{}, "private_attr"=>{}, "alias_attr"=>{}, "to_attr"=>{}, "from_attr"=>{}, "nested_attr"=>{}, "nested_compound_attr"=>{}, "custom_attr"=>{}, "compound_attr"=>{}, "parent"=>{"child"=>{"attr"=>{}}}, "child"=>{"attrs"=>{}}, "owner"=>{}, "delegates"=>{"minimal"=>{}}, "others"=>{}, "alias_relation"=>{"implicit_attr"=>{}}}) }
+        it { expect(subject).to eq({"explicit_attr"=>{}, "implicit_attr"=>{}, "dynamic_attr"=>{}, "private_attr"=>{}, "alias_attr"=>{}, "to_attr"=>{}, "from_attr"=>{}, "nested_attr"=>{}, "nested_compound_attr"=>{}, "custom_attr"=>{}, "compound_attr"=>{}, "parent"=>{"children"=>{"attr"=>{}}}, "master"=>{}, "leader"=>{}, "children"=>{"nested"=>{}}, "others"=>{}, "extras"=>{"minimal"=>{}}, "alias_relation"=>{"implicit_attr"=>{}}}) }
       end
 
       context "named attributes" do
@@ -284,7 +285,7 @@ describe RealCerealBusiness::Serializer::Base do
       end
 
       context "association" do
-        let(:field) { :owner }
+        let(:field) { :master }
         it { expect(subject).to be(association_serializer_class.new) }
       end
 

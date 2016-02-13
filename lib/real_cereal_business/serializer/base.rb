@@ -3,10 +3,6 @@ module RealCerealBusiness
     module Base
       extend ActiveSupport::Concern
 
-      included do
-        attr_reader :association_cache
-      end
-
       module ClassMethods
 
         # ###
@@ -218,7 +214,6 @@ module RealCerealBusiness
       def initialize
         ::PerformanceMonitor.measure("--ignore, memoized in production:: initialize_field_sets") do
           config.compile! self
-          @association_cache = RealCerealBusiness::AssociationCache.new(self)
         end
       rescue SystemStackError => e
         raise RealCerealBusiness::Errors::ConfigurationError.new(RealCerealBusiness::Errors::ConfigurationError::STACK_ERROR_MSG)

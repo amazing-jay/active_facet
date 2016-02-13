@@ -8,7 +8,6 @@
 # - performance
 # -- remove indifferent access in config
 # - update this document and move it into the main readme
-# - kill or upgrade association_cache
 
 # ?- implement psuedo containers for non AR resources
 # ?-- make the facade the primary kickoff point

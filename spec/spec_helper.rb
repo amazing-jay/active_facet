@@ -2,6 +2,8 @@
 ENV["RAILS_ENV"] ||= 'test'
 require File.expand_path("../dummy/config/environment", __FILE__)
 require 'real_cereal_business'
+require 'database_cleaner'
+require 'factory_girl'
 require 'rapido'
 require 'pry'
 
@@ -17,6 +19,9 @@ Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
 RSpec.enable_rapido
 
 Rails.backtrace_cleaner.remove_silencers!
+
+FactoryGirl.definition_file_paths = [File.join(Rails.root, 'spec', 'dummy', 'factories')]
+FactoryGirl.find_definitions
 
 RSpec.configure do |config|
 
@@ -39,6 +44,19 @@ RSpec.configure do |config|
   # examples within a transaction, remove the following line or assign false
   # instead of true.
   # config.use_transactional_fixtures = true
+
+  config.include FactoryGirl::Syntax::Methods
+
+  config.before(:suite) do
+    DatabaseCleaner.strategy = :transaction
+    DatabaseCleaner.clean_with(:truncation)
+  end
+
+  config.around(:each) do |example|
+    DatabaseCleaner.cleaning do
+      example.run
+    end
+  end
 
   # If true, the base class of anonymous controllers will be inferred
   # automatically. This will be the default behavior in future versions of

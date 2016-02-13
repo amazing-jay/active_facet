@@ -16,6 +16,9 @@ ActiveRecord::Schema.define(:version => 20160212213438) do
   create_table "resource_as", :force => true do |t|
     t.datetime "created_at",               :null => false
     t.datetime "updated_at",               :null => false
+    t.integer  "parent_id"
+    t.integer  "master_id"
+    t.integer  "leader_id"
     t.string   "explicit_attr"
     t.string   "implicit_attr"
     t.string   "custom_attr"
@@ -33,6 +36,8 @@ ActiveRecord::Schema.define(:version => 20160212213438) do
   create_table "resource_bs", :force => true do |t|
     t.datetime "created_at",               :null => false
     t.datetime "updated_at",               :null => false
+    t.integer  "other_id"
+    t.integer  "extra_id"
     t.string   "explicit_attr"
     t.string   "implicit_attr"
     t.string   "custom_attr"

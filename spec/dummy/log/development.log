@@ -175,3 +175,71 @@ Migrating to CreateResourceAs (20160212213202)
 Migrating to CreateResourceBs (20160212213438)
   [1m[35m (0.0ms)[0m  select sqlite_version(*)
   [1m[36m (0.1ms)[0m  [1mSELECT "schema_migrations"."version" FROM "schema_migrations" [0m
+Connecting to database specified by database.yml
+  [1m[36m (0.1ms)[0m  [1mSELECT "schema_migrations"."version" FROM "schema_migrations" [0m
+  [1m[35m (0.1ms)[0m  SELECT "schema_migrations"."version" FROM "schema_migrations" 
+Migrating to CreateResourceBs (20160212213438)
+  [1m[36m (0.0ms)[0m  [1mselect sqlite_version(*)[0m
+  [1m[35m (0.0ms)[0m  begin transaction
+  [1m[36m (3.1ms)[0m  [1mDROP TABLE "resource_bs"[0m
+  [1m[35m (2.0ms)[0m  DELETE FROM "schema_migrations" WHERE "schema_migrations"."version" = '20160212213438'
+  [1m[36m (3.2ms)[0m  [1mcommit transaction[0m
+  [1m[35m (0.1ms)[0m  SELECT "schema_migrations"."version" FROM "schema_migrations" 
+Connecting to database specified by database.yml
+  [1m[36m (0.1ms)[0m  [1mSELECT "schema_migrations"."version" FROM "schema_migrations" [0m
+  [1m[35m (0.1ms)[0m  SELECT "schema_migrations"."version" FROM "schema_migrations" 
+Migrating to CreateResourceAs (20160212213202)
+  [1m[36m (0.0ms)[0m  [1mselect sqlite_version(*)[0m
+  [1m[35m (0.1ms)[0m  begin transaction
+  [1m[36m (0.4ms)[0m  [1mDROP TABLE "resource_as"[0m
+  [1m[35m (0.1ms)[0m  DELETE FROM "schema_migrations" WHERE "schema_migrations"."version" = '20160212213202'
+  [1m[36m (3.5ms)[0m  [1mcommit transaction[0m
+  [1m[35m (0.1ms)[0m  SELECT "schema_migrations"."version" FROM "schema_migrations" 
+Connecting to database specified by database.yml
+  [1m[36m (0.1ms)[0m  [1mSELECT "schema_migrations"."version" FROM "schema_migrations" [0m
+Migrating to CreateResourceAs (20160212213202)
+  [1m[35m (0.0ms)[0m  select sqlite_version(*)
+  [1m[36m (0.0ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.4ms)[0m  CREATE TABLE "resource_as" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "created_at" datetime NOT NULL, "updated_at" datetime NOT NULL, "parent_id" integer, "owner_id" integer, "explicit_attr" varchar(255), "implicit_attr" varchar(255), "custom_attr" varchar(255), "nested_accessor" varchar(255), "dynamic_accessor" varchar(255), "private_accessor" varchar(255), "aliased_accessor" varchar(255), "from_accessor" varchar(255), "to_accessor" varchar(255), "compound_accessor" varchar(255), "nested_compound_accessor" varchar(255), "unexposed_attr" varchar(255)) 
+  [1m[36m (0.1ms)[0m  [1mINSERT INTO "schema_migrations" ("version") VALUES ('20160212213202')[0m
+  [1m[35m (2.1ms)[0m  commit transaction
+Migrating to CreateResourceBs (20160212213438)
+  [1m[36m (0.0ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.3ms)[0m  CREATE TABLE "resource_bs" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "created_at" datetime NOT NULL, "updated_at" datetime NOT NULL, "other_id" integer, "extra_id" integer, "slave_id" integer, "explicit_attr" varchar(255), "implicit_attr" varchar(255), "custom_attr" varchar(255), "nested_accessor" varchar(255), "dynamic_accessor" varchar(255), "private_accessor" varchar(255), "aliased_accessor" varchar(255), "from_accessor" varchar(255), "to_accessor" varchar(255), "compound_accessor" varchar(255), "nested_compound_accessor" varchar(255), "unexposed_attr" varchar(255)) 
+  [1m[36m (0.1ms)[0m  [1mINSERT INTO "schema_migrations" ("version") VALUES ('20160212213438')[0m
+  [1m[35m (0.4ms)[0m  commit transaction
+  [1m[36m (0.1ms)[0m  [1mSELECT "schema_migrations"."version" FROM "schema_migrations" [0m
+Connecting to database specified by database.yml
+  [1m[36m (0.1ms)[0m  [1mSELECT "schema_migrations"."version" FROM "schema_migrations" [0m
+  [1m[35m (0.1ms)[0m  SELECT "schema_migrations"."version" FROM "schema_migrations" 
+Migrating to CreateResourceBs (20160212213438)
+  [1m[36m (0.0ms)[0m  [1mselect sqlite_version(*)[0m
+  [1m[35m (0.0ms)[0m  begin transaction
+  [1m[36m (0.5ms)[0m  [1mDROP TABLE "resource_bs"[0m
+  [1m[35m (0.1ms)[0m  DELETE FROM "schema_migrations" WHERE "schema_migrations"."version" = '20160212213438'
+  [1m[36m (2.1ms)[0m  [1mcommit transaction[0m
+  [1m[35m (0.1ms)[0m  SELECT "schema_migrations"."version" FROM "schema_migrations" 
+Connecting to database specified by database.yml
+  [1m[36m (0.1ms)[0m  [1mSELECT "schema_migrations"."version" FROM "schema_migrations" [0m
+  [1m[35m (0.1ms)[0m  SELECT "schema_migrations"."version" FROM "schema_migrations" 
+Migrating to CreateResourceAs (20160212213202)
+  [1m[36m (0.0ms)[0m  [1mselect sqlite_version(*)[0m
+  [1m[35m (0.0ms)[0m  begin transaction
+  [1m[36m (0.4ms)[0m  [1mDROP TABLE "resource_as"[0m
+  [1m[35m (0.1ms)[0m  DELETE FROM "schema_migrations" WHERE "schema_migrations"."version" = '20160212213202'
+  [1m[36m (2.4ms)[0m  [1mcommit transaction[0m
+  [1m[35m (0.0ms)[0m  SELECT "schema_migrations"."version" FROM "schema_migrations" 
+Connecting to database specified by database.yml
+  [1m[36m (0.1ms)[0m  [1mSELECT "schema_migrations"."version" FROM "schema_migrations" [0m
+Migrating to CreateResourceAs (20160212213202)
+  [1m[35m (0.0ms)[0m  select sqlite_version(*)
+  [1m[36m (0.0ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.5ms)[0m  CREATE TABLE "resource_as" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "created_at" datetime NOT NULL, "updated_at" datetime NOT NULL, "parent_id" integer, "master_id" integer, "leader_id" integer, "explicit_attr" varchar(255), "implicit_attr" varchar(255), "custom_attr" varchar(255), "nested_accessor" varchar(255), "dynamic_accessor" varchar(255), "private_accessor" varchar(255), "aliased_accessor" varchar(255), "from_accessor" varchar(255), "to_accessor" varchar(255), "compound_accessor" varchar(255), "nested_compound_accessor" varchar(255), "unexposed_attr" varchar(255)) 
+  [1m[36m (0.1ms)[0m  [1mINSERT INTO "schema_migrations" ("version") VALUES ('20160212213202')[0m
+  [1m[35m (2.6ms)[0m  commit transaction
+Migrating to CreateResourceBs (20160212213438)
+  [1m[36m (0.1ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.4ms)[0m  CREATE TABLE "resource_bs" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "created_at" datetime NOT NULL, "updated_at" datetime NOT NULL, "other_id" integer, "extra_id" integer, "explicit_attr" varchar(255), "implicit_attr" varchar(255), "custom_attr" varchar(255), "nested_accessor" varchar(255), "dynamic_accessor" varchar(255), "private_accessor" varchar(255), "aliased_accessor" varchar(255), "from_accessor" varchar(255), "to_accessor" varchar(255), "compound_accessor" varchar(255), "nested_compound_accessor" varchar(255), "unexposed_attr" varchar(255)) 
+  [1m[36m (0.1ms)[0m  [1mINSERT INTO "schema_migrations" ("version") VALUES ('20160212213438')[0m
+  [1m[35m (0.6ms)[0m  commit transaction
+  [1m[36m (0.1ms)[0m  [1mSELECT "schema_migrations"."version" FROM "schema_migrations" [0m

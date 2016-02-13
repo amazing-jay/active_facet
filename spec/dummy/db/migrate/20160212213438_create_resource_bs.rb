@@ -3,6 +3,9 @@ class CreateResourceBs < ActiveRecord::Migration
     create_table :resource_bs do |t|
       t.timestamps null: false
 
+      t.integer :other_id
+      t.integer :extra_id
+
       t.string :explicit_attr
       t.string :implicit_attr
       t.string :custom_attr

@@ -3,6 +3,10 @@ class CreateResourceAs < ActiveRecord::Migration
     create_table :resource_as do |t|
       t.timestamps null: false
 
+      t.integer :parent_id
+      t.integer :master_id
+      t.integer :leader_id
+
       t.string :explicit_attr
       t.string :implicit_attr
       t.string :custom_attr

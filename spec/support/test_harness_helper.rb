@@ -64,13 +64,13 @@ module TestHarnessHelper
       expose :custom, as: [:custom_attr, :compound_attr, :nested_compound_attr]
       expose :minimal, as: [:explicit_attr]
       expose :basic, as: [:minimal, :nested_attr]
-      expose :relations, as: [:parent, :child, :owner, :delegates]
+      expose :relations, as: [:parent, :master, :leader, :master, :children, :others, :extras]
       expose :alias_relation, as: [:others]
       expose :deep_relations, as: [
-        {parent: {child: :attr}},
-        {child: :attrs},
-        :owner,
-        {delegates: :minimal},
+        {parent: {children: :attr}},
+        {children: :nested},
+        :master,
+        {extras: :minimal},
         {alias_relation: :implicit_attr}
       ]
     end

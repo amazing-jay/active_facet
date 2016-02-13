@@ -235,31 +235,31 @@ describe RealCerealBusiness::Serializer::Facade do
     end
   end
 
-  describe ".get_association_attribute(scope)" do
-        # attribute = serializer.resource_attribute_name(scope)
-        # key = [attribute, filters].to_s
-        # association = preload_association_collection(key, scope)
-        # if association.blank?
-        #   attribute = resource.send(attribute)
-        #   attribute = attribute.scope_filters(filters) if is_attribute_scopeable?(attribute)
-        #   attribute
-        # else
-        #   association[:relation].collection? ? association[:collection] : association[:collection].first
-        # end
-  end
+  describe ".get_association_attribute" do
+    let(:field) { :children }
+    let(:resource) { create :resource_a, :with_children }
+    subject { instance.send(:get_association_attribute, field ) }
 
-  describe ".preload_association_collection(key, scope)" do
-    let(:key) { :foo }
-    let(:field) { :parent }
-    let(:filters) { {} }
-    subject { instance.send(:preload_association_collection, key, field ) }
-    it { expect(subject).to eq('') }
-        # association_serializer = serializer.get_association_serializer_class(scope)
-        # relation = serializer.get_association_reflection(scope)
-        # association = relation.klass
-        # association = association.scope_filters(filters)
+    context 'default' do
+      let(:filters) { {} }
+      it { expect(subject).to match_array(resource.children) }
+      it { expect(subject.is_a?(ActiveRecord::Relation)).to be true }
+      it { expect(subject).to_not be_empty }
+    end
 
-        # serializer.association_cache.preload_association_collection(key, resource, association_serializer, relation, association)
+    context 'filtered' do
+      let(:filters) { {} }
+      it { expect(subject).to match_array(resource.children) }
+      it { expect(subject.is_a?(ActiveRecord::Relation)).to be true }
+    end
+
+    context 'nil' do
+      let(:filters) { {} }
+      let(:field) { :others }
+      it { expect(subject).to match_array(resource.others) }
+      it { expect(subject.is_a?(ActiveRecord::Relation)).to be true }
+      it { expect(subject).to be_empty }
+    end
   end
 
   describe ".serialize_scopes!" do

@@ -167,27 +167,9 @@ module RealCerealBusiness
       def get_association_attribute(field)
         attribute = serializer.resource_attribute_name(field)
         key = [attribute, filters].to_s
-        association = preload_association_collection(key, field)
-        if association.blank?
-          attribute = resource.send(attribute)
-          attribute = attribute.scope_filters(filters) if is_expression_scopeable?(attribute)
-          attribute
-        else
-          association[:relation].collection? ? association[:collection] : association[:collection].first
-        end
-      end
-
-      # Preload association for all records in cached collection
-      # @param key [String] unique cache key identifying association & field set
-      # @param field [Symbol] attribute to get
-      # @return [Array] of ActiveRecord
-      def preload_association_collection(key, field)
-        association_serializer = serializer.get_association_serializer_class(field)
-        relation = serializer.get_association_reflection(field)
-        association = relation.klass
-        association = association.scope_filters(filters)
-
-        serializer.association_cache.preload_association_collection(key, resource, association_serializer, relation, association)
+        association = resource.send(attribute)
+        association = association.scope_filters(filters) if is_expression_scopeable?(association)
+        association
       end
 
       # Modifies json by reference by applying custom serializers to all attributes registered with custom serializers

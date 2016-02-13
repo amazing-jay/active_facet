@@ -19,9 +19,7 @@ module RealCerealBusiness
         if options.present? && options.key?(RealCerealBusiness.json_attribute_key) &&
             (serializer = RealCerealBusiness::ResourceManager.new.serializer_for(self.klass)).present?
           collection = PerformanceMonitor.measure(:active_record) { to_a }
-          serializer.association_cache.perform(collection) do
-            collection.as_json(options)
-          end
+          collection.as_json(options)
         else
           as_json_without_real_cereal_business_caching(options)
         end
