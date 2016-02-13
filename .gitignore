@@ -7,5 +7,6 @@
 /pkg/
 /spec/reports/
 /tmp/
+/spec/dummy/log
 .ruby-version
 .ruby-gemset

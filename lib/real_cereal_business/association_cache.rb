@@ -28,6 +28,7 @@ module RealCerealBusiness
     # @param association [ActiveRelation] relation to query
     # @return [Array] of ActiveRecord
     def preload_association_collection(key, resource, serializer, relation, association)
+      binding.pry
       ids = (cached_collection.try(:keys) || []).compact
       collections = cached_record_collections[resource.id]
 

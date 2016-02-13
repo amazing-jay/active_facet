@@ -249,6 +249,11 @@ describe RealCerealBusiness::Serializer::Facade do
   end
 
   describe ".preload_association_collection(key, scope)" do
+    let(:key) { :foo }
+    let(:field) { :parent }
+    let(:filters) { {} }
+    subject { instance.send(:preload_association_collection, key, field ) }
+    it { expect(subject).to eq('') }
         # association_serializer = serializer.get_association_serializer_class(scope)
         # relation = serializer.get_association_reflection(scope)
         # association = relation.klass

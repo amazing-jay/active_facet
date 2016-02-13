@@ -162,12 +162,12 @@ module RealCerealBusiness
       end
 
       # Retrieves scoped association from cache or record
-      # @param scope [Symbol] attribute to get
+      # @param field [Symbol] attribute to get
       # @return [Array | ActiveRelation] of ActiveRecord
-      def get_association_attribute(scope)
-        attribute = serializer.resource_attribute_name(scope)
+      def get_association_attribute(field)
+        attribute = serializer.resource_attribute_name(field)
         key = [attribute, filters].to_s
-        association = preload_association_collection(key, scope)
+        association = preload_association_collection(key, field)
         if association.blank?
           attribute = resource.send(attribute)
           attribute = attribute.scope_filters(filters) if is_expression_scopeable?(attribute)
@@ -179,11 +179,11 @@ module RealCerealBusiness
 
       # Preload association for all records in cached collection
       # @param key [String] unique cache key identifying association & field set
-      # @param scope [Symbol] attribute to get
+      # @param field [Symbol] attribute to get
       # @return [Array] of ActiveRecord
-      def preload_association_collection(key, scope)
-        association_serializer = serializer.get_association_serializer_class(scope)
-        relation = serializer.get_association_reflection(scope)
+      def preload_association_collection(key, field)
+        association_serializer = serializer.get_association_serializer_class(field)
+        relation = serializer.get_association_reflection(field)
         association = relation.klass
         association = association.scope_filters(filters)
 
