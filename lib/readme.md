@@ -1,23 +1,31 @@
 #TODO --jdc
-# - add unit tests
-# - add integration tests
-# - clone all serializers and attribute serializers
-# - reset serializer_base_new
-# - implement version switch in resource manager
-# - implement version switch in routes
+# - move configured serializer class to explicit files
+# - finish facade tests
+# - add extention tests
+# - add attribute serializer tests
+# - add document cache tests
+# - add resource manager tests
+# - remove attribute manager class
+# - remove filter class
+# - implement versioning
+# -- clone all serializers and attribute serializers
+# -- reset serializer_base_new ( CORE-92 )
+# -- remove direct references to group_includes in gem
+# --- move group_includes into context
+# --- rename context something more unique (rcb_opts)
+# -- implement version switch in resource manager ( CORE-92 )
+# -- implement version switch in routes ( CORE-92 )
+# - merge document_cache branch ( CORE-113 )
 # - performance
 # -- remove indifferent access in config
 # - update this document and move it into the main readme
+# - extract performance monitor into a gem
 
 # ?- implement psuedo containers for non AR resources
 # ?-- make the facade the primary kickoff point
 # ?- implement registry based resource manager
-# ?- rename scopes to fields & field_groups
-# ?- remove direct references to group_includes
-# ?-- move group_includes into context
-# ?-- rename context something more unique (rcb_opts)
 # ?- add client test helpers
-
+# ?- create a config generator
 
 
 

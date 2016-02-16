@@ -10,3 +10,4 @@
 /spec/dummy/log
 .ruby-version
 .ruby-gemset
+/spec/dummy/db/test.sqlite3

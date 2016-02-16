@@ -5269,3 +5269,190 @@ Connecting to database specified by database.yml
   [1m[36m (0.0ms)[0m  [1mcommit transaction[0m
   [1m[35m (0.0ms)[0m  begin transaction
   [1m[36m (0.1ms)[0m  [1mrollback transaction[0m
+Connecting to database specified by database.yml
+  [1m[36m (0.8ms)[0m  [1mDELETE FROM "resource_as";[0m
+  [1m[35m (0.1ms)[0m  SELECT name FROM sqlite_master WHERE type='table' AND name='sqlite_sequence';
+  [1m[36m (0.1ms)[0m  [1mDELETE FROM sqlite_sequence where name = 'resource_as';[0m
+  [1m[35m (2.1ms)[0m  DELETE FROM "resource_bs";
+  [1m[36m (0.1ms)[0m  [1mSELECT name FROM sqlite_master WHERE type='table' AND name='sqlite_sequence';[0m
+  [1m[35m (0.1ms)[0m  DELETE FROM sqlite_sequence where name = 'resource_bs';
+  [1m[36m (0.1ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.0ms)[0m  commit transaction
+  [1m[36m (0.1ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.0ms)[0m  rollback transaction
+  [1m[36m (0.1ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.0ms)[0m  commit transaction
+  [1m[36m (0.0ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.0ms)[0m  rollback transaction
+  [1m[36m (0.0ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.0ms)[0m  commit transaction
+  [1m[36m (0.0ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.0ms)[0m  rollback transaction
+  [1m[36m (0.0ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.0ms)[0m  commit transaction
+  [1m[36m (0.0ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.0ms)[0m  rollback transaction
+  [1m[36m (0.0ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.0ms)[0m  commit transaction
+  [1m[36m (0.0ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.0ms)[0m  rollback transaction
+  [1m[36m (0.0ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.0ms)[0m  commit transaction
+  [1m[36m (0.0ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.1ms)[0m  rollback transaction
+  [1m[36m (0.0ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.0ms)[0m  commit transaction
+  [1m[36m (0.0ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.1ms)[0m  rollback transaction
+  [1m[36m (0.0ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.0ms)[0m  commit transaction
+  [1m[36m (0.0ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.0ms)[0m  rollback transaction
+  [1m[36m (0.0ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.0ms)[0m  commit transaction
+  [1m[36m (0.0ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.0ms)[0m  rollback transaction
+  [1m[36m (0.0ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.0ms)[0m  commit transaction
+  [1m[36m (0.0ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.0ms)[0m  rollback transaction
+  [1m[36m (0.0ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.0ms)[0m  commit transaction
+  [1m[36m (0.0ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.0ms)[0m  rollback transaction
+  [1m[36m (0.0ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.0ms)[0m  commit transaction
+  [1m[36m (0.0ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.0ms)[0m  rollback transaction
+  [1m[36m (0.1ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.0ms)[0m  commit transaction
+  [1m[36m (0.0ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.0ms)[0m  rollback transaction
+  [1m[36m (0.0ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.0ms)[0m  commit transaction
+  [1m[36m (0.0ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.0ms)[0m  rollback transaction
+  [1m[36m (0.0ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.0ms)[0m  commit transaction
+  [1m[36m (0.0ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.0ms)[0m  rollback transaction
+  [1m[36m (0.0ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.0ms)[0m  commit transaction
+  [1m[36m (0.0ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.0ms)[0m  rollback transaction
+  [1m[36m (0.0ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.0ms)[0m  commit transaction
+  [1m[36m (0.0ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.0ms)[0m  rollback transaction
+  [1m[36m (0.1ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.0ms)[0m  commit transaction
+  [1m[36m (0.0ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.0ms)[0m  rollback transaction
+  [1m[36m (0.0ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.0ms)[0m  commit transaction
+  [1m[36m (0.1ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.0ms)[0m  rollback transaction
+  [1m[36m (0.0ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.0ms)[0m  commit transaction
+  [1m[36m (0.0ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.5ms)[0m  rollback transaction
+  [1m[36m (0.0ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.0ms)[0m  commit transaction
+  [1m[36m (0.0ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.0ms)[0m  rollback transaction
+  [1m[36m (0.0ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.0ms)[0m  commit transaction
+  [1m[36m (0.0ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.0ms)[0m  rollback transaction
+  [1m[36m (0.1ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.0ms)[0m  commit transaction
+  [1m[36m (0.0ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.0ms)[0m  SAVEPOINT active_record_1
+  [1m[36mSQL (4.8ms)[0m  [1mINSERT INTO "resource_as" ("aliased_accessor", "compound_accessor", "created_at", "custom_attr", "dynamic_accessor", "explicit_attr", "from_accessor", "implicit_attr", "leader_id", "master_id", "nested_accessor", "nested_compound_accessor", "parent_id", "private_accessor", "to_accessor", "unexposed_attr", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)[0m  [["aliased_accessor", "aliased_accessor"], ["compound_accessor", "compound_accessor"], ["created_at", Sat, 13 Feb 2016 02:03:49 UTC +00:00], ["custom_attr", "custom_attr"], ["dynamic_accessor", "dynamic_accessor"], ["explicit_attr", "explicit_attr"], ["from_accessor", "from_accessor"], ["implicit_attr", "implicit_attr"], ["leader_id", nil], ["master_id", nil], ["nested_accessor", {:nested_attr=>"nested_attr"}], ["nested_compound_accessor", "nested_compound_accessor"], ["parent_id", nil], ["private_accessor", "private_accessor"], ["to_accessor", "to_accessor"], ["unexposed_attr", "unexposed_attr"], ["updated_at", Sat, 13 Feb 2016 02:03:49 UTC +00:00]]
+  [1m[35m (0.0ms)[0m  RELEASE SAVEPOINT active_record_1
+  [1m[36m (0.0ms)[0m  [1mSAVEPOINT active_record_1[0m
+  [1m[35mSQL (0.9ms)[0m  INSERT INTO "resource_as" ("aliased_accessor", "compound_accessor", "created_at", "custom_attr", "dynamic_accessor", "explicit_attr", "from_accessor", "implicit_attr", "leader_id", "master_id", "nested_accessor", "nested_compound_accessor", "parent_id", "private_accessor", "to_accessor", "unexposed_attr", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)  [["aliased_accessor", "aliased_accessor"], ["compound_accessor", "compound_accessor"], ["created_at", Sat, 13 Feb 2016 02:03:49 UTC +00:00], ["custom_attr", "custom_attr"], ["dynamic_accessor", "dynamic_accessor"], ["explicit_attr", "explicit_attr"], ["from_accessor", "from_accessor"], ["implicit_attr", "implicit_attr"], ["leader_id", nil], ["master_id", nil], ["nested_accessor", {:nested_attr=>"nested_attr"}], ["nested_compound_accessor", "nested_compound_accessor"], ["parent_id", nil], ["private_accessor", "private_accessor"], ["to_accessor", "to_accessor"], ["unexposed_attr", "unexposed_attr"], ["updated_at", Sat, 13 Feb 2016 02:03:49 UTC +00:00]]
+  [1m[36m (0.0ms)[0m  [1mRELEASE SAVEPOINT active_record_1[0m
+  [1m[35m (0.0ms)[0m  SAVEPOINT active_record_1
+  [1m[36mSQL (0.4ms)[0m  [1mINSERT INTO "resource_as" ("aliased_accessor", "compound_accessor", "created_at", "custom_attr", "dynamic_accessor", "explicit_attr", "from_accessor", "implicit_attr", "leader_id", "master_id", "nested_accessor", "nested_compound_accessor", "parent_id", "private_accessor", "to_accessor", "unexposed_attr", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)[0m  [["aliased_accessor", "aliased_accessor"], ["compound_accessor", "compound_accessor"], ["created_at", Sat, 13 Feb 2016 02:03:49 UTC +00:00], ["custom_attr", "custom_attr"], ["dynamic_accessor", "dynamic_accessor"], ["explicit_attr", "explicit_attr"], ["from_accessor", "from_accessor"], ["implicit_attr", "implicit_attr"], ["leader_id", nil], ["master_id", nil], ["nested_accessor", {:nested_attr=>"nested_attr"}], ["nested_compound_accessor", "nested_compound_accessor"], ["parent_id", nil], ["private_accessor", "private_accessor"], ["to_accessor", "to_accessor"], ["unexposed_attr", "unexposed_attr"], ["updated_at", Sat, 13 Feb 2016 02:03:49 UTC +00:00]]
+  [1m[35m (0.0ms)[0m  RELEASE SAVEPOINT active_record_1
+  [1m[36m (0.0ms)[0m  [1mSAVEPOINT active_record_1[0m
+  [1m[35mSQL (0.3ms)[0m  INSERT INTO "resource_as" ("aliased_accessor", "compound_accessor", "created_at", "custom_attr", "dynamic_accessor", "explicit_attr", "from_accessor", "implicit_attr", "leader_id", "master_id", "nested_accessor", "nested_compound_accessor", "parent_id", "private_accessor", "to_accessor", "unexposed_attr", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)  [["aliased_accessor", "aliased_accessor"], ["compound_accessor", "compound_accessor"], ["created_at", Sat, 13 Feb 2016 02:03:49 UTC +00:00], ["custom_attr", "custom_attr"], ["dynamic_accessor", "dynamic_accessor"], ["explicit_attr", "explicit_attr"], ["from_accessor", "from_accessor"], ["implicit_attr", "implicit_attr"], ["leader_id", nil], ["master_id", nil], ["nested_accessor", {:nested_attr=>"nested_attr"}], ["nested_compound_accessor", "nested_compound_accessor"], ["parent_id", nil], ["private_accessor", "private_accessor"], ["to_accessor", "to_accessor"], ["unexposed_attr", "unexposed_attr"], ["updated_at", Sat, 13 Feb 2016 02:03:49 UTC +00:00]]
+  [1m[36m (0.1ms)[0m  [1mUPDATE "resource_as" SET "parent_id" = 4, "updated_at" = '2016-02-13 02:03:49.530493' WHERE "resource_as"."id" = 1[0m
+  [1m[35m (0.1ms)[0m  UPDATE "resource_as" SET "parent_id" = 4, "updated_at" = '2016-02-13 02:03:49.531925' WHERE "resource_as"."id" = 2
+  [1m[36m (0.1ms)[0m  [1mUPDATE "resource_as" SET "parent_id" = 4, "updated_at" = '2016-02-13 02:03:49.533062' WHERE "resource_as"."id" = 3[0m
+  [1m[35m (0.0ms)[0m  RELEASE SAVEPOINT active_record_1
+  [1m[36mResourceA Load (0.1ms)[0m  [1mSELECT "resource_as".* FROM "resource_as" WHERE "resource_as"."parent_id" = 4[0m
+  [1m[35m (6.1ms)[0m  rollback transaction
+  [1m[36m (0.0ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.0ms)[0m  commit transaction
+  [1m[36m (0.0ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.0ms)[0m  SAVEPOINT active_record_1
+  [1m[36mSQL (0.5ms)[0m  [1mINSERT INTO "resource_as" ("aliased_accessor", "compound_accessor", "created_at", "custom_attr", "dynamic_accessor", "explicit_attr", "from_accessor", "implicit_attr", "leader_id", "master_id", "nested_accessor", "nested_compound_accessor", "parent_id", "private_accessor", "to_accessor", "unexposed_attr", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)[0m  [["aliased_accessor", "aliased_accessor"], ["compound_accessor", "compound_accessor"], ["created_at", Sat, 13 Feb 2016 02:03:49 UTC +00:00], ["custom_attr", "custom_attr"], ["dynamic_accessor", "dynamic_accessor"], ["explicit_attr", "explicit_attr"], ["from_accessor", "from_accessor"], ["implicit_attr", "implicit_attr"], ["leader_id", nil], ["master_id", nil], ["nested_accessor", {:nested_attr=>"nested_attr"}], ["nested_compound_accessor", "nested_compound_accessor"], ["parent_id", nil], ["private_accessor", "private_accessor"], ["to_accessor", "to_accessor"], ["unexposed_attr", "unexposed_attr"], ["updated_at", Sat, 13 Feb 2016 02:03:49 UTC +00:00]]
+  [1m[35m (0.0ms)[0m  RELEASE SAVEPOINT active_record_1
+  [1m[36m (0.0ms)[0m  [1mSAVEPOINT active_record_1[0m
+  [1m[35mSQL (0.5ms)[0m  INSERT INTO "resource_as" ("aliased_accessor", "compound_accessor", "created_at", "custom_attr", "dynamic_accessor", "explicit_attr", "from_accessor", "implicit_attr", "leader_id", "master_id", "nested_accessor", "nested_compound_accessor", "parent_id", "private_accessor", "to_accessor", "unexposed_attr", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)  [["aliased_accessor", "aliased_accessor"], ["compound_accessor", "compound_accessor"], ["created_at", Sat, 13 Feb 2016 02:03:49 UTC +00:00], ["custom_attr", "custom_attr"], ["dynamic_accessor", "dynamic_accessor"], ["explicit_attr", "explicit_attr"], ["from_accessor", "from_accessor"], ["implicit_attr", "implicit_attr"], ["leader_id", nil], ["master_id", nil], ["nested_accessor", {:nested_attr=>"nested_attr"}], ["nested_compound_accessor", "nested_compound_accessor"], ["parent_id", nil], ["private_accessor", "private_accessor"], ["to_accessor", "to_accessor"], ["unexposed_attr", "unexposed_attr"], ["updated_at", Sat, 13 Feb 2016 02:03:49 UTC +00:00]]
+  [1m[36m (0.0ms)[0m  [1mRELEASE SAVEPOINT active_record_1[0m
+  [1m[35m (0.0ms)[0m  SAVEPOINT active_record_1
+  [1m[36mSQL (0.4ms)[0m  [1mINSERT INTO "resource_as" ("aliased_accessor", "compound_accessor", "created_at", "custom_attr", "dynamic_accessor", "explicit_attr", "from_accessor", "implicit_attr", "leader_id", "master_id", "nested_accessor", "nested_compound_accessor", "parent_id", "private_accessor", "to_accessor", "unexposed_attr", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)[0m  [["aliased_accessor", "aliased_accessor"], ["compound_accessor", "compound_accessor"], ["created_at", Sat, 13 Feb 2016 02:03:49 UTC +00:00], ["custom_attr", "custom_attr"], ["dynamic_accessor", "dynamic_accessor"], ["explicit_attr", "explicit_attr"], ["from_accessor", "from_accessor"], ["implicit_attr", "implicit_attr"], ["leader_id", nil], ["master_id", nil], ["nested_accessor", {:nested_attr=>"nested_attr"}], ["nested_compound_accessor", "nested_compound_accessor"], ["parent_id", nil], ["private_accessor", "private_accessor"], ["to_accessor", "to_accessor"], ["unexposed_attr", "unexposed_attr"], ["updated_at", Sat, 13 Feb 2016 02:03:49 UTC +00:00]]
+  [1m[35m (0.0ms)[0m  RELEASE SAVEPOINT active_record_1
+  [1m[36m (0.0ms)[0m  [1mSAVEPOINT active_record_1[0m
+  [1m[35mSQL (0.4ms)[0m  INSERT INTO "resource_as" ("aliased_accessor", "compound_accessor", "created_at", "custom_attr", "dynamic_accessor", "explicit_attr", "from_accessor", "implicit_attr", "leader_id", "master_id", "nested_accessor", "nested_compound_accessor", "parent_id", "private_accessor", "to_accessor", "unexposed_attr", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)  [["aliased_accessor", "aliased_accessor"], ["compound_accessor", "compound_accessor"], ["created_at", Sat, 13 Feb 2016 02:03:49 UTC +00:00], ["custom_attr", "custom_attr"], ["dynamic_accessor", "dynamic_accessor"], ["explicit_attr", "explicit_attr"], ["from_accessor", "from_accessor"], ["implicit_attr", "implicit_attr"], ["leader_id", nil], ["master_id", nil], ["nested_accessor", {:nested_attr=>"nested_attr"}], ["nested_compound_accessor", "nested_compound_accessor"], ["parent_id", nil], ["private_accessor", "private_accessor"], ["to_accessor", "to_accessor"], ["unexposed_attr", "unexposed_attr"], ["updated_at", Sat, 13 Feb 2016 02:03:49 UTC +00:00]]
+  [1m[36m (0.1ms)[0m  [1mUPDATE "resource_as" SET "parent_id" = 4, "updated_at" = '2016-02-13 02:03:49.566344' WHERE "resource_as"."id" = 1[0m
+  [1m[35m (0.1ms)[0m  UPDATE "resource_as" SET "parent_id" = 4, "updated_at" = '2016-02-13 02:03:49.566954' WHERE "resource_as"."id" = 2
+  [1m[36m (0.1ms)[0m  [1mUPDATE "resource_as" SET "parent_id" = 4, "updated_at" = '2016-02-13 02:03:49.567579' WHERE "resource_as"."id" = 3[0m
+  [1m[35m (0.0ms)[0m  RELEASE SAVEPOINT active_record_1
+  [1m[36m (3.1ms)[0m  [1mrollback transaction[0m
+  [1m[35m (0.0ms)[0m  begin transaction
+  [1m[36m (0.0ms)[0m  [1mcommit transaction[0m
+  [1m[35m (0.0ms)[0m  begin transaction
+  [1m[36m (0.0ms)[0m  [1mSAVEPOINT active_record_1[0m
+  [1m[35mSQL (0.4ms)[0m  INSERT INTO "resource_as" ("aliased_accessor", "compound_accessor", "created_at", "custom_attr", "dynamic_accessor", "explicit_attr", "from_accessor", "implicit_attr", "leader_id", "master_id", "nested_accessor", "nested_compound_accessor", "parent_id", "private_accessor", "to_accessor", "unexposed_attr", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)  [["aliased_accessor", "aliased_accessor"], ["compound_accessor", "compound_accessor"], ["created_at", Sat, 13 Feb 2016 02:03:49 UTC +00:00], ["custom_attr", "custom_attr"], ["dynamic_accessor", "dynamic_accessor"], ["explicit_attr", "explicit_attr"], ["from_accessor", "from_accessor"], ["implicit_attr", "implicit_attr"], ["leader_id", nil], ["master_id", nil], ["nested_accessor", {:nested_attr=>"nested_attr"}], ["nested_compound_accessor", "nested_compound_accessor"], ["parent_id", nil], ["private_accessor", "private_accessor"], ["to_accessor", "to_accessor"], ["unexposed_attr", "unexposed_attr"], ["updated_at", Sat, 13 Feb 2016 02:03:49 UTC +00:00]]
+  [1m[36m (0.0ms)[0m  [1mRELEASE SAVEPOINT active_record_1[0m
+  [1m[35m (0.0ms)[0m  SAVEPOINT active_record_1
+  [1m[36mSQL (0.5ms)[0m  [1mINSERT INTO "resource_as" ("aliased_accessor", "compound_accessor", "created_at", "custom_attr", "dynamic_accessor", "explicit_attr", "from_accessor", "implicit_attr", "leader_id", "master_id", "nested_accessor", "nested_compound_accessor", "parent_id", "private_accessor", "to_accessor", "unexposed_attr", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)[0m  [["aliased_accessor", "aliased_accessor"], ["compound_accessor", "compound_accessor"], ["created_at", Sat, 13 Feb 2016 02:03:49 UTC +00:00], ["custom_attr", "custom_attr"], ["dynamic_accessor", "dynamic_accessor"], ["explicit_attr", "explicit_attr"], ["from_accessor", "from_accessor"], ["implicit_attr", "implicit_attr"], ["leader_id", nil], ["master_id", nil], ["nested_accessor", {:nested_attr=>"nested_attr"}], ["nested_compound_accessor", "nested_compound_accessor"], ["parent_id", nil], ["private_accessor", "private_accessor"], ["to_accessor", "to_accessor"], ["unexposed_attr", "unexposed_attr"], ["updated_at", Sat, 13 Feb 2016 02:03:49 UTC +00:00]]
+  [1m[35m (0.0ms)[0m  RELEASE SAVEPOINT active_record_1
+  [1m[36m (0.0ms)[0m  [1mSAVEPOINT active_record_1[0m
+  [1m[35mSQL (0.2ms)[0m  INSERT INTO "resource_as" ("aliased_accessor", "compound_accessor", "created_at", "custom_attr", "dynamic_accessor", "explicit_attr", "from_accessor", "implicit_attr", "leader_id", "master_id", "nested_accessor", "nested_compound_accessor", "parent_id", "private_accessor", "to_accessor", "unexposed_attr", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)  [["aliased_accessor", "aliased_accessor"], ["compound_accessor", "compound_accessor"], ["created_at", Sat, 13 Feb 2016 02:03:49 UTC +00:00], ["custom_attr", "custom_attr"], ["dynamic_accessor", "dynamic_accessor"], ["explicit_attr", "explicit_attr"], ["from_accessor", "from_accessor"], ["implicit_attr", "implicit_attr"], ["leader_id", nil], ["master_id", nil], ["nested_accessor", {:nested_attr=>"nested_attr"}], ["nested_compound_accessor", "nested_compound_accessor"], ["parent_id", nil], ["private_accessor", "private_accessor"], ["to_accessor", "to_accessor"], ["unexposed_attr", "unexposed_attr"], ["updated_at", Sat, 13 Feb 2016 02:03:49 UTC +00:00]]
+  [1m[36m (0.0ms)[0m  [1mRELEASE SAVEPOINT active_record_1[0m
+  [1m[35m (0.0ms)[0m  SAVEPOINT active_record_1
+  [1m[36mSQL (0.2ms)[0m  [1mINSERT INTO "resource_as" ("aliased_accessor", "compound_accessor", "created_at", "custom_attr", "dynamic_accessor", "explicit_attr", "from_accessor", "implicit_attr", "leader_id", "master_id", "nested_accessor", "nested_compound_accessor", "parent_id", "private_accessor", "to_accessor", "unexposed_attr", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)[0m  [["aliased_accessor", "aliased_accessor"], ["compound_accessor", "compound_accessor"], ["created_at", Sat, 13 Feb 2016 02:03:49 UTC +00:00], ["custom_attr", "custom_attr"], ["dynamic_accessor", "dynamic_accessor"], ["explicit_attr", "explicit_attr"], ["from_accessor", "from_accessor"], ["implicit_attr", "implicit_attr"], ["leader_id", nil], ["master_id", nil], ["nested_accessor", {:nested_attr=>"nested_attr"}], ["nested_compound_accessor", "nested_compound_accessor"], ["parent_id", nil], ["private_accessor", "private_accessor"], ["to_accessor", "to_accessor"], ["unexposed_attr", "unexposed_attr"], ["updated_at", Sat, 13 Feb 2016 02:03:49 UTC +00:00]]
+  [1m[35m (0.1ms)[0m  UPDATE "resource_as" SET "parent_id" = 4, "updated_at" = '2016-02-13 02:03:49.579607' WHERE "resource_as"."id" = 1
+  [1m[36m (0.1ms)[0m  [1mUPDATE "resource_as" SET "parent_id" = 4, "updated_at" = '2016-02-13 02:03:49.580214' WHERE "resource_as"."id" = 2[0m
+  [1m[35m (0.1ms)[0m  UPDATE "resource_as" SET "parent_id" = 4, "updated_at" = '2016-02-13 02:03:49.580768' WHERE "resource_as"."id" = 3
+  [1m[36m (0.1ms)[0m  [1mRELEASE SAVEPOINT active_record_1[0m
+  [1m[35mResourceB Load (0.1ms)[0m  SELECT "resource_bs".* FROM "resource_bs" WHERE "resource_bs"."other_id" = 4
+  [1m[36mResourceB Load (0.1ms)[0m  [1mSELECT "resource_bs".* FROM "resource_bs" WHERE "resource_bs"."other_id" = 4[0m
+  [1m[35m (5.0ms)[0m  rollback transaction
+  [1m[36m (0.0ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.0ms)[0m  commit transaction
+  [1m[36m (0.1ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.0ms)[0m  rollback transaction
+  [1m[36m (0.0ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.0ms)[0m  commit transaction
+  [1m[36m (0.0ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.1ms)[0m  rollback transaction
+  [1m[36m (0.0ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.0ms)[0m  commit transaction
+  [1m[36m (0.0ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.0ms)[0m  rollback transaction
+  [1m[36m (0.0ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.0ms)[0m  commit transaction
+  [1m[36m (0.0ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.0ms)[0m  rollback transaction
+  [1m[36m (0.0ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.0ms)[0m  commit transaction
+  [1m[36m (0.0ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.0ms)[0m  rollback transaction
+  [1m[36m (0.0ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.0ms)[0m  commit transaction
+  [1m[36m (0.1ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.0ms)[0m  rollback transaction
+  [1m[36m (0.0ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.0ms)[0m  commit transaction
+  [1m[36m (0.0ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.0ms)[0m  rollback transaction
+  [1m[36m (0.0ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.0ms)[0m  commit transaction
+  [1m[36m (0.0ms)[0m  [1mbegin transaction[0m
+  [1m[35m (0.1ms)[0m  rollback transaction
