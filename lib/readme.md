@@ -5,8 +5,6 @@
 # - add attribute serializer tests
 # - add document cache tests
 # - add resource manager tests
-# - remove attribute manager class
-# - remove filter class
 # - implement versioning
 # -- clone all serializers and attribute serializers
 # -- reset serializer_base_new ( CORE-92 )
