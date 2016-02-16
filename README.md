@@ -1,37 +1,37 @@
-# TODO
+### TODO
 
-# - implement controller versioning in www
+### - implement controller versioning in www
 
-# - implement serializer versioning in CORE-92
-# -- clone all serializers and attribute serializers using inheritance
-# --- use old signature for from_hash & attribute.serialize in old serializers
-# --- use new signature for from_hash & attribute.serialize in new serializers
-# -- add back serializer_base_new
-# --- patch extentions to trigger SBN when version is 1.0
+### - implement serializer versioning in CORE-92
+### -- clone all serializers and attribute serializers using inheritance
+### --- use old signature for from_hash & attribute.serialize in old serializers
+### --- use new signature for from_hash & attribute.serialize in new serializers
+### -- add back serializer_base_new
+### --- patch extentions to trigger SBN when version is 1.0
 
-# - implement versioning
-# -- remove direct references to group_includes in gem
-# --- move group_includes into context
-# --- rename context something more unique (rcb_opts)
+### - implement versioning
+### -- remove direct references to group_includes in gem
+### --- move group_includes into context
+### --- rename context something more unique (rcb_opts)
 
-# - merge document_cache branch  & test( CORE-113 )
+### - merge document_cache branch  & test( CORE-113 )
 
-# - test RCB
-# -- move configured serializer class to explicit files
-# -- finish facade tests
-# -- add extention tests
-# -- add attribute serializer tests
-# -- add document cache tests
-# -- add resource manager tests
+### - test RCB
+### -- move configured serializer class to explicit files
+### -- finish facade tests
+### -- add extention tests
+### -- add attribute serializer tests
+### -- add document cache tests
+### -- add resource manager tests
 
-# - performance: remove indifferent access in config
-# - implement psuedo containers for non AR resources
+### - performance: remove indifferent access in config
+### - implement psuedo containers for non AR resources
 
-# ?-- make the facade the primary kickoff point
-# ?- implement registry based resource manager
-# ?- extract performance monitor into a gem
-# ?- add client test helpers
-# ?- create a config generator
+### ?-- make the facade the primary kickoff point
+### ?- implement registry based resource manager
+### ?- extract performance monitor into a gem
+### ?- add client test helpers
+### ?- create a config generator
 
 
 # RealCerealBusiness
@@ -63,88 +63,11 @@ Or install it yourself as:
 
 ## Configuration
 
-Add an initializer to your application:
+And then execute:
 
-```ruby
-require 'real_cereal_business'
+    $ rails g real_cereal_business:install
 
-RealCerealBusiness.configure do |config|
-
-  # The symbol which acts as the options key that designates context for serialization. :rsb_opts by default.
-  config.opts_key                       = :context
-
-  # The symbol which acts as the context key that designates fields for serialization. :fields by default.
-  # config.fields_key                     = :fields
-
-  # The symbol which acts as the context key that designates field overrides for serialization. :field_overrides by default.
-  # config.field_overrides_key            = :field_overrides
-
-  # The symbol which acts as the context key that designates version for serialization. :version by default.
-  # config.version_key                    = :version
-
-  # The symbol which acts as the context key that designates filters for serialization. :filters by default.
-  # config.filters_key                    = :filters
-
-  # The symbol which acts as the context key that designates force for cache. :cache_force by default.
-  config.cache_force_key                = :bypass_cache
-
-  # Tell if associations should be preloaded to mitigate N+1 problems. False by default.
-  # config.preload_associations           = false
-
-  # Tell document cache to cache
-  # config.cache_enabled                  = false
-
-  # Default options for Rails.cache.fetch
-  # config.default_cache_options          = { expires_in: 5.minutes }
-
-  # Tell document cache adaptor to use
-  # config.document_cache = ::RealCerealBusiness::DocumentCache
-
-  # Tell which filters and field_overrides apply to a given resource
-  # config.resource_mapper { |resource_class|
-  #   [].tap do |map|
-  #     until(resource_class.superclass == BasicObject) do
-  #       map << resource_class.name.tableize
-  #       resource_class = resource_class.superclass
-  #     end
-  #   end
-  # }
-
-  # Applies scope to relation chains based on availability of active filter scopes
-  config.global_filter(:active) do |state = Honest::Models::SerializationExtensions::DEFAULT_ACTIVE_FILTER|
-    case state.to_sym
-    when :enabled, :active
-      if respond_to?(:enabled)
-        enabled
-      elsif respond_to?(:active)
-        active
-      end
-    when :disabled, :inactive
-      if respond_to?(:disabled)
-        disabled
-      elsif respond_to?(:inactive)
-        inactive
-      end
-    end
-  end
-
-  #FIX --jdc was this really intended to be declared for all models, or just some?
-  config.global_filter(:slice) do |name = :none|
-    return if name.nil?
-    if name.to_sym == :mobile_app
-      if respond_to?(:enabled_for_app)
-        enabled_for_app
-      elsif respond_to?(:enabled)
-        enabled
-      elsif respond_to?(:active)
-        active
-      end
-    elsif respond_to?(name.to_sym)
-      name.constantize
-    end
-  end
-end
-```
+To add an initializer to your application.
 
 ## Usage
 
