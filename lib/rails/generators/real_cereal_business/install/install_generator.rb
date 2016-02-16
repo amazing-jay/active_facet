@@ -6,7 +6,7 @@ module RealCerealBusiness
       desc 'Creates a RealCerealBusiness gem configuration file at config/real_cereal_business.yml, and an initializer at config/initializers/real_cereal_business.rb'
 
       def self.source_root
-        @_sugarcrm_source_root ||= File.expand_path("../templates", __FILE__)
+        @_rcb_source_root ||= File.expand_path("../templates", __FILE__)
       end
 
       def create_config_file
