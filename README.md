@@ -1,21 +1,26 @@
-### TODO
-
-### - implement controller versioning in www
+## Prioritized Todos
 
 ### - implement serializer versioning in CORE-92
 ### -- clone all serializers and attribute serializers using inheritance
-### --- use old signature for from_hash & attribute.serialize in old serializers
-### --- use new signature for from_hash & attribute.serialize in new serializers
-### -- add back serializer_base_new
-### --- patch extentions to trigger SBN when version is 1.0
+### --- lib/publishers/base_publisher.rb
+### --- * propagate options
 
-### - implement versioning
-### -- remove direct references to group_includes in gem
+### --- * use old signature for from_hash & attribute.serialize in old serializers
+### --- * use new signature for from_hash & attribute.serialize in new serializers
+### -- add back serializer_base_new
+### --- change references to api_errors to rcb/errors
+### --- patch extentions to trigger SBN when version is 1.0
+### --- figure out what to do with lookups --> add back serialization_helper?
+
+### - implement route versioning (in www) --> Thanh
+
+### - implement versioning (in gem)
+### -- remove direct references to group_includes
 ### --- move group_includes into context
 ### --- rename context something more unique (rcb_opts)
 
-### - merge document_cache branch  & test( CORE-113 )
-
+### - merge master into CORE-92
+### - merge CORE-92 document_cache branch & test( CORE-113 )
 ### - test RCB
 ### -- move configured serializer class to explicit files
 ### -- finish facade tests
@@ -24,19 +29,23 @@
 ### -- add document cache tests
 ### -- add resource manager tests
 
-### - performance: remove indifferent access in config
-### - implement psuedo containers for non AR resources
+### - research OJ & utilize -> Thanh
+### - benchmark -> Team
 
+## Prioritized Wishlist
+
+### ?- implement one v3 api
+### ?- performance: remove indifferent access in config
+### ?- implement psuedo containers for non AR resources
 ### ?-- make the facade the primary kickoff point
 ### ?- implement registry based resource manager
 ### ?- extract performance monitor into a gem
 ### ?- add client test helpers
-### ?- create a config generator
 
 
 # RealCerealBusiness
 
-RealCerealBusiness is a Rails plugin that enables custom as_json serialization. It is designed for speed, and is magnatudes of order faster than tools like jbuilder.
+RealCerealBusiness is a Rails plugin that enables custom as_json serialization. It is designed for speed, and is magnitudes of order faster than tools like jbuilder.
 
 The framework supports:
 * fields - define the fields you want to serialize, by resource type
