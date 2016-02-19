@@ -36,7 +36,7 @@ module RealCerealBusiness
           config.namespaces[api_attribute]  = options[:within]  if options[:within].present?
         end
 
-        # DSL Defines an attribute extention available for decoration and serialization
+        # DSL Defines an attribute extension available for decoration and serialization
         # @param api_attribute [Symbol] name of the attribute
         def extension(api_attribute)
           config.extensions[api_attribute] = true

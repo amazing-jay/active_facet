@@ -24,8 +24,7 @@ describe RealCerealBusiness::Serializer::Facade do
   let(:serializer) { resource_serializer_class.new }
   let(:resource) { test_resource_class.new(explicit_attr: 'hello', implicit_attr: 'mcfly') }
   let(:instance) { described_class.new(serializer, resource, options) }
-  #TODO remove group_includes after moving to gem
-  let(:options) { { RealCerealBusiness.opts_key => opts, group_includes: fields } }
+  let(:options) { { RealCerealBusiness.opts_key => opts } }
   let(:opts) {
     {
       RealCerealBusiness.fields_key => fields,

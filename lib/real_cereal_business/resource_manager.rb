@@ -78,6 +78,10 @@ module RealCerealBusiness
       end
     end
 
+    def extract_version_from_opts(options)
+      (options.try(:[], RealCerealBusiness.opts_key) || {})[RealCerealBusiness.version_key] || '1.0'
+    end
+
     private
 
     attr_accessor :registry, :memoized_serializers, :memoized_resource_map
@@ -96,7 +100,7 @@ module RealCerealBusiness
     # @param options [Hash] context
     # @return [Class] the first Class successfully described
     def fetch_serializer(resource_class, serializer, type, options)
-      version = (options[RealCerealBusiness.opts_key] || {})[RealCerealBusiness.version_key] || '1.0'
+      version = extract_version_from_opts(options)
       self.class.serializer_mapper.call(resource_class, serializer, type, version, options)
     end
   end

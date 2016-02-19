@@ -30,7 +30,7 @@ module RealCerealBusiness
     # Hash: keys are resource attribute names storing nested JSON, values are nested attribute names
     attr_reader :namespaces
 
-    # Hash: keys are defined extention values
+    # Hash: keys are defined extension values
     attr_reader :extensions
 
     def alias_field_set(field_set_alias, field_set)

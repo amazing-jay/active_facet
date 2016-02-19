@@ -11,10 +11,6 @@
 ### --- update spec/requests/api/v1/product_categories_spec.rb
 ### --- do we clone all request specs?
 
-### - remove direct references to group_includes
-### -- move group_includes into context
-### -- rename context something more unique (rcb_opts)
-
 ### - merge CORE-92 document_cache branch & test( CORE-113 )
 
 ### - test RCB
@@ -30,13 +26,16 @@
 
 ## Prioritized Wishlist
 
-### ?- implement one v3 api
-### ?- performance: remove indifferent access in config
-### ?- implement psuedo containers for non AR resources
-### ?-- make the facade the primary kickoff point
-### ?- implement registry based resource manager
-### ?- extract performance monitor into a gem
-### ?- add client test helpers
+### ? remove direct references to group_includes
+### ?- move group_includes into context
+### ?- rename context something more unique (rcb_opts)
+### ? implement one v3 api
+### ? performance: remove indifferent access in config
+### ? implement psuedo containers for non AR resources
+### ?- make the facade the primary kickoff point
+### ? implement registry based resource manager
+### ? extract performance monitor into a gem
+### ?- add client test helpers with timers and sql counts
 
 
 # RealCerealBusiness

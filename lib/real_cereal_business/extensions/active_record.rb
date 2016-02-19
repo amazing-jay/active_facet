@@ -24,11 +24,11 @@ module RealCerealBusiness
         RealCerealBusiness::ResourceManager.new.serializer_for(self.class, options).from_hash(self, attributes)
       end
 
-      # Overrides default serializer behavior when :group_includes option is present
+      # Overrides default serializer behavior when RCB key is present
       # @param options [Hash]
       # @return [JSON]
       def as_json(options = nil)
-        if options.present? && options.key?(RealCerealBusiness.json_attribute_key) &&
+        if options.present? && options.key?(RealCerealBusiness.opts_key) &&
             (serializer = RealCerealBusiness::ResourceManager.new.serializer_for(self.class, options)).present?
           serializer.as_json(self, options)
         else

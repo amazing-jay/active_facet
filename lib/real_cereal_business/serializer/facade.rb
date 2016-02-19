@@ -18,10 +18,7 @@ module RealCerealBusiness
         self.options          = options
         self.opts             = options[RealCerealBusiness.opts_key] || {}
 
-        #TODO --jdc depricate and enable
-        # search project for group_includes and replace
-        #self.fields          = opts[RealCerealBusiness.fields_key]
-        self.fields           = options[:group_includes]
+        self.fields           = opts[RealCerealBusiness.fields_key]
         self.field_overrides  = opts[RealCerealBusiness.field_overrides_key] || {}
         self.overrides        = RealCerealBusiness::ResourceManager.new.resource_map(resource_class).inject({}) { |overrides, map_entry|
           overrides.merge(field_overrides[map_entry] || {})
@@ -117,34 +114,39 @@ module RealCerealBusiness
       end
 
       # Gets serialized field from the resource
-      # @param scope [Symbol]
+      # @param field [Symbol]
       # @param nested_scope [Mixed] Field Set to pass for relations
       # @return [Mixed]
-      def get_resource_attribute(scope, nested_scopes)
-        if config.namespaces.key? scope
+      def get_resource_attribute(field, nested_field_set)
+        if config.namespaces.key? field
           ::PerformanceMonitor.measure("namespaced resource") do
-            if ns = get_resource_attribute!(config.namespaces[scope])
-              ns[serializer.resource_attribute_name(scope).to_s]
+            if ns = get_resource_attribute!(config.namespaces[field])
+              ns[serializer.resource_attribute_name(field).to_s]
             else
               nil
             end
           end
-        elsif config.extensions.key?(scope)
+        elsif config.extensions.key?(field)
           ::PerformanceMonitor.measure("extended resource") do
-            scope
+            field
           end
-        elsif serializer.is_association?(scope)
-          attribute = ::PerformanceMonitor.measure("N+1 association loading", serializer.class.name, scope, resource.try(:id)) do
-            get_association_attribute(scope)
+        elsif serializer.is_association?(field)
+          attribute = ::PerformanceMonitor.measure("N+1 association loading", serializer.class.name, field, resource.try(:id)) do
+            get_association_attribute(field)
           end
-          ::PerformanceMonitor.measure("nested serialization", serializer.class.name, scope, resource.try(:id)) do
-            attribute.as_json(options.merge(group_includes: nested_scopes))
+          ::PerformanceMonitor.measure("nested serialization", serializer.class.name, field, resource.try(:id)) do
+            #TODO --jdc do we need to deep copy?
+            #o = deep_copy(options)
+            old_field_set = options[RealCerealBusiness.opts_key][RealCerealBusiness.fields_key]
+            options[RealCerealBusiness.opts_key][RealCerealBusiness.fields_key] = nested_field_set
+            attribute.as_json(options)
+            options[RealCerealBusiness.opts_key][RealCerealBusiness.fields_key] = old_field_set
           end
         else
           #TODO: consider serializing everything instead of only associations.
           # Order#shipping_address, for example, is an ActiveRecord but not an association
-          ::PerformanceMonitor.measure("basic resource", serializer.class.name, scope, (resource.is_a?(Array) ? resource : resource.id)) do
-            get_resource_attribute!(serializer.resource_attribute_name(scope))
+          ::PerformanceMonitor.measure("basic resource", serializer.class.name, field, (resource.is_a?(Array) ? resource : resource.id)) do
+            get_resource_attribute!(serializer.resource_attribute_name(field))
           end
         end
       end

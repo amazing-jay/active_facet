@@ -12,9 +12,7 @@ require 'real_cereal_business/version'
 require 'performance_monitor'
 
 module RealCerealBusiness
-  mattr_accessor :json_attribute_key,
-    :json_context_key,
-    :opts_key,
+  mattr_accessor :opts_key,
     :fields_key,
     :field_overrides_key,
     :version_key,
@@ -24,10 +22,6 @@ module RealCerealBusiness
     :cache_enabled,
     :default_cache_options,
     :document_cache
-
-  #TODO --jdc delete both of these
-  self.json_attribute_key             = :group_includes
-  self.json_context_key               = :context
 
   self.opts_key                       = :rsb_opts
   self.fields_key                     = :fields
