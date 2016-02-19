@@ -2,25 +2,21 @@
 
 ### - implement serializer versioning in CORE-92
 ### -- clone all serializers and attribute serializers using inheritance
-### --- lib/publishers/base_publisher.rb
-### --- * propagate options
-
-### --- * use old signature for from_hash & attribute.serialize in old serializers
-### --- * use new signature for from_hash & attribute.serialize in new serializers
-### -- add back serializer_base_new
-### --- change references to api_errors to rcb/errors
-### --- patch extentions to trigger SBN when version is 1.0
-### --- figure out what to do with lookups --> add back serialization_helper?
+### --- remove serializer from spec/requests/api/v1/bundle_orders_spec.rb
+### --- remove serializer from spec/requests/api/v1/bundles_spec.rb
+### --- remove serializer from spec/requests/api/v1/orders_spec.rb
 
 ### - implement route versioning (in www) --> Thanh
+### --- allow api_base_controller.fields:420 param only if version > 1.0
+### --- update spec/requests/api/v1/product_categories_spec.rb
+### --- do we clone all request specs?
 
-### - implement versioning (in gem)
-### -- remove direct references to group_includes
-### --- move group_includes into context
-### --- rename context something more unique (rcb_opts)
+### - remove direct references to group_includes
+### -- move group_includes into context
+### -- rename context something more unique (rcb_opts)
 
-### - merge master into CORE-92
 ### - merge CORE-92 document_cache branch & test( CORE-113 )
+
 ### - test RCB
 ### -- move configured serializer class to explicit files
 ### -- finish facade tests

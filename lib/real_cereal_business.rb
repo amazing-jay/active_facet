@@ -22,8 +22,8 @@ module RealCerealBusiness
     :cache_force_key,
     :preload_associations,
     :cache_enabled,
-    :document_cache,
-    :default_cache_options
+    :default_cache_options,
+    :document_cache
 
   #TODO --jdc delete both of these
   self.json_attribute_key             = :group_includes
@@ -51,6 +51,10 @@ module RealCerealBusiness
 
   def self.resource_mapper
     RealCerealBusiness::ResourceManager.resource_mapper = Proc.new
+  end
+
+  def self.serializer_mapper
+    RealCerealBusiness::ResourceManager.serializer_mapper = Proc.new
   end
 end
 

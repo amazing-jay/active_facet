@@ -7,6 +7,8 @@ default:
   cache_force_key: cache_force
   preload_associations: true
   cache_enabled: true
+  serializer_namespace:
 test:
   preload_associations: false
   cache_enabled: false
+  serializer_namespace:

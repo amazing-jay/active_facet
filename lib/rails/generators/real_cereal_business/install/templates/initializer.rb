@@ -36,14 +36,24 @@ RealCerealBusiness.configure do |config|
   # config.document_cache = ::RealCerealBusiness::DocumentCache
 
   # Tell which filters and field_overrides apply to a given resource
-  # config.resource_mapper { |resource_class|
+  # config.resource_mapper do |resource_class|
   #   [].tap do |map|
   #     until(resource_class.superclass == BasicObject) do
   #       map << resource_class.name.tableize
   #       resource_class = resource_class.superclass
   #     end
   #   end
-  # }
+  # end
+
+  # Tell which serializer to apply for a given resource
+  # config.serializer_mapper do |resource_class, serializer, type, version, options|
+  #   case type
+  #   when :serializer
+  #     (version.to_s + '::' + resource_class.name.camelcase + type.to_s.camecase).constantize.new
+  #   else
+  #     (version.to_s + '::' + resource_class.name.camelcase + type.to_s.camecase).constantize
+  #   end
+  # end
 
   # Define global filters to apply for all resources
   # config.global_filter(:active) do |state = :enabled|
