@@ -26,21 +26,19 @@
 
 ## Prioritized Wishlist
 
-### ? remove direct references to group_includes
-### ?- move group_includes into context
-### ?- rename context something more unique (rcb_opts)
 ### ? implement one v3 api
 ### ? performance: remove indifferent access in config
 ### ? implement psuedo containers for non AR resources
-### ?- make the facade the primary kickoff point
+### ? - make the facade the primary kickoff point
+### ? - extract filters from extensions
 ### ? implement registry based resource manager
 ### ? extract performance monitor into a gem
-### ?- add client test helpers with timers and sql counts
+### ? add client test helpers with timers and sql counts
 
 
 # RealCerealBusiness
 
-RealCerealBusiness is a Rails plugin that enables custom as_json serialization. It is designed for speed, and is magnitudes of order faster than tools like jbuilder.
+RealCerealBusiness is a Rails plugin that enables custom as_json serialization. It is designed for speed, and is magnitudes of order faster than jbuilder.
 
 The framework supports:
 * fields - define the fields you want to serialize, by resource type
@@ -76,146 +74,145 @@ To add an initializer to your application.
 ## Usage
 
 ```ruby
-Kid.new({
-  id: 1,
-  created_at: "2014-03-23 00:23:32",
-  updated_at: "2014-03-23 00:23:32",
-  data: { 'weight' => 243 }
-}).as_json(group_includes: [:timestamps, :name])
-# =>
-# {
-#   id: 1,
-#   created_at: 2343242342,
-#   updated_at: "2014-03-23 00:23:32",
-#   weight: 2432252
-# }
-
-Kid.new.hydrate!({
-  id: 1,
-  created_at: 2343242342,
-  updated_at: "2014-03-23 00:23:32",
-  weight: 2432252
+Parent.limit(2).as_json(rcb_opts: {
+  version: "2.3.8",
+  cache_force: true,
+  fields: [:basic, :extended, { children: [:minimal, :extension] }]
+  field_overrides: {
+    parent: [:id, :children, :foo, :bar],
+    child: [:fizz, :buzz]
+  },
+  filters: {
+    single_parent: true,
+    with_children_parent: 3,
+    active: :disabled
+  }
 })
 # =>
-# {
-#   id: 1,
-#   created_at: "2014-03-23 00:23:32",
-#   updated_at: "2014-03-23 00:23:32",
-#   data: { 'weight' => 243 }
-# }
-
-Kid.scoped_includes([:timestamps, :trackings])
-# =>
-# equivalent to: Kid.includes([:trackings])
-
-Honest::Serializers::Kid::KidSerializer.new.exposed_aliases(:all)
-# =>
-# [
-#    [0] :birth_date,
-#    [1] :created_at,
-#    [2] :gender,
-#    [3] :id,
-#    [4] :image,
-#    [5] :name,
-#    [6] :notes,
-#    [7] :updated_at,
-#    [8] :weight,
-#    [9] :weight_date
-# ]
-
-Honest::Serializers::Kid::KidSerializer.new.exposed_aliases(:all,true)
-# =>
-# [
-#    [ 0] :birth_date,
-#    [ 1] :created_at,
-#    [ 2] :gender,
-#    [ 3] :id,
-#    [ 4] :image,
-#    [ 5] :name,
-#    [ 6] :notes,
-#    [ 7] :trackings, ##<< relations are included
-#    [ 8] :updated_at,
-#    [ 9] :weight,
-#    [10] :weight_date
-# ]
+[ {
+    id: 1,
+    created_at: 2343242342,
+    updated_at: "2014-03-23 00:23:32",
+    weight: 2432252,
+    children: [ {
+      fizz: 'care bear'
+    }, {
+      fizz: 'hello',
+      buzz: 'world'
+    } ]
+  }, {
+    id: 2,
+    created_at: 2343242777,
+    updated_at: "2014-04-24 01:34:25",
+    children: [ {
+      fizz: 'tamato'
+    } ]
+  }
+}
 ```
 
-# API v1 serializers use the following DSL to configure the serialization & hydration of resources
-## Every resource should declare a serializer as follows:
+### Defaults
+
+All options are optional
+
+#### :version
+Version of serializer to marshal resources with. Defaults to:
 ```ruby
-module Honest
-  module Serializers
-    module Kid
-      class KidSerializer < ::RealCerealBusiness::Base
+"1.0"
+```
 
+#### :cache_force
+Force serializers to ignore cached documents. Defaults to:
+```ruby
+false
+```
 
-          # TRANSFORMS
+#### :fields
+Attributes to marshal. See Field Sets. Defaults to:
+```ruby
+:basic
+```
 
-          # Renames kid.kid_trackings to json['trackings'] on kid.as_json...
-          transform :trackings,               from: :kid_trackings
+#### :field_overrides
+Attributes to marshal, by resource type. See Field Sets. Defaults to:
+```ruby
+{}
+```
 
-          # Renames json['trackings'] to kid.kid_trackings on Kid.from_hash...:
-          transform :trackings,               to: :kid_trackings
+#### :filters
+Filters to apply when marshalling associations. See Field Sets. Defaults to:
+```ruby
+{}
+```
 
-          # Renames kid.kid_trackings to json['trackings'] on kid.as_json... & Kid.from_hash...
-          transform :trackings,               as: :kid_trackings
+### Serializer DSL
 
-          # Converts json['created_at'] with TimeCustomAttributeSerializer on kid.as_json... & Kid.from_hash...
-          transform :created_at,              with: :time
+```ruby
+class ParentSerializer
+  include RealCerealBusiness::Serializer::Base
 
-          # Renames json['created_at'] to kid.data['weight'] on kid.as_json... & Kid.from_hash...
-          transform :weight,                  within: :data
+  # TRANSFORMS
 
-          # Renames json['weighed'] to kid.data['weighed_at'] using TimeCustomAttributeSerializer converter on kid.as_json... & Kid.from_hash...
-          transform :weighed,                 within: :data, with: :time, as: :wieghed_at
+  # Transforms rename attributes and apply custom serializers to attributes data.
 
+  # Renames parent.kid_trackings to json['trackings'] on parent.as_json...
+  transform :trackings,               from: :kid_trackings
 
+  # Renames json['trackings'] to parent.kid_trackings on parent.from_hash...:
+  transform :trackings,               to: :kid_trackings
 
-          # EXTENSIONS
+  # Renames parent.kid_trackings to json['trackings'] on parent.as_json... & parent.from_hash...
+  transform :trackings,               as: :kid_trackings
 
-          # Extensions are ONLY to be used when data is not directly accessible from the resource.
-          # Use `transform` whenever possible
+  # Converts json['created_at'] with TimeCustomAttributeSerializer on parent.as_json... & parent.from_hash...
+  transform :created_at,              with: :time
 
-          # Decorates & serializes json['free_shipping_minimum'] on kid.as_json...
-          extension :free_shipping_minimum
+  # Renames json['created_at'] to parent.data['weight'] on parent.as_json... & parent.from_hash...
+  transform :weight,                  within: :data
 
-
-
-          # EXPOSURES
-
-          # Declare an alias that can be used in lieu of a collection of attributes & relation attributes on kid.as_json...
-
-          # Symbols map to resource methods or other aliases
-
-          # NOTE:: ALL RESOURCE METHODS ARE EXPOSED BY DEFAULT
-          # expose :name
-
-          # Arrays map to collections of resource methods and aliases
-          expose :timestamps,                 as: [:id, :created_at, :updated_at]
-          expose :basic,                      as: [:timestamps, :name]
-
-          # Hashes map to relations and attributes/aliases declared on the relation
-          expose :deep,                       as: { trackings: :basic }
-
-          # Composite structures can be formed from Symbols, Arrays, and Hashes
-          expose :deep_basic,                 as: [:timestamps, :basic, { trackings: [:basic, :extended] }]
-
-          # NOTE:: all serializers must expose a basic collection, as it is added to all composites by default
-          expose :deep_basic,                 as: [:timestamps, { trackings: :extended }]
+  # Renames json['weighed'] to parent.data['weighed_at'] using TimeCustomAttributeSerializer converter on parent.as_json... & parent.from_hash...
+  transform :weighed,                 within: :data, with: :time, as: :wieghed_at
 
 
 
-          # BONUSES
+  # EXTENSIONS
 
-          # Equivalent to
-          # transform :created_at, with: :time
-          # transform :updated_at, with: :time
-          # expose :timestamps, as: [:id, :created_at, :updated_at]
-          expose_timestamps
+  # Extensions decorate the json response when attribute data is not directly accessible from the resource.
 
-      end
-    end
-  end
+  # Decorates json['free_shipping_minimum'] on parent.as_json...
+  extension :free_shipping_minimum
+
+
+
+  # FIELD SETS
+
+  # Field sets indicate the desired fields to serialize for a given resource type.
+  # Field sets can be aliased, and reference aliases, recursively.
+  # Field sets can reference Field Sets defined for ActiveRecord Association resource types in a hierarchical structure
+
+  # NOTE:: make sure to define :basic and :minimal Field Sets for all resources
+  # :basic is implicitely added to all Field Sets that do not inclue :minimal during serialization
+
+  # Arrays map to collections
+  expose :timestamps,                 as: [:id, :created_at, :updated_at]
+  expose :basic,                      as: [:timestamps, :name]
+
+  # Hashes map to relations and the Field Sets declared on the relation
+  expose :deep,                       as: { trackings: :basic }
+
+  # Composite structures can be formed from Symbols, Arrays, and Hashes
+  expose :deep_basic,                 as: [:timestamps, :basic, { trackings: [:basic, :extended] }]
+
+
+
+  # EXPOSE_TIMESTAMPS
+
+  # expose_timestamps is equivalent to
+  # transform :created_at, with: :time
+  # transform :updated_at, with: :time
+  # expose :timestamps, as: [:id, :created_at, :updated_at]
+  expose_timestamps
+
 end
 ```
 
@@ -225,6 +222,8 @@ After checking out the repo, run `bin/setup` to install dependencies. Then, run 
 
 To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
 
+To configure a host application to use a local version of the gem without modifying the host application's Gemfile run 'bundle config local.real_cereal_business /path/to/local/git/repository'`.
+
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/real_cereal_business. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
@@ -233,3 +232,6 @@ Bug reports and pull requests are welcome on GitHub at https://github.com/[USERN
 ## License
 
 The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
+
+Collections of nested attributes can be exposed as an alias.
+

@@ -28,7 +28,7 @@ module RealCerealBusiness
   self.field_overrides_key            = :field_overrides
   self.version_key                    = :version
   self.filters_key                    = :filters
-  self.cache_force_key                = :cache_force
+  self.cache_force_key                = :cache_force0
 
   self.preload_associations           = false
   self.cache_enabled                  = false
@@ -37,6 +37,7 @@ module RealCerealBusiness
 
   def self.configure
     yield(self)
+    ActiveRecord::Base.register_filters
   end
 
   def self.global_filter(name)

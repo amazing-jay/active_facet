@@ -10,12 +10,6 @@ module RealCerealBusiness
       mattr_accessor :filters
       self.filters = {}
 
-      included do
-        RealCerealBusiness::Extensions::ActiveRecord.filters.each do |filter_name, filter_method|
-          scope_filter filter_name, &filter_method
-        end
-      end
-
       # Extends AR allowing hydration of a model instance
       # @param attributes [Hash]
       # @param options [Hash]
@@ -38,6 +32,13 @@ module RealCerealBusiness
 
       module ClassMethods
 
+        #TODO --jdc extract this from the AR namespace
+        def register_filters(receiver = self)
+          RealCerealBusiness::Extensions::ActiveRecord.filters.each do |filter_name, filter_method|
+            receiver.scope_filter filter_name, &filter_method
+          end
+        end
+
         # Applies all filters registered with this resource on a ProxyCollection
         # @param filter_values [Hash] keys = registerd filter name, values = filter arguments
         def scope_filters(filter_values = nil)
@@ -51,14 +52,14 @@ module RealCerealBusiness
           end
         end
 
-        #TODO --jdc remove this from AR namespace
+        #TODO --jdc extract this from AR namespace
 
         # Registers a scope filter on this resource and subclasses
         # @param filter_name [Symbol] filter name
         # @param filter_method_name [Symbol] scope name
         def scope_filter(filter_name, filter_method_name = nil, &filter_method)
           filter_method_name ||= "registered_filter_#{filter_name}"
-          singleton_class.send(:define_method, filter_method_name, filter_method) if filter_method
+          define_singleton_method(filter_method_name, filter_method) if filter_method
 
           @inheritable_scope_filters ||= {}
           @inheritable_scope_filters[filter_name.to_sym] = filter_method_name.to_sym
