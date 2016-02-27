@@ -296,7 +296,7 @@ describe RealCerealBusiness::Serializer::Base do
     end
 
     describe ".get_custom_serializer_class" do
-      subject { instance.get_custom_serializer_class(field) }
+      subject { instance.get_custom_serializer_class(field, options) }
       context "registered" do
         let(:field) { :customizer }
         it { expect(subject).to be(attribute_serializer_class) }

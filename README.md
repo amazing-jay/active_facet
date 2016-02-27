@@ -2,9 +2,7 @@
 
 ### - implement serializer versioning in CORE-92
 ### -- clone all serializers and attribute serializers using inheritance
-### --- remove serializer from spec/requests/api/v1/bundle_orders_spec.rb
-### --- remove serializer from spec/requests/api/v1/bundles_spec.rb
-### --- remove serializer from spec/requests/api/v1/orders_spec.rb
+### -- clone all serializer, attribute and request specs
 
 ### - implement route versioning (in www) --> Thanh
 ### --- allow api_base_controller.fields:420 param only if version > 1.0
@@ -46,6 +44,7 @@ The framework supports:
 * versioning - describe serialization of resources by version, with automatic fallback
 * caching - optomize performance by composing documents from smaller documents
 * nested resources - serialize models and associations with one call chain
+* filters - restrict records from associations with custom scopes
 
 ## Installation
 

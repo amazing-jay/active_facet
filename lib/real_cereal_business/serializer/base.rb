@@ -185,10 +185,11 @@ module RealCerealBusiness
 
       # Constantizes an appropriate attribute serializer class
       # @param attribute [Symbol] base_name of attribute serializer class to find
+      # @param options [Hash]
       # @return [Class | nil]
-      def get_custom_serializer_class(attribute)
+      def get_custom_serializer_class(attribute, options)
         @custom_serializers ||= {}
-        @custom_serializers[attribute] ||= RealCerealBusiness::ResourceManager.new.attribute_serializer_class_for(resource_class, attribute)
+        @custom_serializers[attribute] ||= RealCerealBusiness::ResourceManager.new.attribute_serializer_class_for(resource_class, attribute, options)
       end
 
       # Determines if public attribute maps to a private relation

@@ -139,8 +139,9 @@ module RealCerealBusiness
             #o = deep_copy(options)
             old_field_set = options[RealCerealBusiness.opts_key][RealCerealBusiness.fields_key]
             options[RealCerealBusiness.opts_key][RealCerealBusiness.fields_key] = nested_field_set
-            attribute.as_json(options)
+            json = attribute.as_json(options)
             options[RealCerealBusiness.opts_key][RealCerealBusiness.fields_key] = old_field_set
+            json
           end
         else
           #TODO: consider serializing everything instead of only associations.
@@ -182,7 +183,7 @@ module RealCerealBusiness
           ::PerformanceMonitor.measure(config.extensions.key?(scope) ? "extension" : "custom serializer", self.class.name, scope, (resource.is_a?(Array) ? resource : resource.id)) do
             scope_s = scope
             #TODO --jdc add as_json(options) to this call
-            json[scope_s] = serializer.get_custom_serializer_class(type).serialize(json[scope_s], resource, options) if json.key? scope_s
+            json[scope_s] = serializer.get_custom_serializer_class(type, options).serialize(json[scope_s], resource, options) if json.key? scope_s
           end
         end
         Hash[json.sort]
@@ -219,7 +220,7 @@ module RealCerealBusiness
       def hydrate_scopes!(json)
         config.serializers.each do |scope, type|
           scope_s = scope
-          json[scope_s] = serializer.get_custom_serializer_class(type).hydrate(json[scope], resource, options) if json.key? scope_s
+          json[scope_s] = serializer.get_custom_serializer_class(type, options).hydrate(json[scope], resource, options) if json.key? scope_s
         end
         json
       end
