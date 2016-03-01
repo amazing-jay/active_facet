@@ -277,8 +277,9 @@ describe RealCerealBusiness::Serializer::Base do
       end
     end
 
+    #todo test version impact in lookups
     describe ".get_association_serializer_class" do
-      let(:options) { { context: version: 2 } }
+      let(:options) { }
       subject { instance.get_association_serializer_class(field, options) }
       context "self association" do
         let(:field) { :parent }
@@ -297,6 +298,7 @@ describe RealCerealBusiness::Serializer::Base do
     end
 
     describe ".get_custom_serializer_class" do
+      let(:options) { }
       subject { instance.get_custom_serializer_class(field, options) }
       context "registered" do
         let(:field) { :customizer }
@@ -305,7 +307,7 @@ describe RealCerealBusiness::Serializer::Base do
 
       context "unregistered" do
         let(:field) { :unregistered }
-        it { expect(subject).to be nil }
+        it { expect{subject}.to raise_error(RealCerealBusiness::Errors::LookupError, 'Unable to locate serializer for:: ["ResourceA", "Unregistered", :attribute_serializer, 1.0, nil]') }
       end
     end
 

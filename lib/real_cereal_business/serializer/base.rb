@@ -105,7 +105,7 @@ module RealCerealBusiness
             attribute = resource_attribute_name(field_set)
             if nested_field_sets
               serializer_class = get_association_serializer_class(field_set, options)
-              attribute = { attribute => serializer_class.present? ? serializer_class.scoped_includes(nested_field_sets) : nested_field_sets }
+              attribute = { attribute => serializer_class.present? ? serializer_class.scoped_includes(nested_field_sets, options) : nested_field_sets }
             end
             attribute
           else

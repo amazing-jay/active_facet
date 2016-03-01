@@ -35,7 +35,7 @@ describe RealCerealBusiness::Serializer::Facade do
   }
   let(:fields) { :fields }
   let(:field_overrides) { :field_overrides }
-  let(:version) { :version }
+  let(:version) { 1.0 }
   let(:filters) { :filters }
   let(:overrides) { {explicit_attr: true, implicit_attr: true} }
 

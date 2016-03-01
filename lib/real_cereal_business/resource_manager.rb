@@ -1,5 +1,4 @@
 #TODO --jdc rebuild this class to either not use an explicit singleton pattern or use a factory pattern
-#TODO --jdc refactor this class so lookups are not coupled with lib/honest/serializers file structure
 module RealCerealBusiness
   class ResourceManager
 
@@ -101,7 +100,12 @@ module RealCerealBusiness
     # @return [Class] the first Class successfully described
     def fetch_serializer(resource_class, serializer, type, options)
       version = extract_version_from_opts(options)
-      self.class.serializer_mapper.call(resource_class, serializer, type, version, options)
+      unless result = self.class.serializer_mapper.call(resource_class, serializer, type, version, options)
+        #binding.pry
+        #raise RealCerealBusiness::Errors::LookupError.new "Unable to locate serializer for:: " + [resource_class.name, serializer, type, version, options].to_s
+        ap "Unable to locate serializer for:: " + [resource_class.name, serializer, type, version, options].to_s
+      end
+      result
     end
   end
 end

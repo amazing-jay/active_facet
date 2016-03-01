@@ -75,13 +75,30 @@ module TestHarnessHelper
       ]
     end
 
-    #TODO --jdc remove this hack after decoupling serializers from filesystem
-    allow(RealCerealBusiness::ResourceManager.new).to receive(:serializer_for) { nil }
-    allow(RealCerealBusiness::ResourceManager.new).to receive(:serializer_for).with(test_resource_class) {  resource_serializer_class.new }
-    allow(RealCerealBusiness::ResourceManager.new).to receive(:serializer_for).with(test_association_class) { association_serializer_class.new }
-    allow(RealCerealBusiness::ResourceManager.new).to receive(:attribute_serializer_class_for) { nil }
-    allow(RealCerealBusiness::ResourceManager.new).to receive(:attribute_serializer_class_for).with(test_resource_class, :customizer) { attribute_serializer_class }
-    allow(RealCerealBusiness::ResourceManager.new).to receive(:attribute_serializer_class_for).with(test_resource_class, :extension_attr) { attribute_serializer_class }
+    RealCerealBusiness.serializer_mapper do |resource_class, serializer, type, version, options|
+      case type
+      when :serializer
+        case resource_class.to_s
+        when test_resource_class.to_s
+          resource_serializer_class.new
+        when test_association_class.to_s
+          association_serializer_class.new
+        else
+          nil
+        end
+      when :attribute_serializer
+        case serializer
+        when 'Customizer'
+          attribute_serializer_class
+        when 'ExtensionAttr'
+          attribute_serializer_class
+        else
+          nil
+        end
+      else
+        nil
+      end
+    end
 
     resource_serializer_class
   end
