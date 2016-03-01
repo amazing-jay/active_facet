@@ -5,6 +5,9 @@ RealCerealBusiness.configure do |config|
   @config_file = YAML::load_file(config_file_path)
   @env_config = (@config_file['default'] || {}).merge(@config_file[environment] || {})
 
+  # The version to use if none is designated in context for serialization. 1.0 by default.
+  # config.default_version                = 1.0
+
   # The symbol which acts as the options key that designates context for serialization. :rsb_opts by default.
   # config.opts_key                       = @env_config['rsb_opts'].to_sym
 

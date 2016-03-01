@@ -1,15 +1,12 @@
 ## Prioritized Todos
 
-### - implement serializer versioning in CORE-92
-### -- clone all serializers and attribute serializers using inheritance
-### -- clone all serializer, attribute and request specs
-
-### - implement route versioning (in www) --> Thanh
-### --- allow api_base_controller.fields:420 param only if version > 1.0
-### --- update spec/requests/api/v1/product_categories_spec.rb
-### --- do we clone all request specs?
-
+### - search for all group_includes in V2 serializers and merge into context
+### - fix signature on all managedassethelper usages to not include group_includes
+### - raise error in RCB initializer if version is 1 and spec the entire v2 request and serializer suite
+### - look at active_record#delegation to refactor filters
 ### - merge CORE-92 document_cache branch & test( CORE-113 )
+
+### - benchmark
 
 ### - test RCB
 ### -- move configured serializer class to explicit files
@@ -19,12 +16,12 @@
 ### -- add document cache tests
 ### -- add resource manager tests
 
-### - research OJ & utilize -> Thanh
-### - benchmark -> Team
+### - document the shit out of this gem
 
 ## Prioritized Wishlist
 
 ### ? implement one v3 api
+### ? rename field group to facet
 ### ? performance: remove indifferent access in config
 ### ? implement psuedo containers for non AR resources
 ### ? - make the facade the primary kickoff point
@@ -32,11 +29,12 @@
 ### ? implement registry based resource manager
 ### ? extract performance monitor into a gem
 ### ? add client test helpers with timers and sql counts
-
+### ? write an article about scaling with rails in the real world
+### ? open source this gem
 
 # RealCerealBusiness
 
-RealCerealBusiness is a Rails plugin that enables custom as_json serialization. It is designed for speed, and is magnitudes of order faster than jbuilder.
+RealCerealBusiness is a Rails plugin that enables custom as_json serialization intended for APIs. It is designed for speed, and is magnitudes of order faster than jbuilder.
 
 The framework supports:
 * fields - define the fields you want to serialize, by resource type

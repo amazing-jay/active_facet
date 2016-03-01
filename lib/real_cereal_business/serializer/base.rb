@@ -99,12 +99,12 @@ module RealCerealBusiness
       #  [:basic, :extended, {orders: [:basic, :line_items]}]
       #  [:basic, :extended, {orders: [:basic, {line_items: :extended}]}]
       # @return [Hash]
-      def scoped_includes(field_set = nil)
+      def scoped_includes(field_set = nil, options = {})
         config.field_set_itterator(field_set) do |field_set, nested_field_sets|
           if is_association? field_set
             attribute = resource_attribute_name(field_set)
             if nested_field_sets
-              serializer_class = get_association_serializer_class(field_set)
+              serializer_class = get_association_serializer_class(field_set, options)
               attribute = { attribute => serializer_class.present? ? serializer_class.scoped_includes(nested_field_sets) : nested_field_sets }
             end
             attribute
@@ -130,8 +130,8 @@ module RealCerealBusiness
       # @param resource [ActiveRecord] to hydrate
       # @param attribute [Hash] subset of the values returned by {resource.as_json}
       # @return [ActiveRecord] resource
-      def from_hash(resource, attributes)
-        RealCerealBusiness::Serializer::Facade.new(self,resource).from_hash(attributes)
+      def from_hash(resource, attributes, options = {})
+        RealCerealBusiness::Serializer::Facade.new(self, resource, options).from_hash(attributes)
       end
 
       # This method returns a JSON of hash values representing the resource(s)
@@ -170,14 +170,14 @@ module RealCerealBusiness
       # Constantizes an appropriate resource serializer class
       # @param field [Symbol] to test as relation and find serializer class for
       # @return [Class | nil]
-      def get_association_serializer_class(field)
+      def get_association_serializer_class(field, options)
         @association_serializers ||= {}
         unless @association_serializers.key? field
           @association_serializers[field] = nil
           #return nil if field isn't an association
           if reflection = get_association_reflection(field)
             #return nil if association doesn't have a custom class
-            @association_serializers[field] = RealCerealBusiness::ResourceManager.new.serializer_for(reflection.klass)
+            @association_serializers[field] = RealCerealBusiness::ResourceManager.new.serializer_for(reflection.klass, options)
           end
         end
         @association_serializers[field]

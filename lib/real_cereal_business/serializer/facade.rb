@@ -107,7 +107,6 @@ module RealCerealBusiness
             end
           end
         end
-
         serialize_scopes! json
 
         json

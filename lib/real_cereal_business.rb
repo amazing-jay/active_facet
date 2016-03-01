@@ -21,8 +21,10 @@ module RealCerealBusiness
     :preload_associations,
     :cache_enabled,
     :default_cache_options,
-    :document_cache
+    :document_cache,
+    :default_version
 
+  self.default_version                = 1.0
   self.opts_key                       = :rsb_opts
   self.fields_key                     = :fields
   self.field_overrides_key            = :field_overrides

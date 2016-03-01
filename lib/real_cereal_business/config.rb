@@ -180,9 +180,11 @@ module RealCerealBusiness
         minimal ? field_set.to_sym : [field_set.to_sym, :basic]
       when Array
         minimal ? field_set : field_set + [:basic]
-      else #Hash
+      when Hash
         field_set[:basic] = nil unless minimal
         field_set
+      else
+        raise RealCerealBusiness::Errors::ConfigurationError.new(RealCerealBusiness::Errors::ConfigurationError::FIELD_SET_ERROR_MSG)
       end
     end
 
@@ -199,8 +201,10 @@ module RealCerealBusiness
         field_set.to_sym == key
       when Array
         field_set.detect { |s| detect_field_set(s, key) }
-      else #Hash
+      when Hash
         field_set.detect { |s, n| detect_field_set(s, key) }.try(:[], 0)
+      else
+        raise RealCerealBusiness::Errors::ConfigurationError.new(RealCerealBusiness::Errors::ConfigurationError::FIELD_SET_ERROR_MSG)
       end
     end
 

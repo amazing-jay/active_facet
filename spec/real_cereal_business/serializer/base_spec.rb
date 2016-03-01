@@ -278,7 +278,8 @@ describe RealCerealBusiness::Serializer::Base do
     end
 
     describe ".get_association_serializer_class" do
-      subject { instance.get_association_serializer_class(field) }
+      let(:options) { { context: version: 2 } }
+      subject { instance.get_association_serializer_class(field, options) }
       context "self association" do
         let(:field) { :parent }
         it { expect(subject).to be(resource_serializer_class.new) }

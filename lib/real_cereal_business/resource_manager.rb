@@ -79,7 +79,7 @@ module RealCerealBusiness
     end
 
     def extract_version_from_opts(options)
-      ((options.try(:[], RealCerealBusiness.opts_key) || {})[RealCerealBusiness.version_key] || '1.0').to_f
+      ((options.try(:[], RealCerealBusiness.opts_key) || {})[RealCerealBusiness.version_key] || RealCerealBusiness.default_version).to_f
     end
 
     private
