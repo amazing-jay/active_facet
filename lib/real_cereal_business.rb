@@ -60,14 +60,13 @@ module RealCerealBusiness
   end
 
   def self.options_with_fields(options, fields)
-    binding.pry unless options
     (options[RealCerealBusiness.opts_key] ||= {})[RealCerealBusiness.fields_key] = fields
     options
   end
 
   def self.restore_opts_after(options, key, value)
     opts = (options[RealCerealBusiness.opts_key] ||= {})
-    old = [key]
+    old = opts[key]
     opts[key] = value
     yield
   ensure

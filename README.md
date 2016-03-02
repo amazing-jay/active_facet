@@ -1,10 +1,12 @@
 ## Prioritized Todos
 
 ### - search for all group_includes in V2 serializers and merge into context
-### - fix signature on all managedassethelper usages to not include group_includes
-### - raise error in RCB initializer if version is 1 and spec the entire v2 request and serializer suite
-### - look at active_record#delegation to refactor filters
 ### - merge CORE-92 document_cache branch & test( CORE-113 )
+### - add OJ to CORE-113
+
+### - fix Publishers::BasePublisher usage of RCB_CURRENT_VERSION
+### - fix signature on all managedassethelper usages to not include group_includes
+### - look at active_record#delegation to refactor filters
 
 ### - benchmark
 

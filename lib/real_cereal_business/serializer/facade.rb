@@ -176,8 +176,10 @@ module RealCerealBusiness
         config.serializers.each do |scope, type|
           ::PerformanceMonitor.measure(config.extensions.key?(scope) ? "extension" : "custom serializer", self.class.name, scope, (resource.is_a?(Array) ? resource : resource.id)) do
             scope_s = scope
-            #TODO --jdc add as_json(options) to this call
-            json[scope_s] = serializer.get_custom_serializer_class(type, options).serialize(json[scope_s], resource, options) if json.key? scope_s
+            json[scope_s] = RealCerealBusiness.restore_opts_after(options, RealCerealBusiness.fields_key, fields) do
+              #TODO --jdc add as_json(options) to this call
+              serializer.get_custom_serializer_class(type, options).serialize(json[scope_s], resource, options)
+            end if json.key? scope_s
           end
         end
         Hash[json.sort]
