@@ -101,9 +101,9 @@ module RealCerealBusiness
     def fetch_serializer(resource_class, serializer, type, options)
       version = extract_version_from_opts(options)
       unless result = self.class.serializer_mapper.call(resource_class, serializer, type, version, options)
-        #binding.pry
-        #raise RealCerealBusiness::Errors::LookupError.new "Unable to locate serializer for:: " + [resource_class.name, serializer, type, version, options].to_s
-        ap "Unable to locate serializer for:: " + [resource_class.name, serializer, type, version, options].to_s
+        # binding.pry
+        # raise RealCerealBusiness::Errors::LookupError.new "Unable to locate serializer for:: " + [resource_class.name, serializer, type, version].to_s
+        Rails.logger.warn "Unable to locate serializer for:: " + [resource_class.name, serializer, type, version, options].to_s
       end
       result
     end

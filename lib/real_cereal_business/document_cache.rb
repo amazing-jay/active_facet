@@ -15,6 +15,7 @@ module RealCerealBusiness
 
       # didn't use Rails.cache.fetch(cache_key, because it be slower with interprelation
       #TODO --jdc fetch larger documents and pluck field_overrides
+      #TODO --integrate Oj here for both load and dump
       if force.blank? && Rails.cache.exist?(cache_key)
         JSON.parse Rails.cache.fetch(cache_key)
       else

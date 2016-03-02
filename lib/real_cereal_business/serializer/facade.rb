@@ -51,14 +51,10 @@ module RealCerealBusiness
       # @param attribute [Hash] subset of the values returned by {resource.as_json}
       # @return [ActiveRecord] resource
       def from_hash(attributes)
-        hydrate! deep_copy(attributes)
+        hydrate! RealCerealBusiness.deep_copy(attributes)
       end
 
       private
-
-      def deep_copy(o)
-        Marshal.load(Marshal.dump(o))
-      end
 
       # @return [Config]
       def config
@@ -135,11 +131,10 @@ module RealCerealBusiness
           end
           ::PerformanceMonitor.measure("nested serialization", serializer.class.name, field, resource.try(:id)) do
             #TODO --jdc do we need to deep copy?
-            #o = deep_copy(options)
-            old_field_set = options[RealCerealBusiness.opts_key][RealCerealBusiness.fields_key]
-            options[RealCerealBusiness.opts_key][RealCerealBusiness.fields_key] = nested_field_set
-            json = attribute.as_json(options)
-            options[RealCerealBusiness.opts_key][RealCerealBusiness.fields_key] = old_field_set
+            #o = RealCerealBusiness.deep_copy(options)
+            json = RealCerealBusiness.restore_opts_after(options, RealCerealBusiness.fields_key, nested_field_set) do
+              attribute.as_json(options)
+            end
             json
           end
         else

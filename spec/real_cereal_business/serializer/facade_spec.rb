@@ -71,16 +71,6 @@ describe RealCerealBusiness::Serializer::Facade do
         # hydrate! deep_copy(attributes)
   end
 
-  describe ".deep_copy(o)" do
-    let(:obj) { { a: [:b,:c], d: { e: :f } } }
-    subject { instance.send(:deep_copy, obj) }
-    before do
-      subject[:d][:e] = :g
-    end
-    it { expect(obj).to eq({ a: [:b,:c], d: { e: :f } }) }
-    it { expect(subject).to eq({ a: [:b,:c], d: { e: :g } }) }
-  end
-
   describe ".config" do
     subject { instance.send(:config) }
     it { expect(subject).to eq(serializer.config) }
