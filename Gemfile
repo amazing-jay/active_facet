@@ -5,6 +5,8 @@ source "https://rubygems.org"
 # development dependencies will be added by default to the :development group.
 gemspec
 
+gem 'watchful_guerilla', '~> 0.1.0', git: 'git@github.com:honest/watchful_guerilla.git', tag: 'v0.1.0', branch: 'master'
+
 # jquery-rails is used by the dummy application
 gem "jquery-rails"
 
