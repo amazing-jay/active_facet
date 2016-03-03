@@ -1,7 +1,6 @@
 ## Prioritized Todos
 
 ### - search for all group_includes in V2 serializers and merge into context
-### - merge CORE-92 document_cache branch & test( CORE-113 )
 ### - add OJ to CORE-113
 
 ### - fix Publishers::BasePublisher usage of RCB_CURRENT_VERSION

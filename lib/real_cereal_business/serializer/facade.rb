@@ -92,9 +92,9 @@ module RealCerealBusiness
       # @return [JSON]
       def serialize!
         json = {}.with_indifferent_access
-        ::PerformanceMonitor.measure("scope_itteration") do
+        ::WatchfulGuerilla.measure("scope_itteration") do
           config.field_set_itterator(fields) do |scope, nested_scopes|
-            ::PerformanceMonitor.measure("attribute retrieval wrapper", self.class.name, scope, (resource.is_a?(Array) ? resource : resource.id)) do
+            ::WatchfulGuerilla.measure("attribute retrieval wrapper", self.class.name, scope, (resource.is_a?(Array) ? resource : resource.id)) do
               begin
                 json[scope] = get_resource_attribute scope, nested_scopes if allowed_field?(scope)
               rescue RealCerealBusiness::Errors::AttributeError => e
@@ -114,7 +114,7 @@ module RealCerealBusiness
       # @return [Mixed]
       def get_resource_attribute(field, nested_field_set)
         if config.namespaces.key? field
-          ::PerformanceMonitor.measure("namespaced resource") do
+          ::WatchfulGuerilla.measure("namespaced resource") do
             if ns = get_resource_attribute!(config.namespaces[field])
               ns[serializer.resource_attribute_name(field).to_s]
             else
@@ -122,14 +122,14 @@ module RealCerealBusiness
             end
           end
         elsif config.extensions.key?(field)
-          ::PerformanceMonitor.measure("extended resource") do
+          ::WatchfulGuerilla.measure("extended resource") do
             field
           end
         elsif serializer.is_association?(field)
-          attribute = ::PerformanceMonitor.measure("N+1 association loading", serializer.class.name, field, resource.try(:id)) do
+          attribute = ::WatchfulGuerilla.measure("N+1 association loading", serializer.class.name, field, resource.try(:id)) do
             get_association_attribute(field)
           end
-          ::PerformanceMonitor.measure("nested serialization", serializer.class.name, field, resource.try(:id)) do
+          ::WatchfulGuerilla.measure("nested serialization", serializer.class.name, field, resource.try(:id)) do
             #TODO --jdc do we need to deep copy?
             #o = RealCerealBusiness.deep_copy(options)
             json = RealCerealBusiness.restore_opts_after(options, RealCerealBusiness.fields_key, nested_field_set) do
@@ -140,7 +140,7 @@ module RealCerealBusiness
         else
           #TODO: consider serializing everything instead of only associations.
           # Order#shipping_address, for example, is an ActiveRecord but not an association
-          ::PerformanceMonitor.measure("basic resource", serializer.class.name, field, (resource.is_a?(Array) ? resource : resource.id)) do
+          ::WatchfulGuerilla.measure("basic resource", serializer.class.name, field, (resource.is_a?(Array) ? resource : resource.id)) do
             get_resource_attribute!(serializer.resource_attribute_name(field))
           end
         end
@@ -150,10 +150,10 @@ module RealCerealBusiness
       # @param attribute [Symbol] identifies
       # @return [Object]
       def get_resource_attribute!(attribute)
-        raise RealCerealBusiness::Errors::AttributeError.new("#{resource.class.name}.#{attribute} missing") unless ::PerformanceMonitor.measure(:attribute_reflection, self.class.name, attribute, (resource.is_a?(Array) ? resource : resource.id)) do
+        raise RealCerealBusiness::Errors::AttributeError.new("#{resource.class.name}.#{attribute} missing") unless ::WatchfulGuerilla.measure(:attribute_reflection, self.class.name, attribute, (resource.is_a?(Array) ? resource : resource.id)) do
           resource.respond_to?(attribute,true)
         end
-        ::PerformanceMonitor.measure(resource.is_a?(ActiveRecord::Base) && resource.class.attribute_names.include?(attribute.to_s) ? "native attribute" : "virtual attribute", self.class.name, attribute, (resource.is_a?(Array) ? resource : resource.id)) do
+        ::WatchfulGuerilla.measure(resource.is_a?(ActiveRecord::Base) && resource.class.attribute_names.include?(attribute.to_s) ? "native attribute" : "virtual attribute", self.class.name, attribute, (resource.is_a?(Array) ? resource : resource.id)) do
           resource.send(attribute)
         end
       end
@@ -174,7 +174,7 @@ module RealCerealBusiness
       # @return [JSON]
       def serialize_scopes!(json)
         config.serializers.each do |scope, type|
-          ::PerformanceMonitor.measure(config.extensions.key?(scope) ? "extension" : "custom serializer", self.class.name, scope, (resource.is_a?(Array) ? resource : resource.id)) do
+          ::WatchfulGuerilla.measure(config.extensions.key?(scope) ? "extension" : "custom serializer", self.class.name, scope, (resource.is_a?(Array) ? resource : resource.id)) do
             scope_s = scope
             json[scope_s] = RealCerealBusiness.restore_opts_after(options, RealCerealBusiness.fields_key, fields) do
               #TODO --jdc add as_json(options) to this call

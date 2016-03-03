@@ -157,9 +157,9 @@ describe RealCerealBusiness::Serializer::Facade do
 
   describe ".serialize!" do
         # json = {}.with_indifferent_access
-        # ::PerformanceMonitor.measure("scope_itteration") do
+        # ::WatchfulGuerilla.measure("scope_itteration") do
         #   config.field_set_itterator(fields) do |scope, nested_scopes|
-        #     ::PerformanceMonitor.measure("attribute retrieval wrapper", self.class.name, scope, (resource.is_a?(Array) ? resource : resource.id)) do
+        #     ::WatchfulGuerilla.measure("attribute retrieval wrapper", self.class.name, scope, (resource.is_a?(Array) ? resource : resource.id)) do
         #       begin
         #         json[scope] = get_resource_attribute scope, nested_scopes if allowed_field?(scope)
         #       rescue RealCerealBusiness::Errors::AttributeError => e
@@ -176,7 +176,7 @@ describe RealCerealBusiness::Serializer::Facade do
 
   describe ".get_resource_attribute(scope, nested_scopes)" do
         # if config.namespaces.key? scope
-        #   ::PerformanceMonitor.measure("namespaced resource") do
+        #   ::WatchfulGuerilla.measure("namespaced resource") do
         #     if ns = get_resource_attribute!(config.namespaces[scope])
         #       ns[serializer.resource_attribute_name(scope).to_s]
         #     else
@@ -184,20 +184,20 @@ describe RealCerealBusiness::Serializer::Facade do
         #     end
         #   end
         # elsif config.extensions.key?(scope)
-        #   ::PerformanceMonitor.measure("extended resource") do
+        #   ::WatchfulGuerilla.measure("extended resource") do
         #     scope
         #   end
         # elsif serializer.is_association?(scope)
-        #   attribute = ::PerformanceMonitor.measure("N+1 association loading", serializer.class.name, scope, resource.try(:id)) do
+        #   attribute = ::WatchfulGuerilla.measure("N+1 association loading", serializer.class.name, scope, resource.try(:id)) do
         #     get_association_attribute(scope)
         #   end
-        #   ::PerformanceMonitor.measure("nested serialization", serializer.class.name, scope, resource.try(:id)) do
+        #   ::WatchfulGuerilla.measure("nested serialization", serializer.class.name, scope, resource.try(:id)) do
         #     attribute.as_json(options.merge(group_includes: nested_scopes))
         #   end
         # else
         #   #TODO: consider serializing everything instead of only associations.
         #   # Order#shipping_address, for example, is an ActiveRecord but not an association
-        #   ::PerformanceMonitor.measure("basic resource", serializer.class.name, scope, (resource.is_a?(Array) ? resource : resource.id)) do
+        #   ::WatchfulGuerilla.measure("basic resource", serializer.class.name, scope, (resource.is_a?(Array) ? resource : resource.id)) do
         #     get_resource_attribute!(serializer.resource_attribute_name(scope))
         #   end
         # end

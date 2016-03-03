@@ -213,7 +213,7 @@ module RealCerealBusiness
 
       # @return [Serializer::Base]
       def initialize
-        ::PerformanceMonitor.measure("--ignore, memoized in production:: initialize_field_sets") do
+        ::WatchfulGuerilla.measure("--ignore, memoized in production:: initialize_field_sets") do
           config.compile! self
         end
       rescue SystemStackError => e

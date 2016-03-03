@@ -1,7 +1,7 @@
 #TODO - move this file into its own gem
 require "benchmark"
 
-class PerformanceMonitor
+class WatchfulGuerilla
 	def self.toggle_tracing(state = true)
 		@trace_enabled = !!state
 	end

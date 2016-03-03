@@ -26,6 +26,7 @@ Gem::Specification.new do |s|
   s.files = Dir["{lib}/**/*"] + ["MIT-LICENSE", "Rakefile", "README.md"]
 
   s.add_dependency "rails", "~> 3.2.22"
+  s.add_dependency 'watchful_guerilla', '~> 0.1.0', git: 'git@github.com:honest/watchful_guerilla.git', tag: 'v0.1.0', branch: 'master'
 
   s.add_development_dependency "bundler", "~> 1.11"
   s.add_development_dependency "sqlite3"
