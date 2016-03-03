@@ -1,11 +1,11 @@
 source "https://rubygems.org"
 
+gem 'watchful_guerilla', '~> 0.2.0', git: 'git@github.com:honest/watchful_guerilla.git', tag: 'v0.2.0', branch: 'master'
+
 # Declare your gem's dependencies in real_cereal_business.gemspec.
 # Bundler will treat runtime dependencies like base dependencies, and
 # development dependencies will be added by default to the :development group.
 gemspec
-
-gem 'watchful_guerilla', '~> 0.1.0', git: 'git@github.com:honest/watchful_guerilla.git', tag: 'v0.1.0', branch: 'master'
 
 # jquery-rails is used by the dummy application
 gem "jquery-rails"
