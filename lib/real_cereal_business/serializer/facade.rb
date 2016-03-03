@@ -33,7 +33,9 @@ module RealCerealBusiness
       # @param opts [Hash] collection of values required that are not available in lexical scope
       # @return [JSON] representing the values returned by {resource.serialize} method
       def as_json
-        RealCerealBusiness.document_cache.fetch(self) { serialize! }
+        ::WatchfulGuerilla.measure("resource caching") do
+          RealCerealBusiness.document_cache.fetch(self) { serialize! }
+        end
       end
 
       # @return [String] a cache key that can be used to identify this resource
@@ -91,10 +93,10 @@ module RealCerealBusiness
       # This method returns a JSON of hash values representing the resource
       # @return [JSON]
       def serialize!
-        json = {}.with_indifferent_access
-        ::WatchfulGuerilla.measure("scope_itteration") do
-          config.field_set_itterator(fields) do |scope, nested_scopes|
-            ::WatchfulGuerilla.measure("attribute retrieval wrapper", self.class.name, scope, (resource.is_a?(Array) ? resource : resource.id)) do
+        ::WatchfulGuerilla.measure("(SBN): serialize! resource") do
+          json = {}.with_indifferent_access
+          ::WatchfulGuerilla.measure("(SBN): scope itteration") do
+            config.field_set_itterator(fields) do |scope, nested_scopes|
               begin
                 json[scope] = get_resource_attribute scope, nested_scopes if allowed_field?(scope)
               rescue RealCerealBusiness::Errors::AttributeError => e
@@ -102,10 +104,10 @@ module RealCerealBusiness
               end
             end
           end
-        end
-        serialize_scopes! json
+          serialize_scopes! json
 
-        json
+          json
+        end
       end
 
       # Gets serialized field from the resource
@@ -113,35 +115,37 @@ module RealCerealBusiness
       # @param nested_scope [Mixed] Field Set to pass for relations
       # @return [Mixed]
       def get_resource_attribute(field, nested_field_set)
-        if config.namespaces.key? field
-          ::WatchfulGuerilla.measure("namespaced resource") do
-            if ns = get_resource_attribute!(config.namespaces[field])
-              ns[serializer.resource_attribute_name(field).to_s]
-            else
-              nil
+        ::WatchfulGuerilla.measure("(SBN): get_resource_attribute", self.name, field, (resource.is_a?(Array) ? resource : resource.id)) do
+          if config.namespaces.key? field
+            ::WatchfulGuerilla.measure("(SBN): namespaced resource") do
+              if ns = get_resource_attribute!(config.namespaces[field])
+                ns[serializer.resource_attribute_name(field).to_s]
+              else
+                nil
+              end
             end
-          end
-        elsif config.extensions.key?(field)
-          ::WatchfulGuerilla.measure("extended resource") do
-            field
-          end
-        elsif serializer.is_association?(field)
-          attribute = ::WatchfulGuerilla.measure("N+1 association loading", serializer.class.name, field, resource.try(:id)) do
-            get_association_attribute(field)
-          end
-          ::WatchfulGuerilla.measure("nested serialization", serializer.class.name, field, resource.try(:id)) do
-            #TODO --jdc do we need to deep copy?
-            #o = RealCerealBusiness.deep_copy(options)
-            json = RealCerealBusiness.restore_opts_after(options, RealCerealBusiness.fields_key, nested_field_set) do
-              attribute.as_json(options)
+          elsif config.extensions.key?(field)
+            ::WatchfulGuerilla.measure("(SBN): extended resource") do
+              field
             end
-            json
-          end
-        else
-          #TODO: consider serializing everything instead of only associations.
-          # Order#shipping_address, for example, is an ActiveRecord but not an association
-          ::WatchfulGuerilla.measure("basic resource", serializer.class.name, field, (resource.is_a?(Array) ? resource : resource.id)) do
-            get_resource_attribute!(serializer.resource_attribute_name(field))
+          elsif serializer.is_association?(field)
+            attribute = ::WatchfulGuerilla.measure("(SBN): N+1 association loading", self.name, field, resource.try(:id)) do
+              get_association_attribute(field)
+            end
+            ::WatchfulGuerilla.measure("(SBN): nested serialization", self.name, field, resource.try(:id)) do
+              #TODO --jdc do we need to deep copy?
+              #o = RealCerealBusiness.deep_copy(options)
+              json = RealCerealBusiness.restore_opts_after(options, RealCerealBusiness.fields_key, nested_field_set) do
+                attribute.as_json(options)
+              end
+              json
+            end
+          else
+            #TODO: consider serializing everything instead of only associations.
+            # Order#shipping_address, for example, is an ActiveRecord but not an association
+            ::WatchfulGuerilla.measure("(SBN): basic resource", self.name, field, (resource.is_a?(Array) ? resource : resource.id)) do
+              get_resource_attribute!(serializer.resource_attribute_name(field))
+            end
           end
         end
       end
@@ -150,11 +154,11 @@ module RealCerealBusiness
       # @param attribute [Symbol] identifies
       # @return [Object]
       def get_resource_attribute!(attribute)
-        raise RealCerealBusiness::Errors::AttributeError.new("#{resource.class.name}.#{attribute} missing") unless ::WatchfulGuerilla.measure(:attribute_reflection, self.class.name, attribute, (resource.is_a?(Array) ? resource : resource.id)) do
-          resource.respond_to?(attribute,true)
-        end
-        ::WatchfulGuerilla.measure(resource.is_a?(ActiveRecord::Base) && resource.class.attribute_names.include?(attribute.to_s) ? "native attribute" : "virtual attribute", self.class.name, attribute, (resource.is_a?(Array) ? resource : resource.id)) do
-          resource.send(attribute)
+        ::WatchfulGuerilla.measure('(SBN): attribute_reflection', serializer.class.name, attribute, (resource.is_a?(Array) ? resource : resource.id)) do
+          raise RealCerealBusiness::Errors::AttributeError.new("#{resource.class.name}.#{attribute} missing") unless resource.respond_to?(attribute,true)
+          ::WatchfulGuerilla.measure(resource.is_a?(ActiveRecord::Base) && resource.class.attribute_names.include?(attribute.to_s) ? "native attribute" : "virtual attribute", serializer.class.name, attribute, (resource.is_a?(Array) ? resource : resource.id)) do
+            resource.send(attribute)
+          end
         end
       end
 
@@ -164,8 +168,12 @@ module RealCerealBusiness
       def get_association_attribute(field)
         attribute = serializer.resource_attribute_name(field)
         key = [attribute, filters].to_s
-        association = resource.send(attribute)
-        association = association.scope_filters(filters) if is_expression_scopeable?(association)
+        association = ::WatchfulGuerilla.measure("native relation chaining") do
+          resource.send(attribute)
+        end
+        ::WatchfulGuerilla.measure("filter relation chaining") do
+          association = association.scope_filters(filters) if is_expression_scopeable?(association)
+        end
         association
       end
 
@@ -173,16 +181,18 @@ module RealCerealBusiness
       # @param json [JSON] structure
       # @return [JSON]
       def serialize_scopes!(json)
-        config.serializers.each do |scope, type|
-          ::WatchfulGuerilla.measure(config.extensions.key?(scope) ? "extension" : "custom serializer", self.class.name, scope, (resource.is_a?(Array) ? resource : resource.id)) do
-            scope_s = scope
-            json[scope_s] = RealCerealBusiness.restore_opts_after(options, RealCerealBusiness.fields_key, fields) do
-              #TODO --jdc add as_json(options) to this call
-              serializer.get_custom_serializer_class(type, options).serialize(json[scope_s], resource, options)
-            end if json.key? scope_s
+        ::WatchfulGuerilla.measure("(SBN): serialize_scopes!") do
+          config.serializers.each do |scope, type|
+            ::WatchfulGuerilla.measure(config.extensions.key?(scope) ? "extension.serialize" : "attribute_serializer.serialize", serializer.class.name, scope, (resource.is_a?(Array) ? resource : resource.id)) do
+              scope_s = scope
+              json[scope_s] = RealCerealBusiness.restore_opts_after(options, RealCerealBusiness.fields_key, fields) do
+                #TODO --jdc add as_json(options) to this call
+                serializer.get_custom_serializer_class(type, options).serialize(json[scope_s], resource, options)
+              end if json.key? scope_s
+            end
           end
+          Hash[json.sort]
         end
-        Hash[json.sort]
       end
 
       # This method returns a ActiveRecord model updated to match a JSON of hash values
