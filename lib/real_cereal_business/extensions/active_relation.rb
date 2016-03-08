@@ -18,7 +18,7 @@ module RealCerealBusiness
       def as_json_with_real_cereal_business_caching(options = nil)
         if options.present? && options.key?(RealCerealBusiness.opts_key) &&
             (serializer = RealCerealBusiness::ResourceManager.new.serializer_for(self.klass, options)).present?
-          collection = WatchfulGuerilla.measure(:active_record) { to_a }
+          collection = WG.measure(:active_record) { to_a }
           collection.as_json(options)
         else
           as_json_without_real_cereal_business_caching(options)

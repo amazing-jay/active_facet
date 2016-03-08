@@ -118,7 +118,7 @@ module RealCerealBusiness
     def dealias_field_set!(field_set, field_set_alias = nil)
       field_set_alias ||= field_set.to_s.to_sym
       normalized_field_sets[field_set_alias] ||= begin
-        ::WatchfulGuerilla.measure("(SBN): scope normalization") do
+        WG.measure("(SBN): scope normalization") do
           { fields: normalize_field_set(dealias_field_set field_set) }
         end
       end

@@ -1,4 +1,4 @@
-require 'watchful_guerilla'
+require 'w_g'
 require 'real_cereal_business/attribute_serializer/base'
 require 'real_cereal_business/errors/attribute_error'
 require 'real_cereal_business/errors/configuration_error'

@@ -139,9 +139,9 @@ module RealCerealBusiness
       # @param options [Hash] collection of values required that are not available in lexical field_set
       # @return [JSON] representing the resource
       def as_json(resources, options = {})
-        ::WatchfulGuerilla.measure("(SBN): resource_itterator") do
+        WG.measure("(SBN): resource_itterator") do
           resource_itterator(resources) do |resource|
-            facade = ::WatchfulGuerilla.measure("(SBN): facade") do
+            facade = WG.measure("(SBN): facade") do
               RealCerealBusiness::Serializer::Facade.new(self, resource, options)
             end
             facade.as_json
@@ -218,7 +218,7 @@ module RealCerealBusiness
 
       # @return [Serializer::Base]
       def initialize
-        ::WatchfulGuerilla.measure("(SBN): initialize_scopes (cached in production)") do
+        WG.measure("(SBN): initialize_scopes (cached in production)") do
           config.compile! self
         end
       rescue SystemStackError => e

@@ -8,22 +8,31 @@ module RealCerealBusiness
     # @param &block [Proc] for cache miss
     # @return [Object]
     def self.fetch(serializer, options = {})
-      ::WatchfulGuerilla.measure("(cache) find_from_cache") do
+      WG.measure("(cache) find_from_cache") do
         return yield unless cacheable?(serializer)
 
+        options[:force] ||= serializer.opts[RealCerealBusiness.cache_force_key]
         cache_key = digest_key(serializer)
-        force = options[:force] || serializer.opts[RealCerealBusiness.cache_force_key]
-
-        # didn't use Rails.cache.fetch(cache_key, because it be slower with interprelation
-        #TODO --jdc fetch larger documents and pluck field_overrides
-        #TODO --integrate Oj here for both load and dump
-        if force.blank? && Rails.cache.exist?(cache_key)
-          JSON.parse Rails.cache.fetch(cache_key)
-        else
+        if options[:force] || !(result = Rails.cache.fetch(cache_key))
           result = yield
-          Rails.cache.write(cache_key, result.to_json, RealCerealBusiness::default_cache_options.merge(options))
+          Rails.cache.write(cache_key, Oj.dump(result), RealCerealBusiness::default_cache_options.merge(options))
           result
+        else
+          Oj.load(result)
         end
+
+        # force = options[:force] || serializer.opts[RealCerealBusiness.cache_force_key]
+
+        # # didn't use Rails.cache.fetch(cache_key, because it be slower with interprelation
+        # #TODO --jdc fetch larger documents and pluck field_overrides
+        # #TODO --integrate Oj here for both load and dump
+        # if force.blank? && Rails.cache.exist?(cache_key)
+        #   JSON.parse Rails.cache.fetch(cache_key)
+        # else
+        #   result = yield
+        #   Rails.cache.write(cache_key, result.to_json, RealCerealBusiness::default_cache_options.merge(options))
+        #   result
+        # end
       end
     end
 
