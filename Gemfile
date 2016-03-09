@@ -1,6 +1,6 @@
 source "https://rubygems.org"
 
-gem 'w_g', '~> 0.3.1', git: 'git@github.com:honest/watchful_guerilla.git', tag: 'v0.3.1', branch: 'master'
+gem 'w_g', '~> 0.4.0', git: 'git@github.com:honest/watchful_guerilla.git', tag: 'v0.4.0', branch: 'master'
 
 # Declare your gem's dependencies in real_cereal_business.gemspec.
 # Bundler will treat runtime dependencies like base dependencies, and

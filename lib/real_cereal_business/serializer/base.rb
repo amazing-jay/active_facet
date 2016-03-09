@@ -139,13 +139,9 @@ module RealCerealBusiness
       # @param options [Hash] collection of values required that are not available in lexical field_set
       # @return [JSON] representing the resource
       def as_json(resources, options = {})
-        WG.measure("(SBN): resource_itterator") do
-          resource_itterator(resources) do |resource|
-            facade = WG.measure("(SBN): facade") do
-              RealCerealBusiness::Serializer::Facade.new(self, resource, options)
-            end
-            facade.as_json
-          end
+        resource_itterator(resources) do |resource|
+          facade = RealCerealBusiness::Serializer::Facade.new(self, resource, options)
+          facade.as_json
         end
       end
 
@@ -218,9 +214,7 @@ module RealCerealBusiness
 
       # @return [Serializer::Base]
       def initialize
-        WG.measure("(SBN): initialize_scopes (cached in production)") do
-          config.compile! self
-        end
+        config.compile! self
       rescue SystemStackError => e
         raise RealCerealBusiness::Errors::ConfigurationError.new(RealCerealBusiness::Errors::ConfigurationError::STACK_ERROR_MSG)
       end
