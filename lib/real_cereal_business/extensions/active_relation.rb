@@ -17,7 +17,7 @@ module RealCerealBusiness
       # @return [JSON]
       def as_json_with_real_cereal_business_caching(options = nil)
         if options.present? && options.key?(RealCerealBusiness.opts_key) &&
-            (serializer = RealCerealBusiness::ResourceManager.new.serializer_for(self.klass, options)).present?
+            (serializer = RealCerealBusiness::ResourceManager.instance.serializer_for(self.klass, options)).present?
           to_a.as_json(options)
         else
           as_json_without_real_cereal_business_caching(options)

@@ -20,7 +20,7 @@ module RealCerealBusiness
 
         self.fields           = opts[RealCerealBusiness.fields_key]
         self.field_overrides  = opts[RealCerealBusiness.field_overrides_key] || {}
-        self.overrides        = RealCerealBusiness::ResourceManager.new.resource_map(resource_class).inject({}) { |overrides, map_entry|
+        self.overrides        = RealCerealBusiness::ResourceManager.instance.resource_map(resource_class).inject({}) { |overrides, map_entry|
           overrides.merge(field_overrides[map_entry] || {})
         }
 
@@ -102,9 +102,7 @@ module RealCerealBusiness
           end
         end
 
-        serialize_scopes! json
-
-        json
+        apply_custom_serializers! json
       end
 
       # Gets serialized field from the resource
@@ -156,7 +154,7 @@ module RealCerealBusiness
       # Modifies json by reference by applying custom serializers to all attributes registered with custom serializers
       # @param json [JSON] structure
       # @return [JSON]
-      def serialize_scopes!(json)
+      def apply_custom_serializers!(json)
         config.serializers.each do |scope, type|
           scope_s = scope
           json[scope_s] = RealCerealBusiness.restore_opts_after(options, RealCerealBusiness.fields_key, fields) do
@@ -164,7 +162,8 @@ module RealCerealBusiness
             serializer.get_custom_serializer_class(type, options).serialize(json[scope_s], resource, options)
           end if json.key? scope_s
         end
-        Hash[json.sort]
+
+        json
       end
 
       # This method returns a ActiveRecord model updated to match a JSON of hash values

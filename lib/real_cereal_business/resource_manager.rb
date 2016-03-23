@@ -28,8 +28,8 @@ module RealCerealBusiness
 
     # Singleton
     # @return [ResourceManager]
-    def self.new
-      @instance ||= super
+    def self.instance
+      @instance ||= new
     end
 
     # (Memoized) Associate a serializer with a resource_class
@@ -78,7 +78,7 @@ module RealCerealBusiness
     end
 
     def extract_version_from_opts(options)
-      ((options.try(:[], RealCerealBusiness.opts_key) || {})[RealCerealBusiness.version_key] || RealCerealBusiness.default_version).to_f
+      (options[RealCerealBusiness.opts_key][RealCerealBusiness.version_key] || RealCerealBusiness.default_version).to_f
     end
 
     private

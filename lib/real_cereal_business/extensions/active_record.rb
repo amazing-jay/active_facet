@@ -15,7 +15,7 @@ module RealCerealBusiness
       # @param options [Hash]
       # @return [ActiveRecord]
       def hydrate(attributes, options = {})
-        RealCerealBusiness::ResourceManager.new.serializer_for(self.class, options).from_hash(self, attributes)
+        RealCerealBusiness::ResourceManager.instance.serializer_for(self.class, options).from_hash(self, attributes)
       end
 
       # Overrides default serializer behavior when RCB key is present
@@ -23,7 +23,7 @@ module RealCerealBusiness
       # @return [JSON]
       def as_json(options = nil)
         if options.present? && options.key?(RealCerealBusiness.opts_key) &&
-            (serializer = RealCerealBusiness::ResourceManager.new.serializer_for(self.class, options)).present?
+            (serializer = RealCerealBusiness::ResourceManager.instance.serializer_for(self.class, options)).present?
           serializer.as_json(self, options)
         else
           super(options)
@@ -44,7 +44,7 @@ module RealCerealBusiness
         def scope_filters(filter_values = nil)
           filter_values = (filter_values || {}).with_indifferent_access
           registered_scope_filters.inject(scoped) do |result, (k,v)|
-            filter = RealCerealBusiness::ResourceManager.new.resource_map(self).detect { |map_entry|
+            filter = RealCerealBusiness::ResourceManager.instance.resource_map(self).detect { |map_entry|
               filter_values.keys.include? "#{k}_#{map_entry}"
             }
             args = filter_values["#{k}_#{filter}"] || filter_values[k]
@@ -81,7 +81,7 @@ module RealCerealBusiness
         # @param options [Hash]
         # @return [ProxyCollection]
         def group_includes(field_set = :basic, options = {})
-          includes RealCerealBusiness::ResourceManager.new.serializer_for(self, options).scoped_includes(field_set)
+          includes RealCerealBusiness::ResourceManager.instance.serializer_for(self, options).scoped_includes(field_set)
         end
 
         private

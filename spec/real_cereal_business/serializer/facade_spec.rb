@@ -5,7 +5,7 @@ describe RealCerealBusiness::Serializer::Facade do
   include TestHarnessHelper
 
   # before do
-  #   allow(RealCerealBusiness::ResourceManager.new).to receive(:resource_map) { |resource_class|
+  #   allow(RealCerealBusiness::ResourceManager.instance).to receive(:resource_map) { |resource_class|
 
   #   }
   # end
@@ -169,9 +169,7 @@ describe RealCerealBusiness::Serializer::Facade do
         #   end
         # end
 
-        # serialize_scopes! json
-
-        # json
+        # apply_custom_serializers! json
   end
 
   describe ".get_resource_attribute(scope, nested_scopes)" do
@@ -252,8 +250,8 @@ describe RealCerealBusiness::Serializer::Facade do
     end
   end
 
-  describe ".serialize_scopes!" do
-    subject { instance.send(:serialize_scopes!, {'custom_attr' => 'hello', 'explicit_attr' => 'world'}) }
+  describe ".apply_custom_serializers!" do
+    subject { instance.send(:apply_custom_serializers!, {'custom_attr' => 'hello', 'explicit_attr' => 'world'}) }
     before do
       configure_serializers
       allow(attribute_serializer_class).to receive(:serialize) { |attribute, resource, options| "serialized_#{attribute}" }

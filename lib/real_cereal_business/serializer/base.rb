@@ -178,7 +178,7 @@ module RealCerealBusiness
           #return nil if field isn't an association
           if reflection = get_association_reflection(field)
             #return nil if association doesn't have a custom class
-            @association_serializers[field] = RealCerealBusiness::ResourceManager.new.serializer_for(reflection.klass, options)
+            @association_serializers[field] = RealCerealBusiness::ResourceManager.instance.serializer_for(reflection.klass, options)
           end
         end
         @association_serializers[field]
@@ -190,7 +190,7 @@ module RealCerealBusiness
       # @return [Class | nil]
       def get_custom_serializer_class(attribute, options)
         @custom_serializers ||= {}
-        @custom_serializers[attribute] ||= RealCerealBusiness::ResourceManager.new.attribute_serializer_class_for(resource_class, attribute, options)
+        @custom_serializers[attribute] ||= RealCerealBusiness::ResourceManager.instance.attribute_serializer_class_for(resource_class, attribute, options)
       end
 
       # Determines if public attribute maps to a private relation
