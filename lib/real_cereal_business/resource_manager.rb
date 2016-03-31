@@ -103,7 +103,7 @@ module RealCerealBusiness
       unless result = self.class.serializer_mapper.call(resource_class, serializer, type, version, options)
         # binding.pry
         # raise RealCerealBusiness::Errors::LookupError.new "Unable to locate serializer for:: " + [resource_class.name, serializer, type, version].to_s
-        Rails.logger.warn "Unable to locate serializer for:: " + [resource_class.name, serializer, type, version, options].to_s
+        Rails.logger.debug "Unable to locate serializer for:: " + [resource_class.name, serializer, type, version, options].to_s
       end
       result
     end
