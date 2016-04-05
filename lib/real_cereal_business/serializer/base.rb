@@ -157,7 +157,7 @@ module RealCerealBusiness
       # Constantizes the appropriate resource serializer class
       # @return [Class]
       def resource_class
-        @resource_class ||= constantize_resource_class(self.class.name.split("::")[2..-2],-1)
+        @resource_class ||= constantize_resource_class(self.class.name.split("::")[1..-2],-1)
       end
 
       # Constantizes an appropriate resource serializer class for relations

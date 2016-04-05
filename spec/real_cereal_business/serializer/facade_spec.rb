@@ -1,28 +1,12 @@
 require 'spec_helper'
 
 describe RealCerealBusiness::Serializer::Facade do
-
-  include TestHarnessHelper
-
-  # before do
-  #   allow(RealCerealBusiness::ResourceManager.instance).to receive(:resource_map) { |resource_class|
-
-  #   }
-  # end
-
-  # around(:each) do |example|
-  #   mapper = RealCerealBusiness::ResourceManager.resource_mapper
-  #   RealCerealBusiness::ResourceManager.resource_mapperRealCerealBusiness::ResourceManager.method(:default_resource_mapper)
-  #   example.run
-  #   RealCerealBusiness::ResourceManager.resource_mapper = mapper
-  # end
-
-  let(:resource_serializer_class) { build_resource_serializer_class }
-  let(:association_serializer_class) { build_association_serializer_class }
-  let(:attribute_serializer_class) { build_attribute_serializer_class }
-  let(:configure_serializers) { configure_serializer_class resource_serializer_class, association_serializer_class, attribute_serializer_class }
-  let(:serializer) { resource_serializer_class.new }
-  let(:resource) { test_resource_class.new(explicit_attr: 'hello', implicit_attr: 'mcfly') }
+  let(:customizer_attribute_serializer_class) { V1::CustomizerAttributeSerializer }
+  let(:extension_attr_attribute_serializer_class) { V1::ExtensionAttrAttributeSerializer }
+  let(:serializer) { V1::ResourceA::ResourceASerializer.new }
+  let(:resource_class) { ResourceA }
+  let(:association_class) { ResourceB }
+  let(:resource) { ResourceA.new(explicit_attr: 'hello', implicit_attr: 'mcfly') }
   let(:instance) { described_class.new(serializer, resource, options) }
   let(:options) { { RealCerealBusiness.opts_key => opts } }
   let(:opts) {
@@ -40,7 +24,7 @@ describe RealCerealBusiness::Serializer::Facade do
   let(:overrides) { {explicit_attr: true, implicit_attr: true} }
 
   describe ".initialize" do
-    let(:field_overrides) { { test_resource_class.name.tableize => overrides } }
+    let(:field_overrides) { { resource_class.name.tableize => overrides } }
     subject { instance }
     it { expect(subject.serializer).to eq(serializer) }
     it { expect(subject.resource).to eq(resource) }
@@ -82,15 +66,15 @@ describe RealCerealBusiness::Serializer::Facade do
       it { expect(subject).to be true }
     end
     context "explicit" do
-      let(:field_overrides) { { test_resource_class.name.tableize => {explicit_attr: true, implicit_attr: true} } }
+      let(:field_overrides) { { resource_class.name.tableize => {explicit_attr: true, implicit_attr: true} } }
       it { expect(subject).to be true }
     end
     context "denied" do
-      let(:field_overrides) { { test_resource_class.name.tableize => {explicit_attr: false, implicit_attr: true} } }
+      let(:field_overrides) { { resource_class.name.tableize => {explicit_attr: false, implicit_attr: true} } }
       it { expect(subject).to be false }
     end
     context "ommitted" do
-      let(:field_overrides) { { test_resource_class.name.tableize => {implicit_attr: true} } }
+      let(:field_overrides) { { resource_class.name.tableize => {implicit_attr: true} } }
       it { expect(subject).to be nil }
     end
   end
@@ -144,14 +128,14 @@ describe RealCerealBusiness::Serializer::Facade do
 
   describe ".resource_class" do
     subject { instance.send(:resource_class) }
-    it { expect(subject).to eq(test_resource_class) }
+    it { expect(subject).to eq(resource_class) }
     context "mismatched resource" do
-      let(:resource) { test_association_class.new }
-      it { expect(subject).to eq(test_association_class) }
+      let(:resource) { association_class.new }
+      it { expect(subject).to eq(association_class) }
     end
     context "abstract resource" do
       let(:resource) { Object.new }
-      it { expect(subject).to eq(test_resource_class) }
+      it { expect(subject).to eq(resource_class) }
     end
   end
 
@@ -229,23 +213,21 @@ describe RealCerealBusiness::Serializer::Facade do
 
     context 'default' do
       let(:filters) { {} }
-      it { expect(subject).to match_array(resource.children) }
-      it { expect(subject.is_a?(ActiveRecord::Relation)).to be true }
+      let(:fields) { :basic }
+      it { expect(subject).to eq(resource.children.as_json(options)) }
       it { expect(subject).to_not be_empty }
     end
 
     context 'filtered' do
       let(:filters) { {} }
-      skip 'todo: make explicit serializer classes'
       skip 'todo: define a filter'
-      it { expect(subject.is_a?(ActiveRecord::Relation)).to be true }
+      it { expect(subject).to eq(resource.children.as_json(options)) }
     end
 
     context 'nil' do
       let(:filters) { {} }
       let(:field) { :others }
       it { expect(subject).to match_array(resource.others) }
-      it { expect(subject.is_a?(ActiveRecord::Relation)).to be true }
       it { expect(subject).to be_empty }
     end
   end
@@ -253,11 +235,12 @@ describe RealCerealBusiness::Serializer::Facade do
   describe ".apply_custom_serializers!" do
     subject { instance.send(:apply_custom_serializers!, {'custom_attr' => 'hello', 'explicit_attr' => 'world'}) }
     before do
-      configure_serializers
-      allow(attribute_serializer_class).to receive(:serialize) { |attribute, resource, options| "serialized_#{attribute}" }
+      allow(customizer_attribute_serializer_class).to receive(:serialize) { |attribute, resource, options| "serialized_#{attribute}" }
+      allow(extension_attr_attribute_serializer_class).to receive(:serialize) { |attribute, resource, options| "serialized_#{attribute}" }
       subject
     end
-    it { expect(attribute_serializer_class).to have_received(:serialize).with('hello', resource, options) }
+    it { expect(customizer_attribute_serializer_class).to have_received(:serialize).with('hello', resource, options) }
+    it { expect(extension_attr_attribute_serializer_class).to_not have_received(:serialize).with('hello', resource, options) }
     it { expect(subject).to eq({'custom_attr' => 'serialized_hello', 'explicit_attr' => 'world'}) }
   end
 
@@ -284,9 +267,6 @@ describe RealCerealBusiness::Serializer::Facade do
         others: :others
       })
     }
-    before do
-      configure_serializers
-    end
     it { expect(subject.explicit_attr).to eq(:explicit_attr) }
     it { expect(subject.aliased_accessor).to eq(:alias_attr) }
     it { expect(subject.from_accessor).to eq(:from_attr) }
@@ -311,19 +291,17 @@ describe RealCerealBusiness::Serializer::Facade do
   describe ".hydrate_scopes!" do
     subject { instance.send(:hydrate_scopes!, {'custom_attr' => 'hello', 'explicit_attr' => 'world'}) }
     before do
-      configure_serializers
-      allow(attribute_serializer_class).to receive(:hydrate) { |attribute, resource, options| "hydrated_#{attribute}" }
+      allow(customizer_attribute_serializer_class).to receive(:hydrate) { |attribute, resource, options| "hydrated_#{attribute}" }
+      allow(extension_attr_attribute_serializer_class).to receive(:hydrate) { |attribute, resource, options| "serialized_#{attribute}" }
       subject
     end
-    it { expect(attribute_serializer_class).to have_received(:hydrate).with('hello', resource, options) }
+    it { expect(customizer_attribute_serializer_class).to have_received(:hydrate).with('hello', resource, options) }
+    it { expect(extension_attr_attribute_serializer_class).to_not have_received(:hydrate).with('hello', resource, options) }
     it { expect(subject).to eq({'custom_attr' => 'hydrated_hello', 'explicit_attr' => 'world'}) }
   end
 
   describe ".set_resource_attribute" do
     subject { instance.send(:set_resource_attribute, field, value) }
-    before do
-      configure_serializers
-    end
     let(:value) { :foo }
     before do
       subject

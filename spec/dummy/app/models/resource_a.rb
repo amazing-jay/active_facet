@@ -1,5 +1,5 @@
 class ResourceA < ActiveRecord::Base
-  include ::ModelMixin
+  include ModelMixin
 
   belongs_to :parent, class_name: '::ResourceA'
   belongs_to :master, class_name: '::ResourceB'

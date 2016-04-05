@@ -26,6 +26,9 @@ RealCerealBusiness.configure do |config|
   # The symbol which acts as the context key that designates force for cache. :cache_force by default.
   # config.cache_force_key                = @env_config['cache_force'].to_sym
 
+  # Tell if exception should be raised when serializer_mapper returns nil. False by default.
+  # config.strict_lookups                 = @env_config['strict_lookups']
+
   # Tell if associations should be preloaded to mitigate N+1 problems. False by default.
   # config.preload_associations           = @env_config['preload_associations']
 

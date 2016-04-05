@@ -1,11 +1,11 @@
 module TestHarnessHelper
 
   def test_resource_class
-    ::ResourceA
+    ResourceA
   end
 
   def test_association_class
-    ::ResourceB
+    ResourceB
   end
 
   def build_resource_serializer_class
@@ -13,11 +13,11 @@ module TestHarnessHelper
       include RealCerealBusiness::Serializer::Base
 
       def self.name
-        'ResourceBSerializer'
+        'ResourceASerializer'
       end
 
       def resource_class
-        ::ResourceA
+        ResourceA
       end
     }
   end
@@ -25,54 +25,37 @@ module TestHarnessHelper
   def build_association_serializer_class
     Class.new {
       include RealCerealBusiness::Serializer::Base
-
       def self.name
         'ResourceBSerializer'
       end
 
       def resource_class
-        ::ResourceB
+        ResourceB
       end
     }
   end
 
   def build_attribute_serializer_class
     Class.new {
-      def self.serialize(attribute, resource, options)
-        "serialized_#{attribute}"
-      end
-      def self.hydrate(attribute, resource, options)
-        "hydrated_#{attribute}"
-      end
+      include BaseAttributeSerializer
     }
   end
 
-  def configure_serializer_class(resource_serializer_class, association_serializer_class, attribute_serializer_class)
-    resource_serializer_class.class_eval do
-      transform :explicit_attr, as: :explicit_attr
-      transform :alias_attr, as: :aliased_accessor
-      transform :from_attr, from: :from_accessor
-      transform :to_attr, to: :to_accessor
-      transform :nested_attr, within: :nested_accessor
-      transform :custom_attr, with: :customizer
-      transform :compound_attr, with: :customizer, as: :compound_accessor
-      transform :nested_compound_attr, with: :customizer, as: :compound_accessor, within: :nested_compound_accessor
-      extension :extension_attr
+  # def configure_serializer_classes(resource_serializer_class, association_serializer_class, attribute_serializer_class)
+  #   around(:each) do |example|
+  #     setup_serializer_classes(resource_serializer_class, association_serializer_class, attribute_serializer_class)
+  #     example.run
+  #     reset_serializer_classes
+  #   end
+  # end
 
-      expose :attrs, as: [:explicit_attr, :implicit_attr, :dynamic_attr, :private_attr, :alias_attr, :to_attr, :from_attr]
-      expose :nested, as: [:nested_attr, :nested_compound_attr]
-      expose :custom, as: [:custom_attr, :compound_attr, :nested_compound_attr]
-      expose :minimal, as: [:explicit_attr]
-      expose :basic, as: [:minimal, :nested_attr]
-      expose :relations, as: [:parent, :master, :leader, :master, :children, :others, :extras]
-      expose :alias_relation, as: [:others]
-      expose :deep_relations, as: [
-        {parent: {children: :attr}},
-        {children: :nested},
-        :master,
-        {extras: :minimal},
-        {alias_relation: :implicit_attr}
-      ]
+  def reset_serializer_classes
+    RealCerealBusiness::ResourceManager.serializer_mapper = RealCerealBusiness::ResourceManager.method(:default_serializer_mapper)
+  end
+
+  def setup_serializer_classes(resource_serializer_class, association_serializer_class, attribute_serializer_class)
+    resource_serializer_class.class_eval do
+      include BaseSerializer
     end
 
     RealCerealBusiness.serializer_mapper do |resource_class, serializer, type, version, options|

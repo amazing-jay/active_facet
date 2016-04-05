@@ -119,11 +119,8 @@ module RealCerealBusiness
         elsif config.extensions.key?(field)
           field
         elsif serializer.is_association?(field)
-          attribute = get_association_attribute(field)
-          #TODO --jdc do we need to deep copy?
-          #o = RealCerealBusiness.deep_copy(options)
           RealCerealBusiness.restore_opts_after(options, RealCerealBusiness.fields_key, nested_field_set) do
-            attribute.as_json(options)
+            get_association_attribute(field)
           end
         else
           #TODO: consider serializing everything instead of only associations.
@@ -144,11 +141,13 @@ module RealCerealBusiness
       # @param field [Symbol] attribute to get
       # @return [Array | ActiveRelation] of ActiveRecord
       def get_association_attribute(field)
-        attribute = serializer.resource_attribute_name(field)
-        key = [attribute, filters].to_s
-        association = resource.send(attribute)
-        association = association.scope_filters(filters) if is_expression_scopeable?(association)
-        association
+        association = serializer.resource_attribute_name(field)
+
+        RealCerealBusiness.document_cache.fetch_association(self, association) do
+          attribute = resource.send(association)
+          attribute = attribute.scope_filters(filters) if is_expression_scopeable?(attribute)
+          attribute.as_json(options)
+        end
       end
 
       # Modifies json by reference by applying custom serializers to all attributes registered with custom serializers
@@ -158,7 +157,6 @@ module RealCerealBusiness
         config.serializers.each do |scope, type|
           scope_s = scope
           json[scope_s] = RealCerealBusiness.restore_opts_after(options, RealCerealBusiness.fields_key, fields) do
-            #TODO --jdc add as_json(options) to this call
             serializer.get_custom_serializer_class(type, options).serialize(json[scope_s], resource, options)
           end if json.key? scope_s
         end

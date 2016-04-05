@@ -19,6 +19,7 @@ module RealCerealBusiness
     :version_key,
     :filters_key,
     :cache_force_key,
+    :strict_lookups,
     :preload_associations,
     :cache_enabled,
     :default_cache_options,
@@ -31,8 +32,9 @@ module RealCerealBusiness
   self.field_overrides_key            = :field_overrides
   self.version_key                    = :version
   self.filters_key                    = :filters
-  self.cache_force_key                = :cache_force0
+  self.cache_force_key                = :cache_force
 
+  self.strict_lookups                 = false
   self.preload_associations           = false
   self.cache_enabled                  = false
   self.default_cache_options          = { expires_in: 5.minutes }

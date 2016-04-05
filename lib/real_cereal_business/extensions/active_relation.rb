@@ -18,6 +18,7 @@ module RealCerealBusiness
       def as_json_with_real_cereal_business_caching(options = nil)
         if options.present? && options.key?(RealCerealBusiness.opts_key) &&
             (serializer = RealCerealBusiness::ResourceManager.instance.serializer_for(self.klass, options)).present?
+            # TODO split into functions so WG can measure
           to_a.as_json(options)
         else
           as_json_without_real_cereal_business_caching(options)

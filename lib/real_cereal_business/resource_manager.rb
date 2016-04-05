@@ -15,13 +15,26 @@ module RealCerealBusiness
     end
     self.resource_mapper = method(:default_resource_mapper)
 
+    # TODO --jdc implement recursive superclass/parentclass lookup
     # Default serializer mapping scheme, can be overrided with config
     def self.default_serializer_mapper(resource_class, serializer, type, version, options)
       case type
       when :serializer
-        (version.to_s + '::' + resource_class.name.camelcase + type.to_s.camecase).constantize.new
+        [
+          'V' + version.to_i.to_s + '::' + resource_class.name.camelcase + '::' + resource_class.name.camelcase + type.to_s.camelcase,
+          'V' + version.to_i.to_s + '::' + resource_class.name.camelcase + type.to_s.camelcase,
+        ].each { |name|
+          klass = name.safe_constantize
+          return klass.new if klass.present?
+        }
       else
-        (version.to_s + '::' + resource_class.name.camelcase + type.to_s.camecase).constantize
+        [
+          'V' + version.to_i.to_s + '::' + resource_class.name.camelcase + '::' + serializer + type.to_s.camelcase,
+          'V' + version.to_i.to_s + '::' + serializer + type.to_s.camelcase,
+        ].find { |name|
+          klass = name.safe_constantize
+          return klass if klass.present?
+        }
       end
     end
     self.serializer_mapper = method(:default_serializer_mapper)
@@ -101,9 +114,9 @@ module RealCerealBusiness
     def fetch_serializer(resource_class, serializer, type, options)
       version = extract_version_from_opts(options)
       unless result = self.class.serializer_mapper.call(resource_class, serializer, type, version, options)
-        # binding.pry
-        # raise RealCerealBusiness::Errors::LookupError.new "Unable to locate serializer for:: " + [resource_class.name, serializer, type, version].to_s
-        Rails.logger.debug "Unable to locate serializer for:: " + [resource_class.name, serializer, type, version, options].to_s
+        error_message = "Unable to locate serializer for:: " + [resource_class.name, serializer, type, version].to_s
+        Rails.logger.debug error_message
+        raise RealCerealBusiness::Errors::LookupError.new(error_message) if RealCerealBusiness.strict_lookups
       end
       result
     end

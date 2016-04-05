@@ -5,10 +5,10 @@ default:
   version_key: version
   filters_key: filters
   cache_force_key: cache_force
-  preload_associations: true
-  cache_enabled: true
-  serializer_namespace:
-test:
+  strict_lookups: false
   preload_associations: false
   cache_enabled: false
-  serializer_namespace:
+test:
+  strict_lookups: false
+  preload_associations: false
+  cache_enabled: false

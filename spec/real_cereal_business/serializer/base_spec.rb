@@ -7,7 +7,6 @@ describe RealCerealBusiness::Serializer::Base do
   let(:resource_serializer_class) { build_resource_serializer_class }
   let(:association_serializer_class) { build_association_serializer_class }
   let(:attribute_serializer_class) { build_attribute_serializer_class }
-  let(:configure_serializers) { configure_serializer_class resource_serializer_class, association_serializer_class, attribute_serializer_class }
   let(:instance) { resource_serializer_class.new }
   let(:resource) { test_resource_class.new }
 
@@ -179,8 +178,10 @@ describe RealCerealBusiness::Serializer::Base do
   end
 
   describe "instance methods" do
-    before do
-      configure_serializers
+    around(:each) do |example|
+      setup_serializer_classes(resource_serializer_class, association_serializer_class, attribute_serializer_class)
+      example.run
+      reset_serializer_classes
     end
 
     describe ".scoped_includes" do
@@ -237,14 +238,14 @@ describe RealCerealBusiness::Serializer::Base do
       before do
         allow_any_instance_of(RealCerealBusiness::Serializer::Facade).to receive(:as_json) { { foo: :bar } }
       end
-      subject { instance.as_json(resouces, options) }
+      subject { instance.as_json(resources, options) }
       let(:options) { {a: :b} }
-      let(:resouces) { resource }
+      let(:resources) { resource }
       it { expect(subject).to eq({ foo: :bar }) }
       it { expect(RealCerealBusiness::Serializer::Facade).to receive(:new).once }
 
       context 'collection' do
-        let(:resouces) { [resource, resource] }
+        let(:resources) { [resource, resource] }
         it { expect(subject).to eq([{ foo: :bar }, { foo: :bar }]) }
         it { expect(RealCerealBusiness::Serializer::Facade).to receive(:new).twice }
       end

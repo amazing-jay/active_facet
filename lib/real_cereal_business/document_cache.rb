@@ -7,6 +7,8 @@ module RealCerealBusiness
     # @param options [Hash] for Rails.cache.fetch
     # @param &block [Proc] for cache miss
     # @return [Object]
+
+    # TODO -- the argument is a facade not a serializer! fix
     def self.fetch(serializer, options = {})
       return yield unless cacheable?(serializer)
 
@@ -32,6 +34,15 @@ module RealCerealBusiness
       #   Rails.cache.write(cache_key, result.to_json, RealCerealBusiness::default_cache_options.merge(options))
       #   result
       # end
+    end
+
+    # Fetches from Rails Cache or invokes block on miss or force
+    # @param serializer [Object] to cache
+    # @param options [Hash] for Rails.cache.fetch
+    # @param &block [Proc] for cache miss
+    # @return [Object]
+    def self.fetch_association(serializer, association, options = {})
+      yield
     end
 
     private
