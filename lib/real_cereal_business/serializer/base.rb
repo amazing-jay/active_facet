@@ -61,6 +61,11 @@ module RealCerealBusiness
           expose :timestamps, as: [:id, :created_at, :updated_at]
         end
 
+        #DSL Registers the class type to be serialized
+        def resource_class(klass)
+          config.resource_class = klass
+        end
+
         # ###
         # Public Interface
         # ###
@@ -114,10 +119,12 @@ module RealCerealBusiness
         end
       end
 
-      #TODO --jdc document
+      # Returns field_set serialized for dependant resources in custom attribute serializers & extensions
+      # @param field [Field]
+      # @return [Field Set]
       def custom_includes(field)
         attribute = resource_attribute_name(field)
-        custom_serializer_name = c_serializers[ attribute ]
+        custom_serializer_name = config.serializers[attribute]
 
         if custom_serializer_name
           custom_serializer = get_custom_serializer_class(custom_serializer_name)
@@ -170,12 +177,12 @@ module RealCerealBusiness
       end
 
       ### TODO --jdc ^^ START REFLECTOR
-      # decouple this from the /lib/honest/serializers dependency using resource manager
+      # move all this to config or resource manager
 
       # Constantizes the appropriate resource serializer class
       # @return [Class]
       def resource_class
-        @resource_class ||= constantize_resource_class(self.class.name.split("::")[1..-2],-1)
+        @resource_class ||= config.resource_class
       end
 
       # Constantizes an appropriate resource serializer class for relations

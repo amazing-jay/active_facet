@@ -33,6 +33,9 @@ module RealCerealBusiness
     # Hash: keys are defined extension values
     attr_reader :extensions
 
+    # Class: Resource Class to serialize
+    attr_accessor :resource_class
+
     def alias_field_set(field_set_alias, field_set)
       self.compiled = false
       field_sets[field_set_alias] = field_set
@@ -72,6 +75,7 @@ module RealCerealBusiness
     # @return [Config]
     def merge! config
       self.compiled = false
+      self.resource_class ||= config.resource_class
       transforms_from.merge!  config.transforms_from
       transforms_to.merge!    config.transforms_to
       serializers.merge!      config.serializers

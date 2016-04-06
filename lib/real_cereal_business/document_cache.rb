@@ -2,18 +2,16 @@ module RealCerealBusiness
   class DocumentCache
     CACHE_PREFIX = 'rcb_doc_cache'
 
-    # Fetches from Rails Cache or invokes block on miss or force
-    # @param serializer [Object] to cache
+    # Fetches a JSON document representing the facade
+    # @param facade [Object] to cache
     # @param options [Hash] for Rails.cache.fetch
     # @param &block [Proc] for cache miss
     # @return [Object]
+    def self.fetch(facade, options = {})
+      return yield unless cacheable?(facade)
 
-    # TODO -- the argument is a facade not a serializer! fix
-    def self.fetch(serializer, options = {})
-      return yield unless cacheable?(serializer)
-
-      options[:force] ||= serializer.opts[RealCerealBusiness.cache_force_key]
-      cache_key = digest_key(serializer)
+      options[:force] ||= facade.opts[RealCerealBusiness.cache_force_key]
+      cache_key = digest_key(facade)
       if options[:force] || !(result = Rails.cache.fetch(cache_key))
         result = yield
         Rails.cache.write(cache_key, Oj.dump(result), RealCerealBusiness::default_cache_options.merge(options))
@@ -21,43 +19,31 @@ module RealCerealBusiness
       else
         Oj.load(result)
       end
-
-      # force = options[:force] || serializer.opts[RealCerealBusiness.cache_force_key]
-
-      # # didn't use Rails.cache.fetch(cache_key, because it be slower with interprelation
-      # #TODO --jdc fetch larger documents and pluck field_overrides
-      # #TODO --integrate Oj here for both load and dump
-      # if force.blank? && Rails.cache.exist?(cache_key)
-      #   JSON.parse Rails.cache.fetch(cache_key)
-      # else
-      #   result = yield
-      #   Rails.cache.write(cache_key, result.to_json, RealCerealBusiness::default_cache_options.merge(options))
-      #   result
-      # end
     end
 
-    # Fetches from Rails Cache or invokes block on miss or force
-    # @param serializer [Object] to cache
+    # Fetches a JSON document representing the association specified for the resource in the facade
+    # @param facade [Object] to cache
     # @param options [Hash] for Rails.cache.fetch
     # @param &block [Proc] for cache miss
     # @return [Object]
-    def self.fetch_association(serializer, association, options = {})
+    def self.fetch_association(facade, association, options = {})
+      #TODO --jdc implement
       yield
     end
 
     private
 
-    # Salts and hashes serializer cache_key
-    # @param serializer [Facade] to generate key for
+    # Salts and hashes facade cache_key
+    # @param facade [Facade] to generate key for
     # @return [String]
-    def self.digest_key(serializer)
-      Digest::MD5.hexdigest(CACHE_PREFIX + serializer.cache_key.to_s)
+    def self.digest_key(facade)
+      Digest::MD5.hexdigest(CACHE_PREFIX + facade.cache_key.to_s)
     end
 
     # Tells if the resource to be serialized can be cached
-    # @param serializer [Facade] to inspect
+    # @param facade [Facade] to inspect
     # @return [Boolean]
-    def self.cacheable?(serializer)
+    def self.cacheable?(facade)
       RealCerealBusiness.cache_enabled
     end
   end

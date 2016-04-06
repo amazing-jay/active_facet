@@ -12,12 +12,11 @@ module TestHarnessHelper
     Class.new {
       include RealCerealBusiness::Serializer::Base
 
+      resource_class ::ResourceA
+
+      #TODO --jdc remove, unneeded now?
       def self.name
         'ResourceASerializer'
-      end
-
-      def resource_class
-        ResourceA
       end
     }
   end
@@ -25,12 +24,11 @@ module TestHarnessHelper
   def build_association_serializer_class
     Class.new {
       include RealCerealBusiness::Serializer::Base
+      resource_class ::ResourceB
+
+      #TODO --jdc remove, unneeded now?
       def self.name
         'ResourceBSerializer'
-      end
-
-      def resource_class
-        ResourceB
       end
     }
   end

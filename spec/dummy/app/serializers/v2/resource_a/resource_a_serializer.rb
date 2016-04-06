@@ -3,6 +3,7 @@ module V2
     class ResourceASerializer
       include RealCerealBusiness::Serializer::Base
       include BaseSerializer
+      resource_class ::ResourceA
     end
   end
 end
