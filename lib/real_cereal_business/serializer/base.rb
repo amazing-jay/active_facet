@@ -109,8 +109,26 @@ module RealCerealBusiness
             end
             attribute
           else
+            custom_includes field_set
+          end
+        end
+      end
+
+      #TODO --jdc document
+      def custom_includes(field)
+        attribute = resource_attribute_name(field)
+        custom_serializer_name = c_serializers[ attribute ]
+
+        if custom_serializer_name
+          custom_serializer = get_custom_serializer_class(custom_serializer_name)
+
+          if custom_serializer.respond_to? :custom_scope
+            custom_serializer.custom_scope
+          else
             nil
           end
+        else
+          nil
         end
       end
 

@@ -217,12 +217,12 @@ module RealCerealBusiness
         case value = block.call(field, nested_field_set)
         when nil
         when Hash
-          #flatten nested hashes
-          hash.merge! value
+          hash.deep_merge! value
         else
           hash[value] ||= nil
         end
       end
+      #flatten nested hashes
       hash.reject! do |field, nested_field_set|
         if nested_field_set.blank?
           array << field
