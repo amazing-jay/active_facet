@@ -110,16 +110,16 @@ module RealCerealBusiness
       #  [:basic, :extended, {orders: [:basic, {line_items: :extended}]}]
       # @return [Hash]
       def scoped_includes(field_set = nil, options = {})
-        config.field_set_itterator(field_set) do |field_set, nested_field_sets|
-          if is_association? field_set
-            attribute = resource_attribute_name(field_set)
-            if nested_field_sets
-              serializer_class = get_association_serializer_class(field_set, options)
-              attribute = { attribute => serializer_class.present? ? serializer_class.scoped_includes(nested_field_sets, options) : nested_field_sets }
+        config.field_set_itterator(field_set) do |field, nested_field_set|
+          if is_association? field
+            attribute = resource_attribute_name(field)
+            if nested_field_set
+              serializer_class = get_association_serializer_class(field, options)
+              attribute = { attribute => serializer_class.present? ? serializer_class.scoped_includes(nested_field_set, options) : nested_field_set }
             end
             attribute
           else
-            custom_includes field_set
+            custom_includes(field, options)
           end
         end
       end
@@ -127,12 +127,12 @@ module RealCerealBusiness
       # Returns field_set serialized for dependant resources in custom attribute serializers & extensions
       # @param field [Field]
       # @return [Field Set]
-      def custom_includes(field)
+      def custom_includes(field, options)
         attribute = resource_attribute_name(field)
         custom_serializer_name = config.serializers[attribute]
 
         if custom_serializer_name
-          custom_serializer = get_custom_serializer_class(custom_serializer_name)
+          custom_serializer = get_custom_serializer_class(custom_serializer_name, options)
 
           if custom_serializer.respond_to? :custom_scope
             custom_serializer.custom_scope
