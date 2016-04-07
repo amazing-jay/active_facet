@@ -76,6 +76,11 @@ module RealCerealBusiness
           @instance ||= super
         end
 
+        # TODO --jdc change new/instance contract
+        # def instance
+        #   @instance ||= new
+        # end
+
         # Memoized class getter
         # @return [Config]
         def config
@@ -267,18 +272,6 @@ module RealCerealBusiness
       # @return [String]
       def module_name
         @module_name ||= self.class.name.deconstantize
-      end
-
-      # Constantizes an appropriate resource serializer class
-      # raises exception if not successful
-      # @param names [Array] of strings attempt constantize
-      # @param index [Integer] recursive cursor
-      # @return [Class]
-      def constantize_resource_class(names, index)
-        raise RealCerealBusiness::Errors::ConfigurationError.new(RealCerealBusiness::Errors::ConfigurationError::RESOURCE_ERROR_MSG) if names.blank? || -index > names.size
-        klass = names[index..-1].join("::").safe_constantize
-        klass = constantize_resource_class(names, index-1) unless klass.present? && klass < ActiveRecord::Base
-        klass
       end
     end
   end
