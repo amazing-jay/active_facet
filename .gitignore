@@ -11,3 +11,4 @@
 .ruby-version
 .ruby-gemset
 /spec/dummy/db/test.sqlite3
+/spec/dummy/tmp/cache
