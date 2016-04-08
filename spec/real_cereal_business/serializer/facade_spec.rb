@@ -49,10 +49,56 @@ describe RealCerealBusiness::Serializer::Facade do
   end
 
   describe ".as_json" do
-        # RealCerealBusiness.document_cache.fetch(self) { serialize! }
+    subject { instance.send(:as_json) }
+    let(:resource) { create :resource_a, :with_children, :with_master }
+
+    before do
+      RealCerealBusiness.cache_enabled = true
+      instance.send(:as_json) #store in cache
+      RealCerealBusiness.cache_enabled = false
+
+      allow(RealCerealBusiness.document_cache).to receive(:fetch).and_call_original
+      allow(instance).to receive(:serialize!).and_call_original
+    end
+
+    context "without cache" do
+      before do
+        subject
+      end
+      it { expect(RealCerealBusiness.document_cache).to have_received(:fetch) }
+      it { expect(instance).to have_received(:serialize!) }
+    end
+
+    context "with cache" do
+      before do
+        RealCerealBusiness.cache_enabled = true
+        subject
+        RealCerealBusiness.cache_enabled = false
+      end
+
+      it { expect(RealCerealBusiness.document_cache).to have_received(:fetch) }
+      it { expect(instance).to_not have_received(:serialize!) }
+
+    end
   end
-  describe ".from_hash(attributes)" do
-        # hydrate! deep_copy(attributes)
+  describe ".from_hash" do
+    subject { instance.from_hash(attributes) }
+    let(:attributes) {
+      {"explicit_attr"=>"explicit_attr", "implicit_attr"=>"implicit_attr", "private_attr"=>"private_accessor", "alias_attr"=>"aliased_accessor", "to_attr"=>"to_accessor", "from_attr"=>"from_accessor", "nested_attr"=>"nested_attr", "nested_compound_attr"=>"nested_compound_attr", "custom_attr"=>"custom_attr", "compound_attr"=>"serialized_compound_accessor", "parent"=>nil, "master"=>{}, "leader"=>nil, "children"=>[{"nested_attr"=>"nested_attr", "nested_compound_attr"=>"serialized_compound_accessor", "explicit_attr"=>"explicit_attr"}, {"nested_attr"=>"nested_attr", "nested_compound_attr"=>"serialized_compound_accessor", "explicit_attr"=>"explicit_attr"}, {"nested_attr"=>"nested_attr", "nested_compound_attr"=>"serialized_compound_accessor", "explicit_attr"=>"explicit_attr"}], "others"=>[], "extras"=>[]}
+    }
+    let(:other_resource) { create :resource_a }
+    it { expect(subject.explicit_attr).to eq(other_resource.explicit_attr) }
+    it { expect(subject.implicit_attr).to eq(other_resource.implicit_attr) }
+    it { expect(subject.custom_attr).to eq('hydrated_custom_attr') }
+    it { expect(subject.nested_accessor).to eq(other_resource.nested_accessor) }
+    it { expect(subject.dynamic_accessor).to be_blank }
+    it { expect(subject.private_accessor).to eq(other_resource.private_accessor) }
+    it { expect(subject.aliased_accessor).to eq(other_resource.aliased_accessor) }
+    it { expect(subject.from_accessor).to eq(other_resource.from_accessor) }
+    it { expect(subject.to_accessor).to eq(other_resource.to_accessor) }
+    it { expect(subject.nested_compound_accessor).to eq({'compound_accessor' => 'hydrated_nested_compound_attr'}) }
+    it { expect(subject.unexposed_attr).to_not eq(other_resource.unexposed_attr) }
+
   end
 
   describe ".config" do
@@ -140,49 +186,128 @@ describe RealCerealBusiness::Serializer::Facade do
   end
 
   describe ".serialize!" do
-        # json = {}.with_indifferent_access
-        # WG.measure("scope_itteration") do
-        #   config.field_set_itterator(fields) do |scope, nested_scopes|
-        #     WG.measure("attribute retrieval wrapper", self.class.name, scope, (resource.is_a?(Array) ? resource : resource.id)) do
-        #       begin
-        #         json[scope] = get_resource_attribute scope, nested_scopes if allowed_field?(scope)
-        #       rescue RealCerealBusiness::Errors::AttributeError => e
-        #         # Deliberately do nothing. Ignore scopes that do not map to resource methods (or aliases)
-        #       end
-        #     end
-        #   end
-        # end
+    subject { instance.send(:serialize!) }
+    let(:resource) { create :resource_a, :with_children, :with_master }
 
-        # apply_custom_serializers! json
+    context "all" do
+      let(:fields) { :all }
+      let(:filters) { {} }
+      it { expect(subject).to eq({"explicit_attr"=>"explicit_attr", "implicit_attr"=>"implicit_attr", "private_attr"=>"private_accessor", "alias_attr"=>"aliased_accessor", "to_attr"=>"to_accessor", "from_attr"=>"from_accessor", "nested_attr"=>"nested_attr", "nested_compound_attr"=>"serialized_compound_accessor", "custom_attr"=>"serialized_custom_attr", "compound_attr"=>"serialized_compound_accessor", "parent"=>nil, "master"=>{}, "leader"=>nil, "children"=>[{"nested_attr"=>"nested_attr", "nested_compound_attr"=>"serialized_compound_accessor", "explicit_attr"=>"explicit_attr"}, {"nested_attr"=>"nested_attr", "nested_compound_attr"=>"serialized_compound_accessor", "explicit_attr"=>"explicit_attr"}, {"nested_attr"=>"nested_attr", "nested_compound_attr"=>"serialized_compound_accessor", "explicit_attr"=>"explicit_attr"}], "others"=>[], "extras"=>[]}) }
+    end
+
+    context "all_attributes" do
+      let(:fields) { :all_attributes }
+      let(:filters) { {} }
+      it { expect(subject).to eq({"alias_attr"=>"aliased_accessor", "others"=>[], "compound_attr"=>"serialized_compound_accessor", "custom_attr"=>"serialized_custom_attr", "explicit_attr"=>"explicit_attr", "from_attr"=>"from_accessor", "implicit_attr"=>"implicit_attr", "nested_attr"=>"nested_attr", "nested_compound_attr"=>"serialized_compound_accessor", "private_attr"=>"private_accessor", "to_attr"=>"to_accessor"}) }
+    end
+
+    context "composite" do
+      let(:fields) { [:explicit_attr, { children: :implicit_attr}, { master: :minimal}, [ :implicit_attr]] }
+      let(:filters) { {} }
+      it { expect(subject).to eq({"explicit_attr"=>"explicit_attr", "children"=>[{"implicit_attr"=>"implicit_attr", "explicit_attr"=>"explicit_attr", "nested_attr"=>"nested_attr"}, {"implicit_attr"=>"implicit_attr", "explicit_attr"=>"explicit_attr", "nested_attr"=>"nested_attr"}, {"implicit_attr"=>"implicit_attr", "explicit_attr"=>"explicit_attr", "nested_attr"=>"nested_attr"}], "master"=>{}, "implicit_attr"=>"implicit_attr", "nested_attr"=>"nested_attr"}) }
+    end
+
+    context "attrs" do
+      let(:fields) { :attrs }
+      let(:filters) { {} }
+      it { expect(subject).to eq({"explicit_attr"=>"explicit_attr", "implicit_attr"=>"implicit_attr", "private_attr"=>"private_accessor", "alias_attr"=>"aliased_accessor", "to_attr"=>"to_accessor", "from_attr"=>"from_accessor", "nested_attr"=>"nested_attr"}) }
+    end
+
+    context "nested" do
+      let(:fields) { :nested }
+      let(:filters) { {} }
+      it { expect(subject).to eq({"nested_attr"=>"nested_attr", "nested_compound_attr"=>"serialized_compound_accessor", "explicit_attr"=>"explicit_attr"}) }
+    end
+
+    context "custom" do
+      let(:fields) { :custom }
+      let(:filters) { {} }
+      it { expect(subject).to eq({"custom_attr"=>"serialized_custom_attr", "compound_attr"=>"serialized_compound_accessor", "nested_compound_attr"=>"serialized_compound_accessor", "explicit_attr"=>"explicit_attr", "nested_attr"=>"nested_attr"}) }
+    end
+
+    context "minimal" do
+      let(:fields) { :minimal }
+      let(:filters) { {} }
+      it { expect(subject).to eq({"explicit_attr"=>"explicit_attr"}) }
+    end
+
+    context "basic" do
+      let(:fields) { :basic }
+      let(:filters) { {} }
+      it { expect(subject).to eq({"explicit_attr"=>"explicit_attr", "nested_attr"=>"nested_attr"}) }
+    end
+
+    context "relations" do
+      let(:fields) { :relations }
+      let(:filters) { {} }
+      it { expect(subject).to eq({"parent"=>nil, "master"=>{}, "leader"=>nil, "children"=>[{"explicit_attr"=>"explicit_attr", "nested_attr"=>"nested_attr"}, {"explicit_attr"=>"explicit_attr", "nested_attr"=>"nested_attr"}, {"explicit_attr"=>"explicit_attr", "nested_attr"=>"nested_attr"}], "others"=>[], "extras"=>[], "explicit_attr"=>"explicit_attr", "nested_attr"=>"nested_attr"}) }
+    end
+
+    context "alias_relation" do
+      let(:fields) { :alias_relation }
+      let(:filters) { {} }
+      it { expect(subject).to eq({"others"=>[], "explicit_attr"=>"explicit_attr", "nested_attr"=>"nested_attr"}) }
+    end
+
+    context "deep_relations" do
+      let(:fields) { :deep_relations }
+      let(:filters) { {} }
+      it { expect(subject).to eq({"parent"=>nil, "children"=>[{"nested_attr"=>"nested_attr", "nested_compound_attr"=>"serialized_compound_accessor", "explicit_attr"=>"explicit_attr"}, {"nested_attr"=>"nested_attr", "nested_compound_attr"=>"serialized_compound_accessor", "explicit_attr"=>"explicit_attr"}, {"nested_attr"=>"nested_attr", "nested_compound_attr"=>"serialized_compound_accessor", "explicit_attr"=>"explicit_attr"}], "master"=>{}, "extras"=>[], "explicit_attr"=>"explicit_attr", "nested_attr"=>"nested_attr"}) }
+    end
+
+    context "explicit_attr" do
+      let(:fields) { :explicit_attr }
+      let(:filters) { {} }
+      it { expect(subject).to eq({"explicit_attr"=>"explicit_attr", "nested_attr"=>"nested_attr"}) }
+    end
+
+    context "implicit_attr" do
+      let(:fields) { :implicit_attr }
+      let(:filters) { {} }
+      it { expect(subject).to eq({"implicit_attr"=>"implicit_attr", "explicit_attr"=>"explicit_attr", "nested_attr"=>"nested_attr"}) }
+    end
   end
 
-  describe ".get_resource_attribute(scope, nested_scopes)" do
-        # if config.namespaces.key? scope
-        #   WG.measure("namespaced resource") do
-        #     if ns = get_resource_attribute!(config.namespaces[scope])
-        #       ns[serializer.resource_attribute_name(scope).to_s]
-        #     else
-        #       nil
-        #     end
-        #   end
-        # elsif config.extensions.key?(scope)
-        #   WG.measure("extended resource") do
-        #     scope
-        #   end
-        # elsif serializer.is_association?(scope)
-        #   attribute = WG.measure("N+1 association loading", serializer.class.name, scope, resource.try(:id)) do
-        #     get_association_attribute(scope)
-        #   end
-        #   WG.measure("nested serialization", serializer.class.name, scope, resource.try(:id)) do
-        #     attribute.as_json(options.merge(group_includes: nested_scopes))
-        #   end
-        # else
-        #   #TODO: consider serializing everything instead of only associations.
-        #   # Order#shipping_address, for example, is an ActiveRecord but not an association
-        #   WG.measure("basic resource", serializer.class.name, scope, (resource.is_a?(Array) ? resource : resource.id)) do
-        #     get_resource_attribute!(serializer.resource_attribute_name(scope))
-        #   end
-        # end
+  describe ".get_resource_attribute" do
+    subject { instance.send(:get_resource_attribute, field, nested_field_set) }
+    let(:resource) { create :resource_a, :with_children }
+    let(:nested_field_set) { :basic }
+    let(:filters) { {} }
+    before do
+      allow(instance).to receive(:get_resource_attribute!).and_call_original
+      allow(resource).to receive(:children).and_call_original
+      subject
+    end
+
+    context "namespace" do
+      let(:field) { :nested_attr }
+      it { expect(subject).to eq('nested_attr') }
+      it { expect(instance).to have_received(:get_resource_attribute!) }
+    end
+
+    context "extension" do
+      let(:field) { :extension_attr }
+      it { expect(subject).to eq(:extension_attr) }
+    end
+
+    context "association" do
+      let(:field) { :children }
+      let(:children_options) { make_options(fields: :basic) }
+      it { expect(subject).to eq(resource.children.as_json(children_options)) }
+      it { expect(resource).to have_received(:children).twice }
+    end
+
+    context "default" do
+      let(:field) { :explicit_attr }
+      it { expect(subject).to eq('explicit_attr') }
+      it { expect(instance).to have_received(:get_resource_attribute!) }
+    end
+
+    context "transformed" do
+      let(:field) { :alias_attr }
+      it { expect(subject).to eq('aliased_accessor') }
+      it { expect(instance).to have_received(:get_resource_attribute!) }
+    end
   end
 
   describe ".get_resource_attribute!" do
@@ -209,7 +334,8 @@ describe RealCerealBusiness::Serializer::Facade do
   describe ".get_association_attribute" do
     let(:field) { :children }
     let(:resource) { create :resource_a, :with_children }
-    subject { instance.send(:get_association_attribute, field ) }
+    let(:nested_field_set) { :basic }
+    subject { instance.send(:get_association_attribute, field, nested_field_set ) }
 
     context 'default' do
       let(:filters) { {} }
@@ -244,7 +370,7 @@ describe RealCerealBusiness::Serializer::Facade do
     it { expect(subject).to eq({'custom_attr' => 'serialized_hello', 'explicit_attr' => 'world'}) }
   end
 
-  describe ".hydrate!(json)" do
+  describe ".hydrate!" do
     subject { instance.send(:hydrate!, json) }
     let(:valid_attrs) {
       {

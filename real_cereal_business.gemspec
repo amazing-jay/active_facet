@@ -26,15 +26,14 @@ Gem::Specification.new do |s|
   s.files = Dir["{lib}/**/*"] + ["MIT-LICENSE", "Rakefile", "README.md"]
 
   s.add_dependency "rails", "~> 3.2.22"
-  #TODO --jdc move to dev dependency
-  s.add_dependency 'w_g', '~> 0.4.1'
+  s.add_dependency "oj"
+
+  s.add_development_dependency 'w_g', '~> 0.4.1'
 
   s.add_development_dependency "bundler", "~> 1.11"
   s.add_development_dependency "sqlite3"
-  #s.add_development_dependency "rspec"
   s.add_development_dependency "rspec-rails"
   s.add_development_dependency "test-unit"
-  #s.add_development_dependency "rspec-json_expectations"
   s.add_development_dependency "factory_girl_rails"
   s.add_development_dependency "database_cleaner"
   s.add_development_dependency "ffaker"

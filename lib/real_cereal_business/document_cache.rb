@@ -1,3 +1,5 @@
+# This is a really dump cache interface that caches everything
+# Extend with custom class that conditionally caches and stitches independent documents
 module RealCerealBusiness
   class DocumentCache
     CACHE_PREFIX = 'rcb_doc_cache'
@@ -14,10 +16,10 @@ module RealCerealBusiness
       cache_key = digest_key(facade)
       if options[:force] || !(result = Rails.cache.fetch(cache_key))
         result = yield
-        Rails.cache.write(cache_key, Oj.dump(result), RealCerealBusiness::default_cache_options.merge(options))
+        Rails.cache.write(cache_key, ::Oj.dump(result), RealCerealBusiness::default_cache_options.merge(options))
         result
       else
-        Oj.load(result)
+        ::Oj.load(result)
       end
     end
 

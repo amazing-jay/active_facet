@@ -119,12 +119,8 @@ module RealCerealBusiness
         elsif config.extensions.key?(field)
           field
         elsif serializer.is_association?(field)
-          RealCerealBusiness.restore_opts_after(options, RealCerealBusiness.fields_key, nested_field_set) do
-            get_association_attribute(field)
-          end
+          get_association_attribute(field, nested_field_set)
         else
-          #TODO: consider serializing everything instead of only associations.
-          # Order#shipping_address, for example, is an ActiveRecord but not an association
           get_resource_attribute!(serializer.resource_attribute_name(field))
         end
       end
@@ -140,13 +136,15 @@ module RealCerealBusiness
       # Retrieves scoped association from cache or record
       # @param field [Symbol] attribute to get
       # @return [Array | ActiveRelation] of ActiveRecord
-      def get_association_attribute(field)
+      def get_association_attribute(field, nested_field_set)
         association = serializer.resource_attribute_name(field)
 
-        RealCerealBusiness.document_cache.fetch_association(self, association) do
+        RealCerealBusiness.document_cache.fetch_association(self, association, opts) do
           attribute = resource.send(association)
           attribute = attribute.scope_filters(filters) if is_expression_scopeable?(attribute)
-          attribute.as_json(options)
+          RealCerealBusiness.restore_opts_after(options, RealCerealBusiness.fields_key, nested_field_set) do
+            attribute.as_json(options)
+          end
         end
       end
 
