@@ -106,14 +106,20 @@ describe RealCerealBusiness::Serializer::Facade do
   end
 
   describe ".is_expression_scopeable?" do
+    subject { instance.send(:is_expression_scopeable?, exp) }
     let(:exp) { ActiveRecord::Relation.new(nil,nil) }
     let(:persisted) { true }
-    subject { instance.send(:is_expression_scopeable?, exp) }
+    let(:options) { { RealCerealBusiness.opts_key => opts.merge(RealCerealBusiness.filters_force_key => filters_enabled_locally ) } }
+    let(:filters_enabled_locally) { true }
     before do
       allow(resource).to receive(:persisted?) { persisted }
     end
     context "persisted relation" do
       it { expect(subject).to be true }
+      context "filters disabled" do
+        let(:filters_enabled_locally) { false }
+        it { expect(subject).to be false }
+      end
     end
     context "persisted attribute" do
       let(:exp) { :explicit_attr }
@@ -149,6 +155,45 @@ describe RealCerealBusiness::Serializer::Facade do
     context "else" do
       let(:exp) { :explicit_attr }
       it { expect(subject).to be false }
+    end
+  end
+
+  describe ".is_relation_scopeable?" do
+    subject { instance.send(:is_relation_scopeable?, exp) }
+    let(:exp) { ActiveRecord::Relation.new(nil,nil) }
+    around do |example|
+      temp = RealCerealBusiness::filters_enabled
+      RealCerealBusiness::filters_enabled = filters_enabled_globally
+      example.run
+      RealCerealBusiness::filters_enabled = temp
+    end
+
+    context "globally disabled" do
+      let(:filters_enabled_globally) { false }
+      it { expect(subject).to be false }
+
+      context "forced disabled" do
+        let(:options) { { RealCerealBusiness.opts_key => opts.merge(RealCerealBusiness.filters_force_key => false ) } }
+        it { expect(subject).to be false }
+      end
+      context "forced enabled" do
+        let(:options) { { RealCerealBusiness.opts_key => opts.merge(RealCerealBusiness.filters_force_key => true ) } }
+        it { expect(subject).to be true }
+      end
+    end
+
+    context "globally enabled" do
+      let(:filters_enabled_globally) { true }
+      it { expect(subject).to be true }
+
+      context "forced disabled" do
+        let(:options) { { RealCerealBusiness.opts_key => opts.merge(RealCerealBusiness.filters_force_key => false ) } }
+        it { expect(subject).to be false }
+      end
+      context "forced enabled" do
+        let(:options) { { RealCerealBusiness.opts_key => opts.merge(RealCerealBusiness.filters_force_key => true ) } }
+        it { expect(subject).to be true }
+      end
     end
   end
 

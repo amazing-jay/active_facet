@@ -5,10 +5,13 @@ default:
   version_key: version
   filters_key: filters
   cache_force_key: cache_force
+  filters_force_key: cache_force
   strict_lookups: false
   preload_associations: false
   cache_enabled: false
+  filters_enabled: false
 test:
   strict_lookups: false
   preload_associations: false
   cache_enabled: false
+  filters_enabled: false

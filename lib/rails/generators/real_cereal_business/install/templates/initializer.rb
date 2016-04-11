@@ -9,22 +9,25 @@ RealCerealBusiness.configure do |config|
   # config.default_version                = 1.0
 
   # The symbol which acts as the options key that designates context for serialization. :rsb_opts by default.
-  # config.opts_key                       = @env_config['rsb_opts'].to_sym
+  # config.opts_key                       = @env_config['opts_key'].to_sym
 
   # The symbol which acts as the context key that designates fields for serialization. :fields by default.
-  # config.fields_key                     = @env_config['fields'].to_sym
+  # config.fields_key                     = @env_config['fields_key'].to_sym
 
   # The symbol which acts as the context key that designates field overrides for serialization. :field_overrides by default.
-  # config.field_overrides_key            = @env_config['field_overrides'].to_sym
+  # config.field_overrides_key            = @env_config['field_overrides_key'].to_sym
 
   # The symbol which acts as the context key that designates version for serialization. :version by default.
-  # config.version_key                    = @env_config['version'].to_sym
+  # config.version_key                    = @env_config['version_key'].to_sym
 
   # The symbol which acts as the context key that designates filters for serialization. :filters by default.
-  # config.filters_key                    = @env_config['filters'].to_sym
+  # config.filters_key                    = @env_config['filters_key'].to_sym
 
   # The symbol which acts as the context key that designates force for cache. :cache_force by default.
-  # config.cache_force_key                = @env_config['cache_force'].to_sym
+  # config.cache_force_key                = @env_config['cache_force_key'].to_sym
+
+  # The symbol which acts as the context key that designates filters state override. :filters_force by default.
+  # config.filters_force_key              = @env_config['filters_force_key'].to_sym
 
   # Tell if exception should be raised when serializer_mapper returns nil. False by default.
   # config.strict_lookups                 = @env_config['strict_lookups']
@@ -32,8 +35,11 @@ RealCerealBusiness.configure do |config|
   # Tell if associations should be preloaded to mitigate N+1 problems. False by default.
   # config.preload_associations           = @env_config['preload_associations']
 
-  # Tell document cache to cache
+  # Tell serializers to cache
   # config.cache_enabled                  = @env_config['cache_enabled']
+
+  # Tell serializers to enable/disable filters
+  # config.filters_enabled                = @env_config['filters_enabled']
 
   # Default options for Rails.cache.fetch
   # config.default_cache_options          = { expires_in: 5.minutes }

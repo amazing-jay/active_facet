@@ -9,7 +9,8 @@ module RealCerealBusiness
         :field_overrides,         # Field Overrides to apply
         :overrides,               # Field Overrides specific to resource
         :version,                 # Serializer version to apply
-        :filters                  # Filters to apply
+        :filters,                 # Filters to apply
+        :filters_enabled          # Apply Filters, override global setting
 
       # @return [Serializer::Facade]
       def initialize(serializer, resource, options = {})
@@ -26,6 +27,7 @@ module RealCerealBusiness
 
         self.version          = opts[RealCerealBusiness.version_key]
         self.filters          = opts[RealCerealBusiness.filters_key]
+        self.filters_enabled  = opts.key?(RealCerealBusiness.filters_force_key) ? opts[RealCerealBusiness.filters_force_key] : RealCerealBusiness.filters_enabled
       end
 
       # This method returns a JSON of hash values representing the resource
@@ -71,7 +73,7 @@ module RealCerealBusiness
       # @param expression [Symbol]
       # @return [Boolean]
       def is_expression_scopeable?(expression)
-        resource.persisted? && is_active_relation?(expression)
+        resource.persisted? && is_active_relation?(expression) && is_relation_scopeable?(expression)
       end
 
       # Checks field to see if expression is a relation
@@ -80,6 +82,12 @@ module RealCerealBusiness
         #TODO -jdc let me know if anyone finds a better way to identify Proxy objects
         #NOTE:: Proxy Collections use method missing for most actions; .scoped is the only reliable test
         expression.is_a?(ActiveRecord::Relation) || (expression.is_a?(Array) && expression.respond_to?(:scoped))
+      end
+
+      # Checks expression to determine if filters are enabled
+      # @return [Boolean]
+      def is_relation_scopeable?(expression)
+        filters_enabled
       end
 
       #TODO --jdc this is a hack for assets. fix by making this class the primary entry point

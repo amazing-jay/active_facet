@@ -19,7 +19,7 @@ describe RealCerealBusiness::ResourceManager do
 
     context "resource_mapper" do
       subject { described_class.resource_mapper }
-      it { expect(subject == described_class.method(:default_resource_mapper)).to be_true }
+      it { expect(subject == described_class.method(:default_resource_mapper)).to be true }
     end
 
 

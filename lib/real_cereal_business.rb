@@ -19,9 +19,11 @@ module RealCerealBusiness
     :version_key,
     :filters_key,
     :cache_force_key,
+    :filters_force_key,
     :strict_lookups,
     :preload_associations,
     :cache_enabled,
+    :filters_enabled,
     :default_cache_options,
     :document_cache,
     :default_version
@@ -33,9 +35,11 @@ module RealCerealBusiness
   self.version_key                    = :version
   self.filters_key                    = :filters
   self.cache_force_key                = :cache_force
+  self.filters_force_key              = :filters_force
 
   self.strict_lookups                 = false
   self.preload_associations           = false
+  self.filters_enabled                = false
   self.cache_enabled                  = false
   self.default_cache_options          = { expires_in: 5.minutes }
   self.document_cache                 = RealCerealBusiness::DocumentCache
