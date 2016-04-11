@@ -50,37 +50,17 @@ describe RealCerealBusiness::Serializer::Facade do
 
   describe ".as_json" do
     subject { instance.send(:as_json) }
-    let(:resource) { create :resource_a, :with_children, :with_master }
 
     before do
-      RealCerealBusiness.cache_enabled = true
-      instance.send(:as_json) #store in cache
-      RealCerealBusiness.cache_enabled = false
-
       allow(RealCerealBusiness.document_cache).to receive(:fetch).and_call_original
       allow(instance).to receive(:serialize!).and_call_original
+      subject
     end
 
-    context "without cache" do
-      before do
-        subject
-      end
-      it { expect(RealCerealBusiness.document_cache).to have_received(:fetch) }
-      it { expect(instance).to have_received(:serialize!) }
-    end
-
-    context "with cache" do
-      before do
-        RealCerealBusiness.cache_enabled = true
-        subject
-        RealCerealBusiness.cache_enabled = false
-      end
-
-      it { expect(RealCerealBusiness.document_cache).to have_received(:fetch) }
-      it { expect(instance).to_not have_received(:serialize!) }
-
-    end
+    it { expect(RealCerealBusiness.document_cache).to have_received(:fetch) }
+    it { expect(instance).to have_received(:serialize!) }
   end
+
   describe ".from_hash" do
     subject { instance.from_hash(attributes) }
     let(:attributes) {
@@ -192,13 +172,13 @@ describe RealCerealBusiness::Serializer::Facade do
     context "all" do
       let(:fields) { :all }
       let(:filters) { {} }
-      it { expect(subject).to eq({"explicit_attr"=>"explicit_attr", "implicit_attr"=>"implicit_attr", "private_attr"=>"private_accessor", "alias_attr"=>"aliased_accessor", "to_attr"=>"to_accessor", "from_attr"=>"from_accessor", "nested_attr"=>"nested_attr", "nested_compound_attr"=>"serialized_compound_accessor", "custom_attr"=>"serialized_custom_attr", "compound_attr"=>"serialized_compound_accessor", "parent"=>nil, "master"=>{}, "leader"=>nil, "children"=>[{"nested_attr"=>"nested_attr", "nested_compound_attr"=>"serialized_compound_accessor", "explicit_attr"=>"explicit_attr"}, {"nested_attr"=>"nested_attr", "nested_compound_attr"=>"serialized_compound_accessor", "explicit_attr"=>"explicit_attr"}, {"nested_attr"=>"nested_attr", "nested_compound_attr"=>"serialized_compound_accessor", "explicit_attr"=>"explicit_attr"}], "others"=>[], "extras"=>[]}) }
+      it { expect(subject).to eq({"explicit_attr"=>"explicit_attr", "alias_attr"=>"aliased_accessor", "from_attr"=>"from_accessor", "to_attr"=>"to_accessor", "nested_attr"=>"nested_attr", "custom_attr"=>"serialized_custom_attr", "compound_attr"=>"serialized_compound_accessor", "nested_compound_attr"=>"serialized_compound_accessor", "extension_attr"=>"serialized_extension_attr", "implicit_attr"=>"implicit_attr", "private_attr"=>"private_accessor", "parent"=>nil, "master"=>{}, "leader"=>nil, "children"=>[{"nested_attr"=>"nested_attr", "nested_compound_attr"=>"serialized_compound_accessor", "explicit_attr"=>"explicit_attr"}, {"nested_attr"=>"nested_attr", "nested_compound_attr"=>"serialized_compound_accessor", "explicit_attr"=>"explicit_attr"}, {"nested_attr"=>"nested_attr", "nested_compound_attr"=>"serialized_compound_accessor", "explicit_attr"=>"explicit_attr"}], "others"=>[], "extras"=>[]}) }
     end
 
     context "all_attributes" do
       let(:fields) { :all_attributes }
       let(:filters) { {} }
-      it { expect(subject).to eq({"alias_attr"=>"aliased_accessor", "others"=>[], "compound_attr"=>"serialized_compound_accessor", "custom_attr"=>"serialized_custom_attr", "explicit_attr"=>"explicit_attr", "from_attr"=>"from_accessor", "implicit_attr"=>"implicit_attr", "nested_attr"=>"nested_attr", "nested_compound_attr"=>"serialized_compound_accessor", "private_attr"=>"private_accessor", "to_attr"=>"to_accessor"}) }
+      it { expect(subject).to eq({"alias_attr"=>"aliased_accessor", "others"=>[], "compound_attr"=>"serialized_compound_accessor", "custom_attr"=>"serialized_custom_attr", "explicit_attr"=>"explicit_attr", "extension_attr"=>"serialized_extension_attr", "from_attr"=>"from_accessor", "implicit_attr"=>"implicit_attr", "nested_attr"=>"nested_attr", "nested_compound_attr"=>"serialized_compound_accessor", "private_attr"=>"private_accessor", "to_attr"=>"to_accessor"}) }
     end
 
     context "composite" do

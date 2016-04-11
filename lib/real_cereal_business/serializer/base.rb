@@ -34,6 +34,7 @@ module RealCerealBusiness
           end
           config.serializers[api_attribute] = options[:with]    if options[:with].present?
           config.namespaces[api_attribute]  = options[:within]  if options[:within].present?
+          expose api_attribute
         end
 
         # DSL Defines an attribute extension available for decoration and serialization
@@ -41,6 +42,7 @@ module RealCerealBusiness
         def extension(api_attribute)
           config.extensions[api_attribute] = true
           config.serializers[api_attribute] = api_attribute.to_sym
+          expose api_attribute
         end
 
         # DSL Defines an alias that can be used instead of a Field Set
@@ -133,7 +135,6 @@ module RealCerealBusiness
 
         if custom_serializer_name
           custom_serializer = get_custom_serializer_class(custom_serializer_name, options)
-
           if custom_serializer.respond_to? :custom_scope
             custom_serializer.custom_scope
           else

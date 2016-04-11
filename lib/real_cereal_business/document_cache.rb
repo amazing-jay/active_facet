@@ -12,11 +12,11 @@ module RealCerealBusiness
     def self.fetch(facade, options = {})
       return yield unless cacheable?(facade)
 
-      options[:force] ||= facade.opts[RealCerealBusiness.cache_force_key]
+      force = facade.opts[RealCerealBusiness.cache_force_key] || options[:force] || RealCerealBusiness::default_cache_options[:force]
       cache_key = digest_key(facade)
-      if options[:force] || !(result = Rails.cache.fetch(cache_key))
+      if force || !(result = Rails.cache.fetch(cache_key))
         result = yield
-        Rails.cache.write(cache_key, ::Oj.dump(result), RealCerealBusiness::default_cache_options.merge(options))
+        Rails.cache.write(cache_key, ::Oj.dump(result), RealCerealBusiness::default_cache_options.merge(options).merge(force: force))
         result
       else
         ::Oj.load(result)

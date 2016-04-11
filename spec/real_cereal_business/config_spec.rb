@@ -74,7 +74,7 @@ describe RealCerealBusiness::Config do
 
   end
 
-  describe ".merge! config" do
+  describe ".merge!" do
 
     before do
       other = described_class.new

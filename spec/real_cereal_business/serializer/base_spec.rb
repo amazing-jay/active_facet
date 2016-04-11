@@ -191,6 +191,28 @@ describe RealCerealBusiness::Serializer::Base do
       it { expect(subject).to eq([:children, :master, :extras, {:parent=>:children}]) }
     end
 
+    describe ".custom_includes" do
+      subject { instance.custom_includes(field, options) }
+      let(:field) { :custom_attr }
+      let(:options) { nil }
+
+      context "not implemented" do
+        it { expect(subject).to eq(nil) }
+      end
+
+      context "not found" do
+        let(:field) { :foo }
+        it { expect(subject).to eq(nil) }
+      end
+
+      context "implemented" do
+        before do
+          attribute_serializer_class.class_eval { def self.custom_scope; :bar; end }
+        end
+        it { expect(subject).to eq(:bar) }
+      end
+    end
+
     describe ".exposed_aliases" do
       subject { instance.exposed_aliases(field_set_alias, include_relations, include_nested_field_sets) }
       let(:field_set_alias) { :all }
@@ -198,19 +220,19 @@ describe RealCerealBusiness::Serializer::Base do
       let(:include_nested_field_sets) { false }
 
       context "all attributes" do
-        it { expect(subject).to eq([:alias_attr, :alias_relation, :compound_attr, :custom_attr, :dynamic_attr, :explicit_attr, :from_attr, :implicit_attr, :nested_attr, :nested_compound_attr, :private_attr, :to_attr]) }
+        it { expect(subject).to eq([:alias_attr, :alias_relation, :compound_attr, :custom_attr, :dynamic_attr, :explicit_attr, :extension_attr, :from_attr, :implicit_attr, :nested_attr, :nested_compound_attr, :private_attr, :to_attr]) }
       end
 
       context "all fields" do
         #TODO --jdc fix so that relations get dealiased (alias_relation should not be in this set)
         let(:include_relations) { true }
-        it { expect(subject).to eq([:alias_attr, :alias_relation, :children, :compound_attr, :custom_attr, :dynamic_attr, :explicit_attr, :extras, :from_attr, :implicit_attr, :leader, :master, :nested_attr, :nested_compound_attr, :others, :parent, :private_attr, :to_attr]) }
+        it { expect(subject).to eq([:alias_attr, :alias_relation, :children, :compound_attr, :custom_attr, :dynamic_attr, :explicit_attr, :extension_attr, :extras, :from_attr, :implicit_attr, :leader, :master, :nested_attr, :nested_compound_attr, :others, :parent, :private_attr, :to_attr]) }
       end
 
       context "all nested" do
         let(:include_relations) { true }
         let(:include_nested_field_sets) { true }
-        it { expect(subject).to eq({"explicit_attr"=>{}, "implicit_attr"=>{}, "dynamic_attr"=>{}, "private_attr"=>{}, "alias_attr"=>{}, "to_attr"=>{}, "from_attr"=>{}, "nested_attr"=>{}, "nested_compound_attr"=>{}, "custom_attr"=>{}, "compound_attr"=>{}, "parent"=>{"children"=>{"attr"=>{}}}, "master"=>{}, "leader"=>{}, "children"=>{"nested"=>{}}, "others"=>{}, "extras"=>{"minimal"=>{}}, "alias_relation"=>{"implicit_attr"=>{}}}) }
+        it { expect(subject).to eq({"explicit_attr"=>{}, "alias_attr"=>{}, "from_attr"=>{}, "to_attr"=>{}, "nested_attr"=>{}, "custom_attr"=>{}, "compound_attr"=>{}, "nested_compound_attr"=>{}, "extension_attr"=>{}, "implicit_attr"=>{}, "dynamic_attr"=>{}, "private_attr"=>{}, "parent"=>{"children"=>{"attr"=>{}}}, "master"=>{}, "leader"=>{}, "children"=>{"nested"=>{}}, "others"=>{}, "extras"=>{"minimal"=>{}}, "alias_relation"=>{"implicit_attr"=>{}}}) }
       end
 
       context "named attributes" do

@@ -73,7 +73,7 @@ module RealCerealBusiness
 
     # Merges all ancestor accessors into self
     # @return [Config]
-    def merge! config
+    def merge!(config)
       self.compiled = false
       self.resource_class ||= config.resource_class
       transforms_from.merge!  config.transforms_from
