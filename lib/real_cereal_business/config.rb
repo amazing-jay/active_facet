@@ -220,13 +220,14 @@ module RealCerealBusiness
       field_set.each do |field, nested_field_set|
         case value = block.call(field, nested_field_set)
         when nil
-        when Hash
-          hash.deep_merge! value
+        when Symbol, String
+          hash[value.to_sym] = nil
         else
-          hash[value] ||= nil
+          hash = merge_field_sets(hash, value)
         end
       end
-      #flatten nested hashes
+      # convert { key: nil, key2: 1 } to [ :key, { key2: 1 }]
+      # TODO --jdc consider removing
       hash.reject! do |field, nested_field_set|
         if nested_field_set.blank?
           array << field
