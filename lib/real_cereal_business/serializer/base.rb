@@ -112,17 +112,29 @@ module RealCerealBusiness
       #  [:basic, :extended, {orders: [:basic, {line_items: :extended}]}]
       # @return [Hash]
       def scoped_includes(field_set = nil, options = {})
+        result = {}
         config.field_set_itterator(field_set) do |field, nested_field_set|
-          if is_association? field
-            attribute = resource_attribute_name(field)
-            if nested_field_set
-              serializer_class = get_association_serializer_class(field, options)
-              attribute = { attribute => serializer_class.present? ? serializer_class.scoped_includes(nested_field_set, options) : nested_field_set }
-            end
-            attribute
+          case value = scoped_include(field, nested_field_set, options)
+          when nil
+          when Hash
+            result.deep_merge! value
           else
-            custom_includes(field, options)
+            result[value] ||= nil
           end
+        end
+        result
+      end
+
+      def scoped_include(field, nested_field_set, options)
+        if is_association? field
+          attribute = resource_attribute_name(field)
+          if nested_field_set
+            serializer_class = get_association_serializer_class(field, options)
+            attribute = { attribute => serializer_class.present? ? serializer_class.scoped_includes(nested_field_set, options) : nested_field_set }
+          end
+          attribute
+        else
+          custom_includes(field, options)
         end
       end
 

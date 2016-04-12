@@ -216,28 +216,33 @@ module RealCerealBusiness
     # @param block [Block] to call for each field_set
     # @return [Hash] injection of block results
     def internal_field_set_itterator(field_set, block)
-      array, hash = [], {}
       field_set.each do |field, nested_field_set|
-        case value = block.call(field, nested_field_set)
-        when nil
-        when Symbol, String
-          hash[value.to_sym] = nil
-        else
-          hash = merge_field_sets(hash, value)
-        end
+        block.call(field, nested_field_set)
       end
+
+      # array, hash = [], {}
+      # field_set.each do |field, nested_field_set|
+      #   case value = block.call(field, nested_field_set)
+      #   when nil
+      #   when Symbol, String
+      #     hash[value.to_sym] = nil
+      #   else
+      #     hash = merge_field_sets(hash, value)
+      #   end
+      # end
+      # hash
       # convert { key: nil, key2: 1 } to [ :key, { key2: 1 }]
       # TODO --jdc consider removing
-      hash.reject! do |field, nested_field_set|
-        if nested_field_set.blank?
-          array << field
-          true
-        else
-          false
-        end
-      end
-      array << hash unless hash.blank?
-      array.size > 1 ? array : array.first
+      # hash.reject! do |field, nested_field_set|
+      #   if nested_field_set.blank?
+      #     array << field
+      #     true
+      #   else
+      #     false
+      #   end
+      # end
+      # array << hash unless hash.blank?
+      # array.size > 1 ? array : array.first
     end
 
     # Adds a Field into a Normalized Field Set
@@ -271,6 +276,7 @@ module RealCerealBusiness
     def merge_field_sets(a, b)
       na = normalize_field_set(a)
       nb = normalize_field_set(b)
+      binding.pry unless nb
       nb.inject(na.dup) do |result, (field_set, nested_field_sets)|
         result[field_set] = merge_field_sets(na[field_set], nested_field_sets)
         result
