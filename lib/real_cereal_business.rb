@@ -28,7 +28,7 @@ module RealCerealBusiness
     :default_version
 
   self.default_version                = 1.0
-  self.opts_key                       = :rsb_opts
+  self.opts_key                       = :rcb_opts
   self.fields_key                     = :fields
   self.field_overrides_key            = :field_overrides
   self.version_key                    = :version

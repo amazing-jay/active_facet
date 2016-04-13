@@ -181,24 +181,27 @@ end
 
 ## Development
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+After checking out the repo, run `bin/setup` to install dependencies. Then, run `rspec spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment. To work with an interactive prompt including a dummy host application, run `bin/rails c`.
 
 To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
 
-To configure a host application to use a local version of the gem without modifying the host application's Gemfile run ```console
+To push or update an unreleased version, without pushing the `.gem` file, run `bin/update_version`.
+
+To configure a host application to use a local version of the gem without modifying the host application's Gemfile run from the root directory of the host application ```
 bundle config local.real_cereal_business /path/to/local/git/repository
 ```
 
-To unconfigure a host application, run ```console
+To unconfigure a local version of the gem, run ```
 bundle config --delete local.real_cereal_business
 ```
 
 ## Roadmap
-Available at https://github.com/[USERNAME]/real_cereal_business/ROADMAP.md
+Available at https://github.com/honest/real_cereal_business/ROADMAP.md
+
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/real_cereal_business. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
+Bug reports and pull requests are welcome on GitHub at https://github.com/honest/real_cereal_business. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
 
 
 ## License
