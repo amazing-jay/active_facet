@@ -54,4 +54,6 @@ Extract Filters into their own classes
 ### Naming
 Rename field_group to facet
 
-## Write a blog article about this
+## Documentation
+### Write a blog article about this
+### Update the readme
