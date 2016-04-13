@@ -187,13 +187,9 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 To push or update an unreleased version, without pushing the `.gem` file, run `bin/update_version`.
 
-To configure a host application to use a local version of the gem without modifying the host application's Gemfile run from the root directory of the host application ```bash
-bundle config local.real_cereal_business /path/to/local/git/repository
-```
+To configure a host application to use a local version of the gem without modifying the host application's Gemfile run from the root directory of the host application `bundle config local.real_cereal_business /path/to/local/git/repository`
 
-To unconfigure a local version of the gem, run ```bash
-bundle config --delete local.real_cereal_business
-```
+To unconfigure a local version of the gem, run `bundle config --delete local.real_cereal_business`
 
 ## Roadmap
 Available at https://github.com/honest/real_cereal_business/ROADMAP.md
