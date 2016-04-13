@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+version_file=$(<lib/real_cereal_business/version.rb)
+re='"(.+)"'
+if [[ $version_file =~ $re ]]; then version=${BASH_REMATCH[1]}; fi
+
+git tag -d "v$version"
+git push origin ":refs/tags/v$version"
+git tag -a "v$version" -m "RCB v$version"
+git push origin "v$version"
