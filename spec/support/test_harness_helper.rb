@@ -13,11 +13,6 @@ module TestHarnessHelper
       include RealCerealBusiness::Serializer::Base
 
       resource_class ::ResourceA
-
-      #TODO --jdc remove, unneeded now?
-      def self.name
-        'ResourceASerializer'
-      end
     }
   end
 
@@ -25,11 +20,6 @@ module TestHarnessHelper
     Class.new {
       include RealCerealBusiness::Serializer::Base
       resource_class ::ResourceB
-
-      #TODO --jdc remove, unneeded now?
-      def self.name
-        'ResourceBSerializer'
-      end
     }
   end
 
@@ -38,14 +28,6 @@ module TestHarnessHelper
       include BaseAttributeSerializer
     }
   end
-
-  # def configure_serializer_classes(resource_serializer_class, association_serializer_class, attribute_serializer_class)
-  #   around(:each) do |example|
-  #     setup_serializer_classes(resource_serializer_class, association_serializer_class, attribute_serializer_class)
-  #     example.run
-  #     reset_serializer_classes
-  #   end
-  # end
 
   def reset_serializer_classes
     RealCerealBusiness::ResourceManager.serializer_mapper = RealCerealBusiness::ResourceManager.method(:default_serializer_mapper)

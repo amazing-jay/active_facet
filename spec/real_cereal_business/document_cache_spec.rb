@@ -73,47 +73,40 @@ describe RealCerealBusiness::DocumentCache do
         it { expect(fetched_subject).to eq( fetched_result ) }
       end
     end
-
-    # # Fetches a JSON document representing the facade
-    # # @param facade [Object] to cache
-    # # @param options [Hash] for Rails.cache.fetch
-    # # @param &block [Proc] for cache miss
-    # # @return [Object]
-    # def self.fetch(facade, options = {})
-    #   return yield unless cacheable?(facade)
-
-    #   options[:force] ||= facade.opts[RealCerealBusiness.cache_force_key]
-    #   cache_key = digest_key(facade)
-    #   if options[:force] || !(result = Rails.cache.fetch(cache_key))
-    #     result = yield
-    #     Rails.cache.write(cache_key, ::Oj.dump(result), RealCerealBusiness::default_cache_options.merge(options))
-    #     result
-    #   else
-    #     ::Oj.load(result)
-    #   end
-    # end
   end
 
   describe ".fetch_association" do
-    # #TODO --jdc implement
+    skip ("method not implemented")
     # yield
   end
 
   describe ".digest_key" do
-      # Salts and hashes facade cache_key
-    # @param facade [Facade] to generate key for
-    # @return [String]
-    # def self.digest_key(facade)
-    #   Digest::MD5.hexdigest(CACHE_PREFIX + facade.cache_key.to_s)
-    # end
+    subject { described_class.digest_key(facade) }
+    let(:facade) { double("facade") }
+    before do
+      allow(facade).to receive(:cache_key) { 3 }
+      subject
+    end
+    it { expect(facade).to receive(:cache_key) }
+    it { expect(subject).to eq('070fd85815313726309963c5589a4e77') }
   end
 
   describe ".cacheable?" do
-    # Tells if the resource to be serialized can be cached
-    # @param facade [Facade] to inspect
-    # @return [Boolean]
-    # def self.cacheable?(facade)
-    #   RealCerealBusiness.cache_enabled
-    # end
+    subject { described_class.cacheable?(facade) }
+    let(:facade) { double("facade") }
+    let(:enabled) { true }
+    around do |example|
+      temp = RealCerealBusiness.cache_enabled
+      RealCerealBusiness.cache_enabled = enabled
+      example.run
+      RealCerealBusiness.cache_enabled = temp
+    end
+
+    it { expect(subject).to eq(enabled) }
+
+    context "disabled" do
+      let(:enabled) { false }
+      it { expect(subject).to eq(enabled) }
+    end
   end
 end

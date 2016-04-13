@@ -1,38 +1,3 @@
-## Prioritized Todos
-
-### - search for all group_includes in V2 serializers and merge into context
-### - add OJ to CORE-113
-
-### - fix Publishers::BasePublisher usage of RCB_CURRENT_VERSION
-### - fix signature on all managedassethelper usages to not include group_includes
-### - look at active_record#delegation to refactor filters
-
-### - benchmark
-
-### - test RCB
-### -- move configured serializer class to explicit files
-### -- finish facade tests
-### -- add extention tests
-### -- add attribute serializer tests
-### -- add document cache tests
-### -- add resource manager tests
-
-### - document the shit out of this gem
-
-## Prioritized Wishlist
-
-### ? implement one v3 api
-### ? rename field group to facet
-### ? performance: remove indifferent access in config
-### ? implement psuedo containers for non AR resources
-### ? - make the facade the primary kickoff point
-### ? - extract filters from extensions
-### ? implement registry based resource manager
-### ? extract performance monitor into a gem
-### ? add client test helpers with timers and sql counts
-### ? write an article about scaling with rails in the real world
-### ? open source this gem
-
 # RealCerealBusiness
 
 RealCerealBusiness is a Rails plugin that enables custom as_json serialization intended for APIs. It is designed for speed, and is magnitudes of order faster than jbuilder.
@@ -216,14 +181,20 @@ end
 
 ## Development
 
-bundle config local.real_cereal_business /path/to/local/git/repository
-bundle config --delete local.real_cereal_business
-
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
 
 To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
 
-To configure a host application to use a local version of the gem without modifying the host application's Gemfile run 'bundle config local.real_cereal_business /path/to/local/git/repository'`.
+To configure a host application to use a local version of the gem without modifying the host application's Gemfile run ```console
+bundle config local.real_cereal_business /path/to/local/git/repository
+```
+
+To unconfigure a host application, run ```console
+bundle config --delete local.real_cereal_business
+```
+
+## Roadmap
+Available at https://github.com/[USERNAME]/real_cereal_business/ROADMAP.md
 
 ## Contributing
 
@@ -233,6 +204,4 @@ Bug reports and pull requests are welcome on GitHub at https://github.com/[USERN
 ## License
 
 The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
-
-Collections of nested attributes can be exposed as an alias.
 
