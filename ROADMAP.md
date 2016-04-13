@@ -1,15 +1,13 @@
-# Wishlist Items
-
 ## Abstraction
 
 ### Non-AR resources
-#### Extend the project to work with non-AR resource classes by refactoring extensions and serializer lookups
+Extend the project to work with non-AR resource classes by refactoring extensions and serializer lookups
 
 
 ## Performance
 
 ### Dynamic Code Generation
-#### Eliminate conditional logic that occurs during serialization by generating methods which perform the serialization given a specific facet, e.g.
+Eliminate conditional logic that occurs during serialization by generating methods which perform the serialization given a specific facet, e.g.
 
 ```ruby
 class Serializer::V2::DynamicSerializer2523
@@ -40,21 +38,20 @@ end
 ```
 
 ### Memoize Dealiased Facets
-#### Reduce conditional logic by memoizing dealised facets for subsequent calls.
+Reduce conditional logic by memoizing dealised facets for subsequent calls.
 
 ## Refactor
 
 ### Single Responsibility
-#### Move reflection methods from base to config, and cleanup resource manager
+Move reflection methods from base to config, and cleanup resource manager
 
 ### Dependency Injection
-#### Provide constants in RCB so all objects can be easily swapped for consumers
+Provide constants in RCB so all objects can be easily swapped for consumers
 
 ### Encapsulate Filters
-#### Extract Filters into their own classes
+Extract Filters into their own classes
 
 ### Naming
-#### Rename field_group to facet
+Rename field_group to facet
 
-## Other
-### Write a blog article about this
+## Write a blog article about this

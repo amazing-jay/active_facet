@@ -192,7 +192,7 @@ To configure a host application to use a local version of the gem without modify
 To unconfigure a local version of the gem, run `bundle config --delete local.real_cereal_business`
 
 ## Roadmap
-Available at https://github.com/honest/real_cereal_business/ROADMAP.md
+Available at https://github.com/honest/real_cereal_business/blob/master/ROADMAP.md
 
 
 ## Contributing
