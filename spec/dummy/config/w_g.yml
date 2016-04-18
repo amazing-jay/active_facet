@@ -1,0 +1,10 @@
+default:
+  profiling: false
+  measuring: false
+  tracing: false
+  reporting_threshold: 20
+test:
+  profiling: false
+  measuring: false
+  tracing: false
+  reporting_threshold: 20
