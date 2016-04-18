@@ -4,6 +4,7 @@ default:
   field_overrides_key: field_overrides
   version_key: version
   filters_key: filters
+  cache_bypass_key: cache_bypass
   cache_force_key: cache_force
   filters_force_key: cache_force
   strict_lookups: false

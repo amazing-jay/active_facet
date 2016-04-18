@@ -46,7 +46,7 @@ module ActiveFacets
     # @param facade [Facade] to inspect
     # @return [Boolean]
     def self.cacheable?(facade)
-      ActiveFacets.cache_enabled
+      ActiveFacets.cache_enabled && facade.opts[ActiveFacets.cache_bypass_key].blank?
     end
   end
 end

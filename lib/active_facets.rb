@@ -20,6 +20,7 @@ module ActiveFacets
     :field_overrides_key,
     :version_key,
     :filters_key,
+    :cache_bypass_key,
     :cache_force_key,
     :filters_force_key,
     :strict_lookups,
@@ -37,6 +38,7 @@ module ActiveFacets
   self.field_overrides_key            = :field_overrides
   self.version_key                    = :version
   self.filters_key                    = :filters
+  self.cache_bypass_key               = :cache_bypass
   self.cache_force_key                = :cache_force
   self.filters_force_key              = :filters_force
 

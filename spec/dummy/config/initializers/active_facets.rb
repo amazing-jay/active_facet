@@ -23,6 +23,9 @@ ActiveFacets.configure do |config|
   # The symbol which acts as the context key that designates filters for serialization. :filters by default.
   # config.filters_key                    = @env_config['filters_key'].to_sym
 
+  # The symbol which acts as the context key that designates force for cache. :cache_bypass by default.
+  # config.cache_bypass_key               = @env_config['cache_bypass_key'].to_sym
+
   # The symbol which acts as the context key that designates force for cache. :cache_force by default.
   # config.cache_force_key                = @env_config['cache_force_key'].to_sym
 
