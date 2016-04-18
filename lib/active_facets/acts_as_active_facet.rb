@@ -55,9 +55,10 @@ module ActiveFacets
 
           # Applies all filters registered with this resource on a ProxyCollection
           # @param filter_values [Hash] keys = registerd filter name, values = filter arguments
+          # TODO:: change scoped to self(or similar) to preserve the current relation
           define_method(acts_as_active_facet_options[:apply_filters_method_name]) do |filter_values = nil|
             filter_values = (filter_values || {}).with_indifferent_access
-            ActiveFacets::Filter.registered_filters_for(self).inject(self) do |result, (k,v)|
+            ActiveFacets::Filter.registered_filters_for(self).inject(scoped) do |result, (k,v)|
               filter = ActiveFacets::ResourceManager.instance.resource_map(self).detect { |map_entry|
                 filter_values.keys.include? "#{k}_#{map_entry}"
               }
