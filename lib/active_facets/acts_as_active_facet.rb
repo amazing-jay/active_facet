@@ -10,36 +10,6 @@ module ActiveFacets
     included do
     end
 
-    module Filters
-      mattr_accessor :filters, :global_filters
-      self.filters, self.global_filters = {}, {}
-
-      def self.apply_globals_to(receiver)
-        global_filters.each do |filter_name, filter_method|
-          filter_method_name = receiver.acts_as_active_facet_options[:filter_method_name]
-          receiver.send(filter_method_name, filter_name, &filter_method)
-        end
-      end
-
-      # @return [Hash] all filters registered on this resource (and superclass)
-      def self.registered_filters_for(receiver)
-        receiver_filters = filters[receiver.name] ||= {}
-        receiver_filters.reverse_merge(registered_filters_for(receiver.superclass)) if has_registered_filters_for?(receiver.superclass)
-        receiver_filters
-      end
-
-      def self.register_filter_for(receiver, filter_name, filter_method_name)
-        receiver_filters = filters[receiver.name] ||= {}
-        receiver_filters[filter_name.to_sym] = filter_method_name.to_sym
-        receiver_filters
-      end
-
-      def self.has_registered_filters_for?(receiver)
-        filters.key?(receiver.name)
-      end
-
-    end
-
     module ClassMethods
       def acts_as_active_facet(options = {})
 
@@ -80,14 +50,14 @@ module ActiveFacets
             filter_method_name ||= "registered_filter_#{filter_name}"
             define_singleton_method(filter_method_name, filter_method) if filter_method
 
-            ActiveFacets::ActsAsActiveFacet::Filters.register_filter_for(self, filter_name, filter_method_name)
+            ActiveFacets::Filter.register(self, filter_name, filter_method_name)
           end
 
           # Applies all filters registered with this resource on a ProxyCollection
           # @param filter_values [Hash] keys = registerd filter name, values = filter arguments
           define_method(acts_as_active_facet_options[:apply_filters_method_name]) do |filter_values = nil|
             filter_values = (filter_values || {}).with_indifferent_access
-            ActiveFacets::ActsAsActiveFacet::Filters.registered_filters_for(self).inject(self) do |result, (k,v)|
+            ActiveFacets::Filter.registered_filters_for(self).inject(self) do |result, (k,v)|
               filter = ActiveFacets::ResourceManager.instance.resource_map(self).detect { |map_entry|
                 filter_values.keys.include? "#{k}_#{map_entry}"
               }

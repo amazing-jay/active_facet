@@ -252,7 +252,6 @@ module ActiveFacets
     def merge_field_sets(a, b)
       na = normalize_field_set(a)
       nb = normalize_field_set(b)
-      binding.pry unless nb
       nb.inject(na.dup) do |result, (field_set, nested_field_sets)|
         result[field_set] = merge_field_sets(na[field_set], nested_field_sets)
         result

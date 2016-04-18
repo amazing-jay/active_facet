@@ -5,6 +5,7 @@ require 'active_record'
 require 'active_facets/errors/attribute_error'
 require 'active_facets/errors/configuration_error'
 require 'active_facets/errors/lookup_error'
+require 'active_facets/filter'
 require 'active_facets/acts_as_active_facet'
 require 'active_facets/serializer/base'
 require 'active_facets/serializer/facade'
@@ -53,7 +54,7 @@ module ActiveFacets
   end
 
   def self.global_filter(name)
-    ActiveFacets::ActsAsActiveFacet::Filters.global_filters[name] = Proc.new
+    ActiveFacets::Filter.register_global(name, Proc.new)
   end
 
   def self.resource_mapper

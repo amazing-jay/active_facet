@@ -101,7 +101,6 @@ module ActiveFacets
       # @return [JSON]
       def serialize!
         json = {}.with_indifferent_access
-
         config.field_set_itterator(fields) do |scope, nested_scopes|
           begin
             json[scope] = get_resource_attribute scope, nested_scopes if allowed_field?(scope)
@@ -109,7 +108,6 @@ module ActiveFacets
             # Deliberately do nothing. Ignore scopes that do not map to resource methods (or aliases)
           end
         end
-
         apply_custom_serializers! json
       end
 
