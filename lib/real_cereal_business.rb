@@ -22,6 +22,7 @@ module RealCerealBusiness
     :strict_lookups,
     :preload_associations,
     :cache_enabled,
+    :acts_as_active_facet_enabled,
     :filters_enabled,
     :default_cache_options,
     :document_cache,
@@ -40,16 +41,17 @@ module RealCerealBusiness
   self.preload_associations           = false
   self.filters_enabled                = false
   self.cache_enabled                  = false
+  self.acts_as_active_facet_enabled   = false
   self.default_cache_options          = { expires_in: 5.minutes }
   self.document_cache                 = RealCerealBusiness::DocumentCache
 
   def self.configure
     yield(self)
-    ActiveRecord::Base.register_filters
+    ActiveRecord::Base.acts_as_active_facet if RealCerealBusiness.acts_as_active_facet_enabled
   end
 
   def self.global_filter(name)
-    RealCerealBusiness::Extensions::ActiveRecord.filters[name] = Proc.new
+    RealCerealBusiness::ActsAsActiveFacet.Filters[name] = Proc.new
   end
 
   def self.resource_mapper
@@ -83,7 +85,7 @@ module RealCerealBusiness
   end
 end
 
-ActiveRecord::Base.send :include, RealCerealBusiness::Extensions::ActiveRecord
-ActiveRecord::Relation.send :include, RealCerealBusiness::Extensions::ActiveRelation
+ActiveRecord::Base.send :include, RealCerealBusiness::ActsAsActiveFacet
+
 
 

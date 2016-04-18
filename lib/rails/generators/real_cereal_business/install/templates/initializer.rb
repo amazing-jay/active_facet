@@ -38,6 +38,9 @@ RealCerealBusiness.configure do |config|
   # Tell serializers to cache
   # config.cache_enabled                  = @env_config['cache_enabled']
 
+  # Tell ActiveRecord to treat enable acts_as_active_facet for all models. False by default.
+  # config.acts_as_active_facet_enabled   = @env_config['acts_as_active_facet_enabled']
+
   # Tell serializers to enable/disable filters
   # config.filters_enabled                = @env_config['filters_enabled']
 

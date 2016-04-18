@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe RealCerealBusiness::Extensions::ActiveRecord do
+describe RealCerealBusiness::ActsAsActiveFacet do
 
   skip 'todo: test this class'
 
