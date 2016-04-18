@@ -1,9 +1,9 @@
 require 'spec_helper'
 
-describe RealCerealBusiness do
+describe ActiveFacets do
 
   it 'has a version number' do
-    expect(RealCerealBusiness::VERSION).not_to be nil
+    expect(ActiveFacets::VERSION).not_to be nil
   end
 
   describe ".deep_copy(o)" do

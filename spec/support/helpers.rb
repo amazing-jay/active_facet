@@ -2,11 +2,11 @@ module Helpers
 
   def make_options(options)
     {
-      RealCerealBusiness.opts_key => {
-        RealCerealBusiness.fields_key => options[:fields],
-        RealCerealBusiness.field_overrides_key => options[:field_overrides],
-        RealCerealBusiness.version_key => options[:version],
-        RealCerealBusiness.filters_key => options[:filters]
+      ActiveFacets.opts_key => {
+        ActiveFacets.fields_key => options[:fields],
+        ActiveFacets.field_overrides_key => options[:field_overrides],
+        ActiveFacets.version_key => options[:version],
+        ActiveFacets.filters_key => options[:filters]
       }
     }
   end

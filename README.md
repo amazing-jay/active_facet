@@ -1,6 +1,6 @@
-# RealCerealBusiness
+# ActiveFacets
 
-RealCerealBusiness is a Rails plugin that enables custom as_json serialization intended for APIs. It is designed for speed, and is magnitudes of order faster than jbuilder.
+ActiveFacets is a Rails plugin that enables custom as_json serialization intended for APIs. It is designed for speed, and is magnitudes of order faster than jbuilder.
 
 The framework supports:
 * fields - define the fields you want to serialize, by resource type
@@ -15,7 +15,7 @@ The framework supports:
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'real_cereal_business'
+gem 'active_facets'
 ```
 
 And then execute:
@@ -24,20 +24,20 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install real_cereal_business
+    $ gem install active_facets
 
 ## Configuration
 
 And then execute:
 
-    $ rails g real_cereal_business:install
+    $ rails g active_facets:install
 
 To add an initializer to your application.
 
 ## Usage
 
 ```ruby
-Parent.limit(2).as_json(rcb_opts: {
+Parent.limit(2).as_json(af_opts: {
   version: "2.3.8",
   cache_force: true,
   fields: [:basic, :extended, { children: [:minimal, :extension] }]
@@ -112,7 +112,7 @@ Filters to apply when marshalling associations. See Field Sets. Defaults to:
 
 ```ruby
 class ParentSerializer
-  include RealCerealBusiness::Serializer::Base
+  include ActiveFacets::Serializer::Base
 
   # TRANSFORMS
 
@@ -187,17 +187,17 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 To push or update an unreleased version, without pushing the `.gem` file, run `bin/update_version`.
 
-To configure a host application to use a local version of the gem without modifying the host application's Gemfile run from the root directory of the host application `bundle config local.real_cereal_business /path/to/local/git/repository`
+To configure a host application to use a local version of the gem without modifying the host application's Gemfile run from the root directory of the host application `bundle config local.active_facets /path/to/local/git/repository`
 
-To unconfigure a local version of the gem, run `bundle config --delete local.real_cereal_business`
+To unconfigure a local version of the gem, run `bundle config --delete local.active_facets`
 
 ## Roadmap
-Available at https://github.com/honest/real_cereal_business/blob/master/ROADMAP.md
+Available at https://github.com/honest/active_facets/blob/master/ROADMAP.md
 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/honest/real_cereal_business. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
+Bug reports and pull requests are welcome on GitHub at https://github.com/honest/active_facets. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
 
 
 ## License

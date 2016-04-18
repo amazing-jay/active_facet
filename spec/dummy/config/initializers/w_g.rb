@@ -22,12 +22,12 @@ WG.configure do |config|
   # Tell minimum threshold of milliseconds required for a block to be considered long running
   config.reporting_threshold @env_config['reporting_threshold']
 
-  config.decorate_method( { decorator: :measure_decorator, instance_methods: true, target: 'RealCerealBusiness::Serializer::Base'} )
-  config.decorate_method( { decorator: :measure_decorator, instance_methods: true, target: 'RealCerealBusiness::Serializer::Base::ClassMethods'} )
-  config.decorate_method( { decorator: :measure_decorator, instance_methods: true, class_methods: true, target: 'RealCerealBusiness::Serializer::Facade'} )
-  config.decorate_method( { decorator: :measure_decorator, instance_methods: true, class_methods: true, target: 'RealCerealBusiness::Config'} )
-  config.decorate_method( { decorator: :measure_decorator, instance_methods: true, class_methods: true, target: 'RealCerealBusiness::ResourceManager'} )
-  config.decorate_method( { decorator: :measure_decorator, instance_methods: true, class_methods: true, target: 'RealCerealBusiness::DocumentCache'} )
+  config.decorate_method( { decorator: :measure_decorator, instance_methods: true, target: 'ActiveFacets::Serializer::Base'} )
+  config.decorate_method( { decorator: :measure_decorator, instance_methods: true, target: 'ActiveFacets::Serializer::Base::ClassMethods'} )
+  config.decorate_method( { decorator: :measure_decorator, instance_methods: true, class_methods: true, target: 'ActiveFacets::Serializer::Facade'} )
+  config.decorate_method( { decorator: :measure_decorator, instance_methods: true, class_methods: true, target: 'ActiveFacets::Config'} )
+  config.decorate_method( { decorator: :measure_decorator, instance_methods: true, class_methods: true, target: 'ActiveFacets::ResourceManager'} )
+  config.decorate_method( { decorator: :measure_decorator, instance_methods: true, class_methods: true, target: 'ActiveFacets::DocumentCache'} )
 
   config.decorate_method( { decorator: :measure_decorator, instance_methods: :to_json, target: 'ActiveRecord::Base'} )
   config.decorate_method( { decorator: :measure_decorator, instance_methods: [:to_a, :as_json], target: 'ActiveRecord::Relation'} )

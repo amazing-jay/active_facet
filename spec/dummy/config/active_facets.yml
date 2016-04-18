@@ -1,0 +1,12 @@
+default:
+  opts_key: af_opts
+  fields_key: fields
+  field_overrides_key: field_overrides
+  version_key: version
+  filters_key: filters
+  cache_force_key: cache_force
+  preload_associations: true
+  cache_enabled: true
+test:
+  preload_associations: false
+  cache_enabled: false

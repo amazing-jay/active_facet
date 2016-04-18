@@ -2,6 +2,7 @@ module ModelMixin
   extend ActiveSupport::Concern
 
   included do
+    acts_as_active_facet
     serialize :nested_accessor, JSON
   end
 
