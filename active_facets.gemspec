@@ -14,7 +14,7 @@ Gem::Specification.new do |s|
   s.summary       = "Inline JSON serializer"
   s.description   = "Fast JSON serializer for nested PORO and ActiveRecord Objects supporting decoration, field filters, record filters and caching"
   s.homepage      = "https://github.com/honest/active_facets"
-  s.license       = "MIT"
+  s.licenses      = ["MIT"]
 
   #TODO --jdc update this configuration
   # Prevent pushing this gem to RubyGems.org by setting 'allowed_push_host', or
@@ -25,7 +25,7 @@ Gem::Specification.new do |s|
     raise "RubyGems 2.0 or newer is required to protect against public gem pushes."
   end
 
-  s.files = Dir["{lib}/**/*"] + ["MIT-LICENSE", "Rakefile", "README.md"]
+  s.files = Dir["{lib}/**/*"] + ["MIT-LICENSE.txt", "Rakefile", "README.md"]
 
   s.add_dependency "rails", "~> 3.2.22"
   s.add_dependency "oj"
