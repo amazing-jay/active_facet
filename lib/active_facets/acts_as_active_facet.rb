@@ -42,8 +42,8 @@ module ActiveFacets
 
     module ClassMethods
       def acts_as_active_facet(options = {})
-        cattr_accessor :acts_as_active_facet_options
 
+        # save to a local variable so its in scope during instance_eval below
         acts_as_active_facet_options = options.deep_dup
         acts_as_active_facet_options[:includes_method_name]          ||= :facet_includes
         acts_as_active_facet_options[:apply_includes_method_name]    ||= :apply_facet_includes
@@ -52,7 +52,11 @@ module ActiveFacets
         acts_as_active_facet_options[:unserialize_method_name]       ||= :from_json
         acts_as_active_facet_options[:serialize_method_name]         ||= :as_json
 
-        class_eval do
+        cattr_accessor :acts_as_active_facet_options
+        self.acts_as_active_facet_options = acts_as_active_facet_options
+
+        (class << self; self; end).instance_eval do
+
           # Invokes ProxyCollection.includes with a safe translation of field_set
           # @param facets [Object]
           # @param options [Hash]
@@ -76,7 +80,7 @@ module ActiveFacets
             filter_method_name ||= "registered_filter_#{filter_name}"
             define_singleton_method(filter_method_name, filter_method) if filter_method
 
-            ActiveFacets::ActsAsActiveFacet::Filters.register_filter_for(receiver, filter_name, filter_method_name)
+            ActiveFacets::ActsAsActiveFacet::Filters.register_filter_for(self, filter_name, filter_method_name)
           end
 
           # Applies all filters registered with this resource on a ProxyCollection

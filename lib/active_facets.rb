@@ -53,7 +53,7 @@ module ActiveFacets
   end
 
   def self.global_filter(name)
-    ActiveFacets::ActsAsActiveFacet.Filters[name] = Proc.new
+    ActiveFacets::ActsAsActiveFacet::Filters.global_filters[name] = Proc.new
   end
 
   def self.resource_mapper
