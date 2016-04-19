@@ -25,7 +25,7 @@ module ActiveFacets
     # @return [Hash] all filters registered on this resource (and superclass)
     def self.registered_filters_for(receiver)
       receiver_filters = filters[receiver.name] ||= {}
-      receiver_filters.reverse_merge(registered_filters_for(receiver.superclass)) if filters_registered_for?(receiver.superclass)
+      receiver_filters.reverse_merge!(registered_filters_for(receiver.superclass)) if filters_registered_for?(receiver.superclass)
       receiver_filters
     end
 
