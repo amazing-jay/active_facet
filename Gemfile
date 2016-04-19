@@ -3,7 +3,7 @@ source "https://rubygems.org"
 gem 'w_g', '~> 0.4.1', git: 'git@github.com:honest/watchful_guerilla.git', tag: 'v0.4.1', branch: 'master'
 gem 'oj'
 
-# Declare your gem's dependencies in active_facets.gemspec.
+# Declare your gem's dependencies in active_facet.gemspec.
 # Bundler will treat runtime dependencies like base dependencies, and
 # development dependencies will be added by default to the :development group.
 gemspec

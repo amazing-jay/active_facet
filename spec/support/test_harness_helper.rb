@@ -10,7 +10,7 @@ module TestHarnessHelper
 
   def build_resource_serializer_class
     Class.new {
-      include ActiveFacets::Serializer::Base
+      include ActiveFacet::Serializer::Base
 
       resource_class ::ResourceA
     }
@@ -18,7 +18,7 @@ module TestHarnessHelper
 
   def build_association_serializer_class
     Class.new {
-      include ActiveFacets::Serializer::Base
+      include ActiveFacet::Serializer::Base
       resource_class ::ResourceB
     }
   end
@@ -30,7 +30,7 @@ module TestHarnessHelper
   end
 
   def reset_serializer_classes
-    ActiveFacets::ResourceManager.serializer_mapper = ActiveFacets::ResourceManager.method(:default_serializer_mapper)
+    ActiveFacet::ResourceManager.serializer_mapper = ActiveFacet::ResourceManager.method(:default_serializer_mapper)
   end
 
   def setup_serializer_classes(resource_serializer_class, association_serializer_class, attribute_serializer_class)
@@ -38,7 +38,7 @@ module TestHarnessHelper
       include BaseSerializer
     end
 
-    ActiveFacets.serializer_mapper do |resource_class, serializer, type, version, options|
+    ActiveFacet.serializer_mapper do |resource_class, serializer, type, version, options|
       case type
       when :serializer
         case resource_class.to_s

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-version_file=$(<lib/active_facets/version.rb)
+version_file=$(<lib/active_facet/version.rb)
 re='"(.+)"'
 if [[ $version_file =~ $re ]]; then version=${BASH_REMATCH[1]}; fi
 

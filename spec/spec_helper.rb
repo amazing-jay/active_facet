@@ -1,7 +1,7 @@
 # This file is copied to spec/ when you run 'rails generate rspec:install'
 ENV["RAILS_ENV"] ||= 'test'
 require File.expand_path("../dummy/config/environment", __FILE__)
-require 'active_facets'
+require 'active_facet'
 require 'database_cleaner'
 require 'factory_girl'
 require 'rapido'

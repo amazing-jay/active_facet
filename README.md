@@ -1,6 +1,6 @@
-# ActiveFacets
+# ActiveFacet
 
-ActiveFacets is a Rails plugin that enables custom as_json serialization intended for APIs. It is designed for speed, and is magnitudes of order faster than jbuilder.
+ActiveFacet is a Rails plugin that enables custom as_json serialization intended for APIs. It is designed for speed, and is magnitudes of order faster than jbuilder.
 
 The framework supports:
 * fields - define the fields you want to serialize, by resource type
@@ -15,7 +15,7 @@ The framework supports:
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'active_facets'
+gem 'active_facet'
 ```
 
 And then execute:
@@ -24,13 +24,13 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install active_facets
+    $ gem install active_facet
 
 ## Configuration
 
 And then execute:
 
-    $ rails g active_facets:install
+    $ rails g active_facet:install
 
 To add an initializer to your application.
 
@@ -112,7 +112,7 @@ Filters to apply when marshalling associations. See Field Sets. Defaults to:
 
 ```ruby
 class ParentSerializer
-  include ActiveFacets::Serializer::Base
+  include ActiveFacet::Serializer::Base
 
   # TRANSFORMS
 
@@ -187,17 +187,17 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 To push or update an unreleased version, without pushing the `.gem` file, run `bin/update_version`.
 
-To configure a host application to use a local version of the gem without modifying the host application's Gemfile run from the root directory of the host application `bundle config local.active_facets /path/to/local/git/repository`
+To configure a host application to use a local version of the gem without modifying the host application's Gemfile run from the root directory of the host application `bundle config local.active_facet /path/to/local/git/repository`
 
-To unconfigure a local version of the gem, run `bundle config --delete local.active_facets`
+To unconfigure a local version of the gem, run `bundle config --delete local.active_facet`
 
 ## Roadmap
-Available at https://github.com/honest/active_facets/blob/master/ROADMAP.md
+Available at https://github.com/honest/active_facet/blob/master/ROADMAP.md
 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/honest/active_facets. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
+Bug reports and pull requests are welcome on GitHub at https://github.com/honest/active_facet. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
 
 
 ## License

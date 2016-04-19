@@ -1,7 +1,7 @@
 module V2
   module ResourceB
     class ResourceBSerializer
-      include ActiveFacets::Serializer::Base
+      include ActiveFacet::Serializer::Base
       resource_class ::ResourceB
     end
   end

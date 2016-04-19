@@ -9,7 +9,7 @@ require "sprockets/railtie"
 # require "rails/test_unit/railtie"
 
 Bundler.require(*Rails.groups)
-require "active_facets"
+require "active_facet"
 
 module Dummy
   class Application < Rails::Application
