@@ -1,3 +1,4 @@
+# Mixin providing DSL for ActiveFacets Serializers and a handful of public methods which reflect on the DSL
 module ActiveFacets
   module Serializer
     module Base

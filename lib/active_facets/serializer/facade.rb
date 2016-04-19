@@ -1,3 +1,4 @@
+# Serializes Facets of a given resource using an ActiveFacets::Serializer::Base serializer
 module ActiveFacets
   module Serializer
     class Facade

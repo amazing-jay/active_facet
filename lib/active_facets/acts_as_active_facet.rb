@@ -40,16 +40,16 @@ module ActiveFacets
           # @param options [Hash]
           # @return [ProxyCollection]
           define_method(acts_as_active_facet_options[:apply_includes_method_name]) do |facets = :basic, options = {}|
-            includes(self.send(includes_method_name, facets, options))
+            includes(self.send(acts_as_active_facet_options[:includes_method_name], facets, options))
           end
 
           # Registers a scope filter on this resource and subclasses
           # @param filter_name [Symbol] filter name
           # @param filter_method_name [Symbol] scope name
           define_method(acts_as_active_facet_options[:filter_method_name]) do |filter_name, filter_method_name = nil, &filter_method|
+            filter_method, filter_method_name = filter_method_name, nil if filter_method_name.is_a?(Proc)
             filter_method_name ||= "registered_filter_#{filter_name}"
             define_singleton_method(filter_method_name, filter_method) if filter_method
-
             ActiveFacets::Filter.register(self, filter_name, filter_method_name)
           end
 

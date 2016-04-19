@@ -1,5 +1,5 @@
-# This is a really dump cache interface that caches everything
-# Extend with custom class that conditionally caches and stitches independent documents
+# This is a really dump cache interface that caches everything when enabled
+# Extend and conditionally cache independent documents
 module ActiveFacets
   class DocumentCache
     CACHE_PREFIX = 'af_doc_cache'
@@ -29,7 +29,7 @@ module ActiveFacets
     # @param &block [Proc] for cache miss
     # @return [Object]
     def self.fetch_association(facade, association, options = {})
-      #TODO --jdc implement
+      # override and implement
       yield
     end
 

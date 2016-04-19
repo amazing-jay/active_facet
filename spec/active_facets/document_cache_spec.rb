@@ -93,7 +93,12 @@ describe ActiveFacets::DocumentCache do
 
   describe ".cacheable?" do
     subject { described_class.cacheable?(facade) }
-    let(:facade) { double("facade") }
+    let(:facade) { double("facade", :opts => {
+      ActiveFacets.cache_bypass_key => cache_bypass,
+      ActiveFacets.cache_force_key => cache_force
+    } ) }
+    let(:cache_bypass) { false }
+    let(:cache_force) { false }
     let(:enabled) { true }
     around do |example|
       temp = ActiveFacets.cache_enabled
@@ -103,10 +108,19 @@ describe ActiveFacets::DocumentCache do
     end
 
     it { expect(subject).to eq(enabled) }
+    context "cache force enabled" do
+      let(:cache_force) { true }
+      it { expect(subject).to eq(enabled) }
+    end
+
+    context "cache bypass enabled" do
+      let(:cache_bypass) { true }
+      it { expect(subject).to be false }
+    end
 
     context "disabled" do
       let(:enabled) { false }
-      it { expect(subject).to eq(enabled) }
+      it { expect(subject).to be false }
     end
   end
 end
