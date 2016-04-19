@@ -8,11 +8,10 @@ describe ActiveFacets::Filter do
   let(:inherited_class) { Class.new(inherited_acts_as_class) }
   let(:double_inherited_class) { Class.new(inherited_class) }
 
-
   describe "public attributes" do
-    it { expect(described_class.filters).to eq({}) }
-    it { expect(described_class.registered_filters).to eq({}) }
-    it { expect(described_class.global_filters).to eq({}) }
+    it { expect(described_class.filters).to include({}) }
+    it { expect(described_class.registered_filters).to include({}) }
+    it { expect(described_class.global_filters).to include({}) }
   end
 
   describe "register_global" do
