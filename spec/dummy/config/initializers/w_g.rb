@@ -26,7 +26,7 @@ WG.configure do |config|
   config.decorate_method( { decorator: :measure_decorator, instance_methods: true, target: 'ActiveFacet::Serializer::Base::ClassMethods'} )
   config.decorate_method( { decorator: :measure_decorator, instance_methods: true, class_methods: true, target: 'ActiveFacet::Serializer::Facade'} )
   config.decorate_method( { decorator: :measure_decorator, instance_methods: true, class_methods: true, target: 'ActiveFacet::Config'} )
-  config.decorate_method( { decorator: :measure_decorator, instance_methods: true, class_methods: true, target: 'ActiveFacet::ResourceManager'} )
+  config.decorate_method( { decorator: :measure_decorator, instance_methods: true, class_methods: true, target: 'ActiveFacet::Helper'} )
   config.decorate_method( { decorator: :measure_decorator, instance_methods: true, class_methods: true, target: 'ActiveFacet::DocumentCache'} )
 
   config.decorate_method( { decorator: :measure_decorator, instance_methods: :to_json, target: 'ActiveRecord::Base'} )

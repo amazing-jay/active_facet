@@ -22,7 +22,7 @@ module ActiveFacet
 
         self.fields           = opts[ActiveFacet.fields_key]
         self.field_overrides  = opts[ActiveFacet.field_overrides_key] || {}
-        self.overrides        = ActiveFacet::ResourceManager.instance.resource_map(resource_class).inject({}) { |overrides, map_entry|
+        self.overrides        = ActiveFacet::Helper.resource_map(resource_class).inject({}) { |overrides, map_entry|
           overrides.merge(field_overrides[map_entry] || {})
         }
 
@@ -91,6 +91,7 @@ module ActiveFacet
         filters_enabled
       end
 
+      #TODO --jdc delete this method and call resource.class above, see what happens
       #TODO --jdc this is a hack for assets. fix by making this class the primary entry point
       # rather than serializers and pass in resource class, or better yet, enforce pseudo resource classes
       # @return [Class]

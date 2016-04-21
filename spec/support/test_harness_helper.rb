@@ -30,7 +30,7 @@ module TestHarnessHelper
   end
 
   def reset_serializer_classes
-    ActiveFacet::ResourceManager.serializer_mapper = ActiveFacet::ResourceManager.method(:default_serializer_mapper)
+    ActiveFacet::Helper.serializer_mapper = ActiveFacet::Helper.method(:default_serializer_mapper)
   end
 
   def setup_serializer_classes(resource_serializer_class, association_serializer_class, attribute_serializer_class)

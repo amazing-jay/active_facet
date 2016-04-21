@@ -11,7 +11,7 @@ require 'active_facet/serializer/base'
 require 'active_facet/serializer/facade'
 require 'active_facet/config'
 require 'active_facet/document_cache'
-require 'active_facet/resource_manager'
+require 'active_facet/helper'
 require 'active_facet/version'
 
 module ActiveFacet
@@ -49,6 +49,7 @@ module ActiveFacet
   self.acts_as_active_facet_enabled   = false
   self.default_cache_options          = { expires_in: 5.minutes }
   self.document_cache                 = ActiveFacet::DocumentCache
+  #TODO --jdc implement dependency injection for all classes
 
   def self.configure
     yield(self)
@@ -60,11 +61,11 @@ module ActiveFacet
   end
 
   def self.resource_mapper
-    ActiveFacet::ResourceManager.resource_mapper = Proc.new
+    ActiveFacet::Helper.resource_mapper = Proc.new
   end
 
   def self.serializer_mapper
-    ActiveFacet::ResourceManager.serializer_mapper = Proc.new
+    ActiveFacet::Helper.serializer_mapper = Proc.new
   end
 
   def self.fields_from_options(options)
@@ -76,6 +77,7 @@ module ActiveFacet
     options
   end
 
+  #TODO --jdc move the below into helper
   def self.restore_opts_after(options, key, value)
     opts = (options[ActiveFacet.opts_key] ||= {})
     old = opts[key]

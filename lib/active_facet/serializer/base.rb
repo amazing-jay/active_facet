@@ -1,3 +1,4 @@
+#TODO --jdc rebuild this class to either use an explicit singleton pattern or use a factory pattern
 # Mixin providing DSL for ActiveFacet Serializers and a handful of public methods which reflect on the DSL
 module ActiveFacet
   module Serializer
@@ -126,6 +127,8 @@ module ActiveFacet
         result
       end
 
+      # TODO -- comment and move private
+
       def scoped_include(field, nested_field_set, options)
         if is_association? field
           attribute = resource_attribute_name(field)
@@ -138,6 +141,8 @@ module ActiveFacet
           custom_includes(field, options)
         end
       end
+
+      #TODO -- move private
 
       # Returns field_set serialized for dependant resources in custom attribute serializers & extensions
       # @param field [Field]
@@ -195,8 +200,8 @@ module ActiveFacet
         @config ||= self.class.config
       end
 
-      ### TODO --jdc ^^ START REFLECTOR
-      # move all this to config or resource manager
+      # ^^ START REFLECTOR
+      ### TODO --jdc move all this to a reflector class, instance holding resource_class, and store in config
 
       # Constantizes the appropriate resource serializer class
       # @return [Class]
@@ -222,7 +227,7 @@ module ActiveFacet
           #return nil if field isn't an association
           if reflection = get_association_reflection(field)
             #return nil if association doesn't have a custom class
-            @association_serializers[field] = ActiveFacet::ResourceManager.instance.serializer_for(reflection.klass, options)
+            @association_serializers[field] = ActiveFacet::Helper.serializer_for(reflection.klass, options)
           end
         end
         @association_serializers[field]
@@ -234,7 +239,7 @@ module ActiveFacet
       # @return [Class | nil]
       def get_custom_serializer_class(attribute, options)
         @custom_serializers ||= {}
-        @custom_serializers[attribute] ||= ActiveFacet::ResourceManager.instance.attribute_serializer_class_for(resource_class, attribute, options)
+        @custom_serializers[attribute] ||= ActiveFacet::Helper.attribute_serializer_class_for(resource_class, attribute, options)
       end
 
       # Determines if public attribute maps to a private relation

@@ -1,5 +1,5 @@
-# This is a really dump cache interface that caches everything when enabled
-# Extend and conditionally cache independent documents
+# A really dump cache interface that caches everything when enabled.
+# Extend and conditionally cache documents.
 module ActiveFacet
   class DocumentCache
     CACHE_PREFIX = 'af_doc_cache'
