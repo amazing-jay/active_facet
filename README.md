@@ -192,7 +192,7 @@ To configure a host application to use a local version of the gem without modify
 To unconfigure a local version of the gem, run `bundle config --delete local.active_facet`
 
 ## Roadmap
-Available at https://github.com/honest/active_facet/blob/master/ROADMAP.md
+Available at /blob/master/ROADMAP.md
 
 
 ## Contributing

@@ -68,6 +68,8 @@ module ActiveFacet
     ActiveFacet::Helper.serializer_mapper = Proc.new
   end
 
+  #TODO --jdc move the below into helper
+
   def self.fields_from_options(options)
     (options[ActiveFacet.opts_key] || {})[ActiveFacet.fields_key]
   end
@@ -77,7 +79,6 @@ module ActiveFacet
     options
   end
 
-  #TODO --jdc move the below into helper
   def self.restore_opts_after(options, key, value)
     opts = (options[ActiveFacet.opts_key] ||= {})
     old = opts[key]
