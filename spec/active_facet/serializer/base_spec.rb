@@ -2,6 +2,11 @@ require 'spec_helper'
 
 describe ActiveFacet::Serializer::Base do
 
+  skip "make scoped_includes, as_json & from_hash generic"
+  # TODO --jdc, change serializer scoped_includes, as_json & from_hash to be generic and add voerrides in initializer for www
+  #  when serializing, access cattr to determine method name to invoke
+  # add tests for the this module
+
   include TestHarnessHelper
 
   let(:resource_serializer_class) { build_resource_serializer_class }
@@ -254,6 +259,7 @@ describe ActiveFacet::Serializer::Base do
       end
       subject { instance.from_hash(resource, { foo: :bar }) }
       it { expect(subject).to eq({ foo: :bar }) }
+      #TODO fix all of these
       it { expect(ActiveFacet::Serializer::Facade).to receive(:new).once }
     end
 

@@ -23,6 +23,10 @@ describe ActiveFacet::Serializer::Facade do
   let(:filters) { :filters }
   let(:overrides) { {explicit_attr: true, implicit_attr: true} }
 
+  before do
+    reset_serializer_mapper_memoization
+  end
+
   describe ".initialize" do
     let(:field_overrides) { { resource_class.name.tableize => overrides } }
     subject { instance }

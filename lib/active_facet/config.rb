@@ -1,3 +1,5 @@
+#TODO --jdc rename field set to facet throughut project
+
 # Field = Symbol representing a json attribute that corresponds to resource attributes or extensions
 
 # Field Set = Nested, Mixed Collection of Fields, Aliases, and Relations (Strings, Symbols, Arrays and Hashes)
@@ -36,6 +38,9 @@ module ActiveFacet
     # Class: Resource Class to serialize
     attr_accessor :resource_class
 
+    # Store Facet
+    # @param field_set_alias [Symbol]
+    # @param field_set_alias [Facet]
     def alias_field_set(field_set_alias, field_set)
       self.compiled = false
       field_sets[field_set_alias] = field_set

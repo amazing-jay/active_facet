@@ -76,8 +76,7 @@ describe ActiveFacet::DocumentCache do
   end
 
   describe ".fetch_association" do
-    skip ("method not implemented")
-    # yield
+    skip ("abstract method intentionally not implemented")
   end
 
   describe ".digest_key" do
@@ -87,7 +86,7 @@ describe ActiveFacet::DocumentCache do
       allow(facade).to receive(:cache_key) { 3 }
       subject
     end
-    it { expect(facade).to receive(:cache_key) }
+    it { expect(facade).to have_received(:cache_key) }
     it { expect(subject).to eq('d684aece5c3b9b5a45f0acd5bad3b872') }
   end
 

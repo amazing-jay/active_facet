@@ -10,4 +10,18 @@ module Helpers
       }
     }
   end
+
+  def reset_filter_memoization
+    ActiveFacet::Filter.filters = {}
+    ActiveFacet::Filter.registered_filters = {}
+    ActiveFacet::Filter.global_filters = {}
+  end
+
+  def reset_serializer_mapper_memoization
+    ActiveFacet::ResourceManager.memoized_serializers = {}
+  end
+
+  def reset_resource_mapper_memoization
+    ActiveFacet::ResourceManager.instance.send :memoized_resource_map=, {}
+  end
 end

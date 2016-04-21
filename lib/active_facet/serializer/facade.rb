@@ -91,6 +91,7 @@ module ActiveFacet
         filters_enabled
       end
 
+      #TODO --jdc delete this method and call resource.class above, see what happens
       #TODO --jdc this is a hack for assets. fix by making this class the primary entry point
       # rather than serializers and pass in resource class, or better yet, enforce pseudo resource classes
       # @return [Class]

@@ -5,115 +5,231 @@ describe ActiveFacet::ResourceManager do
   describe "public attributes" do
     it { expect(described_class.methods).to include(
       :resource_mapper,
-      :serializer_mapper
+      :serializer_mapper,
+      :memoized_serializers
     )}
   end
 
   describe "class methods" do
 
-    context "default_resource_mapper" do
-      let(:resource_class) { ResourceA }
-      subject { described_class.default_resource_mapper(resource_class) }
-      it { expect(subject).to eq(["resource_as", "active_record/bases"]) }
-    end
-
-    context "resource_mapper" do
+    describe "resource_mapper" do
       subject { described_class.resource_mapper }
       it { expect(subject == described_class.method(:default_resource_mapper)).to be true }
     end
 
+    describe "default_resource_mapper" do
+      subject { described_class.default_resource_mapper(resource_class) }
+      let(:resource_class) { ResourceA }
+      it { expect(subject).to eq(["resource_as", "active_record/bases"]) }
+    end
 
-  #   # Default serializer mapping scheme, can be overrided with config
-  #   def self.default_serializer_mapper(resource_class, serializer, type, version, options)
-  #     case type
-  #     when :serializer
-  #       (version.to_s + '::' + resource_class.name.camelcase + type.to_s.camecase).constantize.new
-  #     else
-  #       (version.to_s + '::' + resource_class.name.camelcase + type.to_s.camecase).constantize
-  #     end
-  #   end
-  #   self.serializer_mapper = method(:default_serializer_mapper)
+    describe "serializer_mapper" do
+      subject { described_class.serializer_mapper }
+      it { expect(subject == described_class.method(:default_serializer_mapper)).to be true }
+    end
 
-  #   # Singleton
-  #   # @return [ResourceManager]
-  #   def self.instance
-  #     @instance ||= new
-  #   end
+    describe "default_serializer_mapper" do
+      subject { described_class.default_serializer_mapper(resource_class, serializer, type, version, options) }
+      let(:resource_class) { ResourceA }
+      let(:serializer) { resource_class.name.demodulize.to_s.camelcase }
+      let(:type) { :serializer }
+      let(:version) { 1.0 }
+      let(:options) { {} }
 
-  #   # (Memoized) Associate a serializer with a resource_class
-  #   # @param resource_class [Object]
-  #   # @param serializer [Serializer::Base]
-  #   # @param namespace [String] (TODO --jdc currently unused)
-  #   # @return [Array]
-  #   def register(resource_class, serializer, namespace = nil)
-  #     registry[resource_class] = [serializer, namespace]
-  #   end
+      before do
+        reset_serializer_mapper_memoization
+        allow(described_class).to receive(:internal_serializer_mapper).and_call_original
+        described_class.default_serializer_mapper(resource_class, serializer, type, version, options)
+        subject
+      end
 
-  #   # Fetches the serializer registered for the resource_class
-  #   # @param resource_class [Object] to find serializer for
-  #   # @param options [Hash] context
-  #   # @return [Serializer::Base]
-  #   def serializer_for(resource_class, options)
-  #     fetch_serializer(resource_class, resource_class.name.demodulize.to_s.camelcase, :serializer, options)
-  #   end
+      context 'not found serializer' do
+        let(:type) { :else }
+        let(:serializer) { 'Customizer' }
+        it { expect(described_class).to have_received(:internal_serializer_mapper).once }
+        it { expect(subject).to eq(nil) }
+      end
 
-  #   # Fetches the attribute serializer registered for the given resource_class
-  #   # @param resource_class [Object] to find attribute serializer class for
-  #   # @param attribute_class_name [String] to find attribute serializer class for
-  #   # @param options [Hash] context
-  #   # @return [AttributeSerializer::Base]
-  #   def attribute_serializer_class_for(resource_class, attribute_name, options)
-  #     fetch_serializer(resource_class, attribute_name.to_s.camelcase, :attribute_serializer, options)
-  #   end
+      context 'resource serializer' do
+        it { expect(described_class).to have_received(:internal_serializer_mapper).once }
+        it { expect(subject).to eq(V1::ResourceA::ResourceASerializer.new) }
+        context 'versioned serializer' do
+          let(:version) { 2.0 }
+          it { expect(described_class).to have_received(:internal_serializer_mapper).once }
+          it { expect(subject).to eq(V2::ResourceA::ResourceASerializer.new) }
+        end
+      end
 
-  #   # Fetches the resource class registered for the serializer
-  #   # @param serializer [Serializer::Base] to find resource class for
-  #   # @return [Object]
-  #   def resource_class_for(serializer)
-  #     registry.each_pair do |resource_class, entry|
-  #       return resource_class if serializer == entry[0]
-  #     end
-  #     nil
-  #   end
+      context 'attribute serializer' do
+        let(:type) { :attribute_serializer }
+        let(:serializer) { 'Customizer' }
+        it { expect(described_class).to have_received(:internal_serializer_mapper).once }
+        it { expect(subject).to eq(V1::CustomizerAttributeSerializer) }
 
-  #   # Fetches the set of filter and field override indexes for resource_class
-  #   # @param resource_class [Object]
-  #   # @return [Array] of string indexes
-  #   def resource_map(resource_class)
-  #     memoized_resource_map[resource_class] ||= begin
-  #       self.class.resource_mapper.call(resource_class)
-  #     end
-  #   end
+        context 'versioned attribute serializer' do
+          let(:version) { 2.0 }
+          it { expect(described_class).to have_received(:internal_serializer_mapper).once }
+          it { expect(subject).to eq(V2::CustomizerAttributeSerializer) }
+        end
+      end
 
-  #   def extract_version_from_opts(options)
-  #     ((options.try(:[], ActiveFacet.opts_key) || {})[ActiveFacet.version_key] || ActiveFacet.default_version).to_f
-  #   end
+    end
 
-  #   private
+    describe "internal_serializer_mapper" do
+      subject { described_class.internal_serializer_mapper(resource_class, serializer, type, version, options) }
+      let(:resource_class) { ResourceA }
+      let(:serializer) { resource_class.name.demodulize.to_s.camelcase }
+      let(:type) { :serializer }
+      let(:version) { 1.0 }
+      let(:options) { {} }
 
-  #   attr_accessor :registry, :memoized_serializers, :memoized_resource_map
+      context 'not found serializer' do
+        let(:type) { :else }
+        let(:serializer) { 'Customizer' }
+        it { expect(subject).to eq(nil) }
+      end
 
-  #   # @return [ResourceManager]
-  #   def initialize
-  #     self.registry = {}
-  #     self.memoized_serializers = {}
-  #     self.memoized_resource_map = {}
-  #   end
+      context 'resource serializer' do
+        it { expect(subject).to eq(V1::ResourceA::ResourceASerializer.new) }
+        context 'versioned serializer' do
+          let(:version) { 2.0 }
+          it { expect(subject).to eq(V2::ResourceA::ResourceASerializer.new) }
+        end
+      end
 
-  #   # Retrieves serializer class from memory or lookup
-  #   # @param resource_class [Class] the class of the resource to serialize
-  #   # @param serializer [String] name of the base_class of the resource to serialize
-  #   # @param type [String] type of serializer to look for (attribute vs. basic, etc.)
-  #   # @param options [Hash] context
-  #   # @return [Class] the first Class successfully described
-  #   def fetch_serializer(resource_class, serializer, type, options)
-  #     version = extract_version_from_opts(options)
-  #     unless result = self.class.serializer_mapper.call(resource_class, serializer, type, version, options)
-  #       # raise ActiveFacet::Errors::LookupError.new "Unable to locate serializer for:: " + [resource_class.name, serializer, type, version].to_s
-  #       Rails.logger.debug "Unable to locate serializer for:: " + [resource_class.name, serializer, type, version, options].to_s
-  #     end
-  #     result
-  #   end
+      context 'attribute serializer' do
+        let(:type) { :attribute_serializer }
+        let(:serializer) { 'Customizer' }
+        it { expect(subject).to eq(V1::CustomizerAttributeSerializer) }
+
+        context 'versioned attribute serializer' do
+          let(:version) { 2.0 }
+          it { expect(subject).to eq(V2::CustomizerAttributeSerializer) }
+        end
+      end
+
+    end
   end
 
+  describe "serializer_for" do
+    let(:instance) { described_class.instance }
+    subject { instance.serializer_for(resource_class, options) }
+    let(:resource_class) { ResourceA }
+    let(:options) { {} }
+
+    it { expect(subject).to eq(V1::ResourceA::ResourceASerializer.new) }
+    context "versioned" do
+      let(:options) { make_options version: 2.0 }
+      it { expect(subject).to eq(V2::ResourceA::ResourceASerializer.new) }
+    end
+  end
+
+  describe "attribute_serializer_class_for" do
+    let(:instance) { described_class.instance }
+    subject { instance.attribute_serializer_class_for(resource_class, attribute_name, options) }
+    let(:resource_class) { ResourceA }
+    let(:attribute_name) { 'Customizer' }
+    let(:options) { {} }
+
+    it { expect(subject).to eq(V1::CustomizerAttributeSerializer) }
+    context "versioned" do
+      let(:options) { make_options version: 2.0 }
+      it { expect(subject).to eq(V2::CustomizerAttributeSerializer) }
+    end
+  end
+
+  describe "resource_map" do
+    let(:instance) { described_class.instance }
+    subject { instance.resource_map(resource_class) }
+    let(:resource_class) { ResourceA }
+
+    before do
+      reset_resource_mapper_memoization
+      allow(described_class).to receive(:resource_mapper).and_call_original
+      instance.resource_map(resource_class)
+      subject
+    end
+
+    it { expect(described_class).to have_received(:resource_mapper).once }
+    it { expect(subject).to eq(["resource_as", "active_record/bases"]) }
+  end
+
+  describe "extract_version_from_opts" do
+    let(:instance) { described_class.instance }
+    subject { instance.extract_version_from_opts(options) }
+
+    context "nil" do
+      let(:options) { nil }
+      it { expect(subject).to eq(1.0) }
+    end
+
+    context "empty" do
+      let(:options) { {} }
+      it { expect(subject).to eq(1.0) }
+    end
+
+    context "nested empty" do
+      let(:options) { make_options({}) }
+      it { expect(subject).to eq(1.0) }
+    end
+
+    context "present" do
+      let(:options) { make_options version: 2.0 }
+      it { expect(subject).to eq(2.0) }
+    end
+  end
+
+  describe "instance attributes" do
+    it { expect(described_class.private_instance_methods).to include(
+      :memoized_resource_map
+    )}
+  end
+
+  describe "fetch_serializer" do
+    subject { instance.send(:fetch_serializer, resource_class, serializer, type, options) }
+    let(:instance) { described_class.instance }
+    let(:resource_class) { ResourceA }
+    let(:serializer) { resource_class.name.demodulize.to_s.camelcase }
+    let(:type) { :serializer }
+    let(:version) { 1.0 }
+    let(:options) { {} }
+
+    before do
+      allow(described_class).to receive(:serializer_mapper).and_call_original
+    end
+
+    context 'not found serializer' do
+      let(:type) { :else }
+      let(:serializer) { 'Customizer' }
+      let(:error_message) { "Unable to locate serializer for:: " + [resource_class.name, serializer, type, version].to_s }
+
+      context 'not strict_lookups' do
+        before do
+          subject
+        end
+
+        it { expect(described_class).to have_received(:serializer_mapper).once }
+        it { expect(subject).to eq(nil) }
+      end
+
+      context 'strict_lookups' do
+        around do |example|
+          ActiveFacet.strict_lookups = true
+          example.run
+          ActiveFacet.strict_lookups = false
+        end
+
+        it { expect{subject}.to raise_error(ActiveFacet::Errors::LookupError, error_message) }
+      end
+    end
+
+    context 'resource serializer' do
+      before do
+        subject
+      end
+
+      it { expect(described_class).to have_received(:serializer_mapper).once }
+      it { expect(subject).to eq(V1::ResourceA::ResourceASerializer.new) }
+    end
+  end
 end

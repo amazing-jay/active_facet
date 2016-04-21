@@ -49,6 +49,7 @@ module ActiveFacet
   self.acts_as_active_facet_enabled   = false
   self.default_cache_options          = { expires_in: 5.minutes }
   self.document_cache                 = ActiveFacet::DocumentCache
+  #TODO --jdc implement dependency injection for all classes
 
   def self.configure
     yield(self)
@@ -76,6 +77,7 @@ module ActiveFacet
     options
   end
 
+  #TODO --jdc move the below into helper
   def self.restore_opts_after(options, key, value)
     opts = (options[ActiveFacet.opts_key] ||= {})
     old = opts[key]
