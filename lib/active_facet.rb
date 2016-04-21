@@ -11,7 +11,7 @@ require 'active_facet/serializer/base'
 require 'active_facet/serializer/facade'
 require 'active_facet/config'
 require 'active_facet/document_cache'
-require 'active_facet/resource_manager'
+require 'active_facet/helper'
 require 'active_facet/version'
 
 module ActiveFacet
@@ -61,11 +61,11 @@ module ActiveFacet
   end
 
   def self.resource_mapper
-    ActiveFacet::ResourceManager.resource_mapper = Proc.new
+    ActiveFacet::Helper.resource_mapper = Proc.new
   end
 
   def self.serializer_mapper
-    ActiveFacet::ResourceManager.serializer_mapper = Proc.new
+    ActiveFacet::Helper.serializer_mapper = Proc.new
   end
 
   def self.fields_from_options(options)

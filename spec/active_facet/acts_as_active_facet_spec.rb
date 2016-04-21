@@ -164,7 +164,7 @@ describe ActiveFacet::ActsAsActiveFacet do
       ] }
       let(:scope) { receiver }
       let(:other_scope) { other_receiver }
-      let(:resource_manager) { ActiveFacet::ResourceManager.instance }
+      let(:resource_manager) { ActiveFacet::Helper }
       let(:filter_values) { { } }
       let(:receiver) { Class.new(ResourceA) {
         def self.name; 'Receiver'; end
@@ -274,7 +274,7 @@ describe ActiveFacet::ActsAsActiveFacet do
     subject { instance.as_json(options) }
     let(:instance) { create :resource_a, :with_master, :with_children }
     let(:options) { {} }
-    let(:resource_manager) { ActiveFacet::ResourceManager.instance }
+    let(:resource_manager) { ActiveFacet::Helper }
 
     before do
       allow(resource_manager).to receive(:serializer_for).and_call_original

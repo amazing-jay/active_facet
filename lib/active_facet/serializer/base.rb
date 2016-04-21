@@ -227,7 +227,7 @@ module ActiveFacet
           #return nil if field isn't an association
           if reflection = get_association_reflection(field)
             #return nil if association doesn't have a custom class
-            @association_serializers[field] = ActiveFacet::ResourceManager.instance.serializer_for(reflection.klass, options)
+            @association_serializers[field] = ActiveFacet::Helper.serializer_for(reflection.klass, options)
           end
         end
         @association_serializers[field]
@@ -239,7 +239,7 @@ module ActiveFacet
       # @return [Class | nil]
       def get_custom_serializer_class(attribute, options)
         @custom_serializers ||= {}
-        @custom_serializers[attribute] ||= ActiveFacet::ResourceManager.instance.attribute_serializer_class_for(resource_class, attribute, options)
+        @custom_serializers[attribute] ||= ActiveFacet::Helper.attribute_serializer_class_for(resource_class, attribute, options)
       end
 
       # Determines if public attribute maps to a private relation

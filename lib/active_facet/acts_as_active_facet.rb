@@ -30,7 +30,7 @@ module ActiveFacet
           # @param options [Hash]
           # @return [Hash]
           define_method(acts_as_active_facet_options[:includes_method_name]) do |facets = :basic, options = {}|
-            ActiveFacet::ResourceManager.instance.serializer_for(self, options).scoped_includes(facets)
+            ActiveFacet::Helper.serializer_for(self, options).scoped_includes(facets)
           end
 
           # Invokes includes with all deeply nested associations found in the given Field Set
@@ -59,7 +59,7 @@ module ActiveFacet
           define_method(acts_as_active_facet_options[:apply_filters_method_name]) do |filter_values = nil|
             filter_values = (filter_values || {}).with_indifferent_access
             ActiveFacet::Filter.registered_filters_for(self).inject(scoped) do |scope, (filter_name, filter_method_name)|
-              filter_resource_name = ActiveFacet::ResourceManager.instance.resource_map(self).detect { |filter_resource_name|
+              filter_resource_name = ActiveFacet::Helper.resource_map(self).detect { |filter_resource_name|
                 filter_values.keys.include? "#{filter_name}_#{filter_resource_name}"
               }
               args = filter_values["#{filter_name}_#{filter_resource_name}"] || filter_values[filter_name]
@@ -81,7 +81,7 @@ module ActiveFacet
         # @param options [Hash]
         # @return [Resource]
         define_method(acts_as_active_facet_options[:unserialize_method_name]) do |attributes, options = {}|
-          ActiveFacet::ResourceManager.instance.serializer_for(self.class, options).from_hash(self, attributes)
+          ActiveFacet::Helper.serializer_for(self.class, options).from_hash(self, attributes)
         end
 
         # Serializes a resource with given Facets
@@ -90,7 +90,7 @@ module ActiveFacet
         # @return [Hash]
         define_method(acts_as_active_facet_options[:serialize_method_name]) do |options = nil|
           if options.present? && options.key?(ActiveFacet.opts_key) &&
-              (serializer = ActiveFacet::ResourceManager.instance.serializer_for(self.class, options)).present?
+              (serializer = ActiveFacet::Helper.serializer_for(self.class, options)).present?
             serializer.as_json(self, options)
           else
             super(options)

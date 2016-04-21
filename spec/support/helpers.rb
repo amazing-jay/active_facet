@@ -18,10 +18,10 @@ module Helpers
   end
 
   def reset_serializer_mapper_memoization
-    ActiveFacet::ResourceManager.memoized_serializers = {}
+    ActiveFacet::Helper.memoized_serializers = {}
   end
 
   def reset_resource_mapper_memoization
-    ActiveFacet::ResourceManager.instance.send :memoized_resource_map=, {}
+    ActiveFacet::Helper.send :memoized_resource_map=, {}
   end
 end

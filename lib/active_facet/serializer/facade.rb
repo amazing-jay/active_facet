@@ -22,7 +22,7 @@ module ActiveFacet
 
         self.fields           = opts[ActiveFacet.fields_key]
         self.field_overrides  = opts[ActiveFacet.field_overrides_key] || {}
-        self.overrides        = ActiveFacet::ResourceManager.instance.resource_map(resource_class).inject({}) { |overrides, map_entry|
+        self.overrides        = ActiveFacet::Helper.resource_map(resource_class).inject({}) { |overrides, map_entry|
           overrides.merge(field_overrides[map_entry] || {})
         }
 
