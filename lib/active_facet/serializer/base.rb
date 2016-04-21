@@ -151,10 +151,10 @@ module ActiveFacet
           if custom_serializer.respond_to? :custom_scope
             custom_serializer.custom_scope
           else
-            nil
+            options[:return_attribute].present? ? attribute : nil
           end
         else
-          nil
+          options[:return_attribute].present? ? attribute : nil
         end
       end
 
