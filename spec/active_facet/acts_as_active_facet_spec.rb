@@ -2,8 +2,8 @@ require 'spec_helper'
 
 describe ActiveFacet::ActsAsActiveFacet do
 
-  let(:serializer) { V1::ResourceA::ResourceASerializer.new }
-  let(:serializer2) { V2::ResourceA::ResourceASerializer.new }
+  let(:serializer) { V1::ResourceA::ResourceASerializer.instance }
+  let(:serializer2) { V2::ResourceA::ResourceASerializer.instance }
   let(:receiver) { ResourceA }
   let(:method_aliases) { {
       includes_method_name:       :includes_method_name,

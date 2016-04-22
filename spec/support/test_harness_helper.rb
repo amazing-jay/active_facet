@@ -43,9 +43,9 @@ module TestHarnessHelper
       when :serializer
         case resource_class.to_s
         when test_resource_class.to_s
-          resource_serializer_class.new
+          resource_serializer_class.instance
         when test_association_class.to_s
-          association_serializer_class.new
+          association_serializer_class.instance
         else
           nil
         end

@@ -75,21 +75,15 @@ module ActiveFacet
 
         # Singleton
         # @return [Serializer::Base]
-        def new
-          @instance ||= super
+        def instance
+          @instance ||= new
         end
-
-        # TODO --jdc change new/instance contract
-        # def instance
-        #   @instance ||= new
-        # end
 
         # Memoized class getter
         # @return [Config]
         def config
           @config ||= ActiveFacet::Config.new
         end
-
       end
 
       # INSTANCE METHODS
@@ -124,42 +118,6 @@ module ActiveFacet
           end
         end
         result
-      end
-
-      # TODO -- comment and move private
-
-      def scoped_include(field, nested_field_set, options)
-        if is_association? field
-          attribute = resource_attribute_name(field)
-          if nested_field_set
-            serializer_class = get_association_serializer_class(field, options)
-            attribute = { attribute => serializer_class.present? ? serializer_class.scoped_includes(nested_field_set, options) : nested_field_set }
-          end
-          attribute
-        else
-          custom_includes(field, options)
-        end
-      end
-
-      #TODO -- move private
-
-      # Returns field_set serialized for dependant resources in custom attribute serializers & extensions
-      # @param field [Field]
-      # @return [Field Set]
-      def custom_includes(field, options)
-        attribute = resource_attribute_name(field)
-        custom_serializer_name = config.serializers[attribute]
-
-        if custom_serializer_name
-          custom_serializer = get_custom_serializer_class(custom_serializer_name, options)
-          if custom_serializer.respond_to? :custom_scope
-            custom_serializer.custom_scope
-          else
-            options[:return_attribute].present? ? attribute : nil
-          end
-        else
-          options[:return_attribute].present? ? attribute : nil
-        end
       end
 
       # Gets flattened fields from a Field Set Alias
@@ -290,6 +248,42 @@ module ActiveFacet
       # @return [String]
       def module_name
         @module_name ||= self.class.name.deconstantize
+      end
+
+      # Returns fully normalized facet
+      # @param field [Field]
+      # @param nested_field_set [Field]
+      # @return [Field Set]
+      def scoped_include(field, nested_field_set, options)
+        if is_association? field
+          attribute = resource_attribute_name(field)
+          if nested_field_set
+            serializer_class = get_association_serializer_class(field, options)
+            attribute = { attribute => serializer_class.present? ? serializer_class.scoped_includes(nested_field_set, options) : nested_field_set }
+          end
+          attribute
+        else
+          custom_includes(field, options)
+        end
+      end
+
+      # Returns fully normalized facet for custom attribute serializers & extensions
+      # @param field [Field]
+      # @return [Field Set]
+      def custom_includes(field, options)
+        attribute = resource_attribute_name(field)
+        custom_serializer_name = config.serializers[attribute]
+
+        if custom_serializer_name
+          custom_serializer = get_custom_serializer_class(custom_serializer_name, options)
+          if custom_serializer.respond_to? :custom_scope
+            custom_serializer.custom_scope
+          else
+            options[:return_attribute].present? ? attribute : nil
+          end
+        else
+          options[:return_attribute].present? ? attribute : nil
+        end
       end
     end
   end

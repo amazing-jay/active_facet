@@ -67,7 +67,7 @@ ActiveFacet.configure do |config|
   # config.serializer_mapper do |resource_class, serializer, type, version, options|
   #   case type
   #   when :serializer
-  #     (version.to_s + '::' + resource_class.name.camelcase + type.to_s.camecase).constantize.new
+  #     (version.to_s + '::' + resource_class.name.camelcase + type.to_s.camecase).constantize.instance
   #   else
   #     (version.to_s + '::' + resource_class.name.camelcase + type.to_s.camecase).constantize
   #   end

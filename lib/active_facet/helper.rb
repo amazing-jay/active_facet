@@ -61,7 +61,7 @@ module ActiveFacet
           'V' + version.to_i.to_s + '::' + resource_class.name.camelcase + type.to_s.camelcase,
         ].each { |name|
           klass = name.safe_constantize
-          return klass.new if klass.present?
+          return klass.instance if klass.present?
         }
       else
         [

@@ -12,7 +12,7 @@ describe ActiveFacet::Serializer::Base do
   let(:resource_serializer_class) { build_resource_serializer_class }
   let(:association_serializer_class) { build_association_serializer_class }
   let(:attribute_serializer_class) { build_attribute_serializer_class }
-  let(:instance) { resource_serializer_class.new }
+  let(:instance) { resource_serializer_class.instance }
   let(:resource) { test_resource_class.new }
 
   describe "#new" do
@@ -27,7 +27,7 @@ describe ActiveFacet::Serializer::Base do
     end
 
     context "singleton" do
-      it { expect(resource_serializer_class.new).to eq(resource_serializer_class.new)}
+      it { expect(resource_serializer_class.instance).to eq(resource_serializer_class.instance)}
     end
   end
 
@@ -197,28 +197,6 @@ describe ActiveFacet::Serializer::Base do
       it { expect(subject).to eq({:children=>{}, :parent=>{:children=>{}}, :master=>{}, :extras=>{}}) }
     end
 
-    describe ".custom_includes" do
-      subject { instance.custom_includes(field, options) }
-      let(:field) { :custom_attr }
-      let(:options) { nil }
-
-      context "not implemented" do
-        it { expect(subject).to eq(nil) }
-      end
-
-      context "not found" do
-        let(:field) { :foo }
-        it { expect(subject).to eq(nil) }
-      end
-
-      context "implemented" do
-        before do
-          attribute_serializer_class.class_eval { def self.custom_scope; :bar; end }
-        end
-        it { expect(subject).to eq(:bar) }
-      end
-    end
-
     describe ".exposed_aliases" do
       subject { instance.exposed_aliases(field_set_alias, include_relations, include_nested_field_sets) }
       let(:field_set_alias) { :all }
@@ -312,12 +290,12 @@ describe ActiveFacet::Serializer::Base do
       subject { instance.get_association_serializer_class(field, options) }
       context "self association" do
         let(:field) { :parent }
-        it { expect(subject).to be(resource_serializer_class.new) }
+        it { expect(subject).to be(resource_serializer_class.instance) }
       end
 
       context "association" do
         let(:field) { :master }
-        it { expect(subject).to be(association_serializer_class.new) }
+        it { expect(subject).to be(association_serializer_class.instance) }
       end
 
       context "attribute" do
@@ -393,6 +371,36 @@ describe ActiveFacet::Serializer::Base do
           let(:field) { :explicit_attr }
           it { expect(subject).to eq(:explicit_attr) }
         end
+      end
+    end
+
+    describe ".scoped_include" do
+      subject { instance.send(:scoped_include, field_set, nested_field_set, options) }
+      let(:field_set) { :parent }
+      let(:nested_field_set) { :children }
+      let(:options) { {} }
+      it { expect(subject).to eq({:parent=>{:children=>{}}}) }
+    end
+
+    describe ".custom_includes" do
+      subject { instance.send(:custom_includes, field, options) }
+      let(:field) { :custom_attr }
+      let(:options) { {} }
+
+      context "not implemented" do
+        it { expect(subject).to eq(nil) }
+      end
+
+      context "not found" do
+        let(:field) { :foo }
+        it { expect(subject).to eq(nil) }
+      end
+
+      context "implemented" do
+        before do
+          attribute_serializer_class.class_eval { def self.custom_scope; :bar; end }
+        end
+        it { expect(subject).to eq(:bar) }
       end
     end
   end

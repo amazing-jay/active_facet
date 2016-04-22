@@ -66,11 +66,11 @@ describe ActiveFacet::Helper do
 
     context 'resource serializer' do
       it { expect(described_class).to have_received(:internal_serializer_mapper).once }
-      it { expect(subject).to eq(V1::ResourceA::ResourceASerializer.new) }
+      it { expect(subject).to eq(V1::ResourceA::ResourceASerializer.instance) }
       context 'versioned serializer' do
         let(:version) { 2.0 }
         it { expect(described_class).to have_received(:internal_serializer_mapper).once }
-        it { expect(subject).to eq(V2::ResourceA::ResourceASerializer.new) }
+        it { expect(subject).to eq(V2::ResourceA::ResourceASerializer.instance) }
       end
     end
 
@@ -102,10 +102,10 @@ describe ActiveFacet::Helper do
       end
 
       context 'resource serializer' do
-        it { expect(subject).to eq(V1::ResourceA::ResourceASerializer.new) }
+        it { expect(subject).to eq(V1::ResourceA::ResourceASerializer.instance) }
         context 'versioned serializer' do
           let(:version) { 2.0 }
-          it { expect(subject).to eq(V2::ResourceA::ResourceASerializer.new) }
+          it { expect(subject).to eq(V2::ResourceA::ResourceASerializer.instance) }
         end
       end
 
@@ -128,10 +128,10 @@ describe ActiveFacet::Helper do
     let(:resource_class) { ResourceA }
     let(:options) { {} }
 
-    it { expect(subject).to eq(V1::ResourceA::ResourceASerializer.new) }
+    it { expect(subject).to eq(V1::ResourceA::ResourceASerializer.instance) }
     context "versioned" do
       let(:options) { make_options version: 2.0 }
-      it { expect(subject).to eq(V2::ResourceA::ResourceASerializer.new) }
+      it { expect(subject).to eq(V2::ResourceA::ResourceASerializer.instance) }
     end
   end
 
@@ -191,7 +191,7 @@ describe ActiveFacet::Helper do
       end
 
       it { expect(described_class).to have_received(:serializer_mapper).once }
-      it { expect(subject).to eq(V1::ResourceA::ResourceASerializer.new) }
+      it { expect(subject).to eq(V1::ResourceA::ResourceASerializer.instance) }
     end
   end
 

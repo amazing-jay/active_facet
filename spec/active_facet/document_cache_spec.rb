@@ -8,7 +8,7 @@ describe ActiveFacet::DocumentCache do
     let(:resource) { create :resource_a, :with_children, :with_master }
     let(:cache_opts) { { force: force } }
     let(:force) { false }
-    let(:serializer) { V1::ResourceA::ResourceASerializer.new }
+    let(:serializer) { V1::ResourceA::ResourceASerializer.instance }
 
     let(:natural_result) { { a: :b } }
     let(:cached_result) { { c: :d } }

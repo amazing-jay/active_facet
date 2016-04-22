@@ -3,7 +3,7 @@ require 'spec_helper'
 describe ActiveFacet::Serializer::Facade do
   let(:customizer_attribute_serializer_class) { V1::CustomizerAttributeSerializer }
   let(:extension_attr_attribute_serializer_class) { V1::ExtensionAttrAttributeSerializer }
-  let(:serializer) { V1::ResourceA::ResourceASerializer.new }
+  let(:serializer) { V1::ResourceA::ResourceASerializer.instance }
   let(:resource_class) { ResourceA }
   let(:association_class) { ResourceB }
   let(:resource) { ResourceA.new(explicit_attr: 'hello', implicit_attr: 'mcfly') }
