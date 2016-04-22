@@ -169,7 +169,7 @@ describe ActiveFacet::Helper do
         before do
           subject
         end
-
+        it { expect(Rails.logger).to receive(:debug) }
         it { expect(described_class).to have_received(:serializer_mapper).once }
         it { expect(subject).to eq(nil) }
       end

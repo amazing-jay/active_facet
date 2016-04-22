@@ -2,6 +2,8 @@
 module ActiveFacet
   module Serializer
     class Facade
+      delegate :resource_class, to: :serializer
+
       attr_accessor :serializer,  # Serializer:Base
         :resource,                # Object to delegate to
         :options,                 # Options Hash passed to as_json
@@ -80,7 +82,7 @@ module ActiveFacet
       # Checks field to see if expression is a relation
       # @return [Boolean]
       def is_active_relation?(expression)
-        #TODO -jdc let me know if anyone finds a better way to identify Proxy objects
+        #NOTE -jdc let me know if anyone finds a better way to identify Proxy objects
         #NOTE:: Proxy Collections use method missing for most actions; .scoped is the only reliable test
         expression.is_a?(ActiveRecord::Relation) || (expression.is_a?(Array) && expression.respond_to?(:scoped))
       end
@@ -89,14 +91,6 @@ module ActiveFacet
       # @return [Boolean]
       def is_relation_scopeable?(expression)
         filters_enabled
-      end
-
-      #TODO --jdc delete this method and call resource.class above, see what happens
-      #TODO --jdc this is a hack for assets. fix by making this class the primary entry point
-      # rather than serializers and pass in resource class, or better yet, enforce pseudo resource classes
-      # @return [Class]
-      def resource_class
-        resource.is_a?(ActiveRecord::Base) ? resource.class : serializer.resource_class
       end
 
       # This method returns a JSON of hash values representing the resource

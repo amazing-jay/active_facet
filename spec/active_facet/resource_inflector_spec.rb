@@ -57,10 +57,9 @@ describe ActiveFacet::ResourceInflector do
       let(:field) { :customizer }
       it { expect(subject).to be(attribute_serializer_class) }
     end
-
     context "unregistered" do
       let(:field) { :unregistered }
-      skip { expect{subject}.to raise_error(ActiveFacet::Errors::LookupError, 'Unable to locate serializer for:: ["ResourceA", "Unregistered", :attribute_serializer, 1.0, nil]') }
+      it { expect(subject).to be(nil) }
     end
   end
 

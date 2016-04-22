@@ -29,6 +29,17 @@ describe ActiveFacet::Serializer::Base do
     context "singleton" do
       it { expect(resource_serializer_class.instance).to eq(resource_serializer_class.instance)}
     end
+
+    context "reflector" do
+      it { expect(resource_serializer_class.instance_methods).to include(
+        :resource_class,
+        :resource_attribute_name,
+        :get_association_reflection,
+        :get_association_serializer_class,
+        :get_custom_serializer_class,
+        :is_association?
+      )}
+    end
   end
 
   describe "#config" do
@@ -119,7 +130,7 @@ describe ActiveFacet::Serializer::Base do
     end
 
     context("relations") do
-      skip "should raise error if envoked on a relation"
+      skip "should work if envoked on a relation"
     end
   end
 
@@ -266,114 +277,6 @@ describe ActiveFacet::Serializer::Base do
       end
     end
 
-    describe ".resource_class" do
-      subject { instance.resource_class }
-      it { expect(subject).to be(test_resource_class)}
-    end
-
-    describe ".get_association_reflection" do
-      subject { instance.get_association_reflection(field) }
-
-      context "relation" do
-        let(:field) { :parent }
-        it { expect(subject.class).to be(ActiveRecord::Reflection::AssociationReflection) }
-      end
-
-      context "field" do
-        let(:field) { :explicit_attr }
-        it { expect(subject).to be nil }
-      end
-    end
-
-    describe ".get_association_serializer_class" do
-      let(:options) { }
-      subject { instance.get_association_serializer_class(field, options) }
-      context "self association" do
-        let(:field) { :parent }
-        it { expect(subject).to be(resource_serializer_class.instance) }
-      end
-
-      context "association" do
-        let(:field) { :master }
-        it { expect(subject).to be(association_serializer_class.instance) }
-      end
-
-      context "attribute" do
-        let(:field) { :explicit_attr }
-        it { expect(subject).to be nil }
-      end
-
-      skip "todo: test version impact in lookups"
-    end
-
-    describe ".get_custom_serializer_class" do
-      let(:options) { }
-      subject { instance.get_custom_serializer_class(field, options) }
-      context "registered" do
-        let(:field) { :customizer }
-        it { expect(subject).to be(attribute_serializer_class) }
-      end
-
-      context "unregistered" do
-        let(:field) { :unregistered }
-        skip { expect{subject}.to raise_error(ActiveFacet::Errors::LookupError, 'Unable to locate serializer for:: ["ResourceA", "Unregistered", :attribute_serializer, 1.0, nil]') }
-      end
-    end
-
-    describe ".is_association?" do
-      subject { instance.is_association?(field) }
-      context "registered" do
-        let(:field) { :parent }
-        it { expect(subject).to be true }
-      end
-
-      context "unregistered" do
-        let(:field) { :extras }
-        it { expect(subject).to be true }
-      end
-
-      context "attribute" do
-        let(:field) { :explicit_attr }
-        it { expect(subject).to be false }
-      end
-    end
-
-    describe ".resource_attribute_name" do
-      subject { instance.resource_attribute_name(field, direction) }
-
-      context "from" do
-        let(:direction) { :from }
-        let(:field) { :from_attr }
-        it { expect(subject).to eq(:from_accessor) }
-
-        context "as" do
-          let(:field) { :alias_attr }
-          it { expect(subject).to eq(:aliased_accessor) }
-        end
-
-        context "none" do
-          let(:field) { :explicit_attr }
-          it { expect(subject).to eq(:explicit_attr) }
-        end
-      end
-
-      context "to" do
-        let(:direction) { :to }
-        let(:field) { :to_attr }
-        it { expect(subject).to eq(:to_accessor) }
-
-        context "as" do
-          let(:field) { :aliased_accessor }
-          it { expect(subject).to eq(:aliased_accessor) }
-        end
-
-        context "none" do
-          let(:field) { :explicit_attr }
-          it { expect(subject).to eq(:explicit_attr) }
-        end
-      end
-    end
-
     describe ".scoped_include" do
       subject { instance.send(:scoped_include, field_set, nested_field_set, options) }
       let(:field_set) { :parent }
@@ -401,42 +304,6 @@ describe ActiveFacet::Serializer::Base do
           attribute_serializer_class.class_eval { def self.custom_scope; :bar; end }
         end
         it { expect(subject).to eq(:bar) }
-      end
-    end
-
-    describe ".resource_attribute_name" do
-      subject { instance.resource_attribute_name(field, direction) }
-
-      context "from" do
-        let(:direction) { :from }
-        let(:field) { :from_attr }
-        it { expect(subject).to eq(:from_accessor) }
-
-        context "as" do
-          let(:field) { :alias_attr }
-          it { expect(subject).to eq(:aliased_accessor) }
-        end
-
-        context "none" do
-          let(:field) { :explicit_attr }
-          it { expect(subject).to eq(:explicit_attr) }
-        end
-      end
-
-      context "to" do
-        let(:direction) { :to }
-        let(:field) { :to_attr }
-        it { expect(subject).to eq(:to_accessor) }
-
-        context "as" do
-          let(:field) { :aliased_accessor }
-          it { expect(subject).to eq(:aliased_accessor) }
-        end
-
-        context "none" do
-          let(:field) { :explicit_attr }
-          it { expect(subject).to eq(:explicit_attr) }
-        end
       end
     end
   end

@@ -180,19 +180,6 @@ module ActiveFacet
         end
       end
 
-      # TODO --jdc remove this after greening
-      # Removes self.class_name from the end of self.module_name
-      # @return [String]
-      # def module_base_name
-      #   @module_base_name ||= module_name.deconstantize
-      # end
-
-      # # Removes self.class_name from the end of self.class.name
-      # # @return [String]
-      # def module_name
-      #   @module_name ||= self.class.name.deconstantize
-      # end
-
       # Returns fully normalized facet
       # @param field [Field]
       # @param nested_field_set [Field]

@@ -14,25 +14,22 @@ module ActiveFacet
     include ActiveFacet::ResourceInflector
 
     # Boolean: state
-    attr_reader :compiled
-
-    # Serializer::Base
-    attr_reader :serializer
+    attr_accessor :compiled
 
     # Hash: compiled field sets
-    attr_reader :normalized_field_sets
+    attr_accessor :normalized_field_sets
 
     # Hash: keys are public API attribute names, values are resource attribute names
-    attr_reader :transforms_from, :transforms_to
+    attr_accessor :transforms_from, :transforms_to
 
     # Hash: API attribute names requiring custom serialization
-    attr_reader :serializers
+    attr_accessor :serializers
 
     # Hash: keys are resource attribute names storing nested JSON, values are nested attribute names
-    attr_reader :namespaces
+    attr_accessor :namespaces
 
     # Hash: keys are defined extension values
-    attr_reader :extensions
+    attr_accessor :extensions
 
     # Class: Resource Class to serialize
     attr_accessor :resource_class
@@ -55,7 +52,6 @@ module ActiveFacet
     # (Memoized) Normalizes all Field Set Aliases
     # @return [Config]
     def compile!
-      self.serializer = serializer
       self.normalized_field_sets = { all: {} }.with_indifferent_access
 
       #aggregate all compiled field_sets into the all collection
@@ -98,12 +94,17 @@ module ActiveFacet
       internal_field_set_itterator(dealias_field_set!(default_field_set(field_set))[:fields], Proc.new)
     end
 
+    # Renames attribute between resource.attribute_name and json.attribute_name
+    # @param field [Symbol] attribute name
+    # @param direction [Symbol] to apply translation
+    # @return [Symbol]
+    def resource_attribute_name(field, direction = :from)
+      (transforms(direction)[field] || field).to_sym
+    end
+
     protected
 
     attr_accessor :field_sets
-
-    attr_writer :compiled, :serializer, :normalized_field_sets, :transforms_from, :transforms_to,
-      :serializers, :namespaces, :extensions
 
     private
 
@@ -260,14 +261,6 @@ module ActiveFacet
         result[field_set] = merge_field_sets(na[field_set], nested_field_sets)
         result
       end
-    end
-
-    # Renames attribute between resource.attribute_name and json.attribute_name
-    # @param field [Symbol] attribute name
-    # @param direction [Symbol] to apply translation
-    # @return [Symbol]
-    def resource_attribute_name(field, direction = :from)
-      (transforms(direction)[field] || field).to_sym
     end
   end
 end

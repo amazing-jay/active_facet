@@ -201,19 +201,6 @@ describe ActiveFacet::Serializer::Facade do
     end
   end
 
-  describe ".resource_class" do
-    subject { instance.send(:resource_class) }
-    it { expect(subject).to eq(resource_class) }
-    context "mismatched resource" do
-      let(:resource) { association_class.new }
-      it { expect(subject).to eq(association_class) }
-    end
-    context "abstract resource" do
-      let(:resource) { Object.new }
-      it { expect(subject).to eq(resource_class) }
-    end
-  end
-
   describe ".serialize!" do
     subject { instance.send(:serialize!) }
     let(:resource) { create :resource_a, :with_children, :with_master }

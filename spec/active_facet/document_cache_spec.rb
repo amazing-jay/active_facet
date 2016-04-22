@@ -76,7 +76,7 @@ describe ActiveFacet::DocumentCache do
   end
 
   describe ".fetch_association" do
-    skip ("abstract method intentionally not implemented")
+    #skip ("abstract method intentionally not implemented")
   end
 
   describe ".digest_key" do

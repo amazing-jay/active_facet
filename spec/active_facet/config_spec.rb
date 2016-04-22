@@ -221,6 +221,48 @@ describe ActiveFacet::Config do
       end
     end
 
+    describe ".resource_attribute_name" do
+      subject { instance.resource_attribute_name(field, direction) }
+      before do
+        instance.transforms_from[:explicit_accessor] = :explicit_accessor
+        instance.transforms_from[:alias_attr] = :aliased_accessor?
+        instance.transforms_to[:explicit_accessor] = :explicit_accessor
+        instance.transforms_to[:alias_attr] = :aliased_accessor
+      end
+
+      context "from" do
+        let(:direction) { :from }
+        let(:field) { :explicit_accessor }
+        it { expect(subject).to eq(:explicit_accessor) }
+
+        context "transformed" do
+          let(:field) { :alias_attr }
+          it { expect(subject).to eq(:aliased_accessor?) }
+        end
+
+        context "implicit" do
+          let(:field) { :implicit_attr }
+          it { expect(subject).to eq(:implicit_attr) }
+        end
+      end
+
+      context "to" do
+        let(:direction) { :to }
+        let(:field) { :explicit_accessor }
+        it { expect(subject).to eq(:explicit_accessor) }
+
+        context "transformed" do
+          let(:field) { :alias_attr }
+          it { expect(subject).to eq(:aliased_accessor) }
+        end
+
+        context "implicit" do
+          let(:field) { :implicit_attr }
+          it { expect(subject).to eq(:implicit_attr) }
+        end
+      end
+    end
+
     describe "private methods" do
 
       describe "dealias_field_set!" do
