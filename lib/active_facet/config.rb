@@ -138,9 +138,9 @@ module ActiveFacet
     # @return [Mixed]
     def dealias_field_set(field_set)
       case field_set
-      when :all
+      when :all, 'all'
         dealias_field_set serializer.exposed_aliases(:all, true, true)
-      when :all_attributes
+      when :all_attributes, 'all_attributes'
         dealias_field_set serializer.exposed_aliases
       when Symbol, String
         field_set = field_set.to_sym
@@ -239,6 +239,7 @@ module ActiveFacet
       when Array
         key.each { |k| inject_field_set(field_set, k) }
       end
+      field_set
     end
 
     # Tells if the Field is a Field Set Alias

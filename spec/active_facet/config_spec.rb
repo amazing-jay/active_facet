@@ -1,8 +1,19 @@
 require 'spec_helper'
 
 describe ActiveFacet::Config do
-
   subject { instance }
+  before do
+    allow(serializer).to receive(:is_association?) { |attribute| attribute.to_s.start_with?('assocation') }
+    allow(serializer).to receive(:exposed_aliases) { |field_set_alias = :all, include_relations = false, include_nested_field_sets = false|
+      return include_nested_field_sets ? field_set_alias : [field_set_alias] unless normalized_field_sets = instance.normalized_field_sets[field_set_alias]
+      result = normalized_field_sets[include_relations ? :fields : :attributes]
+      return result if include_nested_field_sets
+      result.keys.map(&:to_sym).sort
+    }
+    prehook
+  end
+
+  let(:prehook) { }
   let(:instance) { described_class.new }
   let(:serializer) { double('serializer') }
   let(:attrs) { [
@@ -12,13 +23,6 @@ describe ActiveFacet::Config do
     :namespaces,
     :extensions
   ] }
-
-  before do
-    allow(serializer).to receive(:is_association?) { |attribute| [:a, :b].include? attribute.to_sym }
-    allow(serializer).to receive(:exposed_aliases) { |field_set_alias = :all, include_relations = false, include_nested_field_sets = false|
-      {}
-    }
-  end
 
   describe "public attributes" do
     it { expect(described_class.instance_methods).to include(
@@ -70,12 +74,10 @@ describe ActiveFacet::Config do
 
     it { expect(subject.compiled).to be true }
     it { expect(subject.serializer).to eq(serializer) }
-    it { expect(subject.normalized_field_sets).to eq({"all"=>{"fields"=>{"a"=>{}, "b"=>{"c"=>{}}, "d"=>{"e"=>{}}}, "attributes"=>{"d"=>{"e"=>{}}}}, "test"=>{"fields"=>{"a"=>{}, "b"=>{"c"=>{}}, "d"=>{"e"=>{}}}, "attributes"=>{"d"=>{"e"=>{}}}}}) }
-
+    it { expect(subject.normalized_field_sets).to eq({"all"=>{"fields"=>{"a"=>{}, "b"=>{"c"=>{}}, "d"=>{"e"=>{}}}, "attributes"=>{"a"=>{}, "b"=>{"c"=>{}}, "d"=>{"e"=>{}}}}, "test"=>{"fields"=>{"a"=>{}, "b"=>{"c"=>{}}, "d"=>{"e"=>{}}}, "attributes"=>{"a"=>{}, "b"=>{"c"=>{}}, "d"=>{"e"=>{}}}}}) }
   end
 
   describe ".merge!" do
-
     before do
       other = described_class.new
       attrs.each do |attribute|
@@ -94,139 +96,524 @@ describe ActiveFacet::Config do
     }
   end
 
-  describe ".field_set_itterator" do
-    subject {
-      [[],{}].tap { |fields|
-        instance.field_set_itterator(field_set) { |field, nested_field_set|
-          fields[0] << field.to_sym
-          fields[1][field] = nested_field_set unless nested_field_set.blank?
-        }
-        fields[0].sort!
-      }
-    }
-
-    before do
-      prehook
-    end
-
+  describe "post compile methods" do
     let(:prehook) { instance.compile!(serializer) }
 
-    context "uncompiled" do
-      let(:field_set) { :a }
-      let(:prehook) { }
-      it { expect{subject}.to raise_error(ActiveFacet::Errors::ConfigurationError, ActiveFacet::Errors::ConfigurationError::COMPILED_ERROR_MSG)}
-    end
-
-    context "dirty compiled" do
-      let(:field_set) { :a }
-      let(:prehook) {
-        instance.compile!(serializer)
-        instance.alias_field_set(:bar, :bar )
-      }
-      it { expect{subject}.to raise_error(ActiveFacet::Errors::ConfigurationError, ActiveFacet::Errors::ConfigurationError::COMPILED_ERROR_MSG)}
-    end
-
-    context "symbol" do
-      let(:field_set) { :a }
-      it { expect(subject[0]).to eq([:a, :basic]) }
-    end
-
-    context "array of symbols" do
-      let(:field_set) { [:a, :b, :c] }
-      it { expect(subject[0]).to eq([:a, :b, :basic, :c]) }
-      it { expect(subject[1]).to be_blank }
-    end
-
-    context "array of arrays" do
-      let(:field_set) { [:a, [:b, :c]] }
-      it { expect(subject[0]).to eq([:a, :b, :basic, :c]) }
-      it { expect(subject[1]).to be_blank }
-    end
-
-    context "hash" do
-      let(:field_set) { {a: :b, c: :d} }
-      it { expect(subject[0]).to eq([:a, :basic, :c]) }
-      it { expect(subject[1]).to eq({a: :b, c: :d}) }
-    end
-
-    context "hash of nils" do
-      let(:field_set) { {a: nil, c: :d} }
-      it { expect(subject[0]).to eq([:a, :basic, :c]) }
-      it { expect(subject[1]).to eq({c: :d}) }
-    end
-
-    context "mixed" do
-      let(:field_set) { [:a, [[:b, {c: nil, d: :e}]]] }
-      it { expect(subject[0]).to eq([:a, :b, :basic, :c, :d]) }
-      it { expect(subject[1]).to eq({d: {e: {}}}) }
-    end
-
-    context "nested field_sets" do
-      let(:field_set) { [:a, [[:b, {c: nil}, {d: :e}, {f: [{g: :h}, :i]}]]] }
-      it { expect(subject[0]).to eq([:a, :b, :basic, :c, :d, :f]) }
-      it { expect(subject[1]).to eq({:d=>{:e=>{}}, :f=>{:g=>{:h=>{}}, :i=>{}}}) }
-    end
-
-    context "duplicates" do
-      let(:field_set) { [:a, [[:a, {a: nil}, {a: :e}]]] }
-      it { expect(subject[0]).to eq([:a, :basic]) }
-      it { expect(subject[1]).to eq({a: {e: {}}}) }
-    end
-
-    context "basic & minimal" do
-      let(:prehook) {
-        instance.alias_field_set(:minimal, [:a, [[:b, {c: nil, d: :e}]]] )
-        instance.alias_field_set(:basic, [:A, [[:B, {C: nil, D: :E}]]] )
-        instance.alias_field_set(:foo, [:aa, [{bar: nil}]] )
-        instance.alias_field_set(:bar, [[:bb, {cc: nil, dd: :ee}]] )
-        instance.alias_field_set(:empty, [] )
-        instance.alias_field_set(:identity, :identity )
-        instance.compile!(serializer)
+    describe ".field_set_itterator" do
+      subject {
+        {}.tap { |results|
+          instance.field_set_itterator(field_set) { |field, nested_field_set|
+            results[field] = nested_field_set
+          }
+        }
       }
 
-      context "minimal" do
+      context "uncompiled" do
+        let(:field_set) { :a }
+        let(:prehook) { }
+        it { expect{subject}.to raise_error(ActiveFacet::Errors::ConfigurationError, ActiveFacet::Errors::ConfigurationError::COMPILED_ERROR_MSG)}
+      end
+
+      context "dirty compiled" do
+        let(:field_set) { :a }
+        let(:prehook) {
+          instance.compile!(serializer)
+          instance.alias_field_set(:bar, :bar )
+        }
+        it { expect{subject}.to raise_error(ActiveFacet::Errors::ConfigurationError, ActiveFacet::Errors::ConfigurationError::COMPILED_ERROR_MSG)}
+      end
+
+      context "symbol" do
+        let(:field_set) { :a }
+        it { expect(subject).to eq({:a=>{}, :basic=>{}}) }
+      end
+
+      context "array of symbols" do
+        let(:field_set) { [:a, :b, :c] }
+        it { expect(subject).to eq({:a=>{}, :b=>{}, :c=>{}, :basic=>{}}) }
+      end
+
+      context "array of arrays" do
+        let(:field_set) { [:a, [:b, :c]] }
+        it { expect(subject).to eq({:a=>{}, :b=>{}, :c=>{}, :basic=>{}}) }
+      end
+
+      context "hash" do
+        let(:field_set) { {a: :b, c: :d} }
+        it { expect(subject).to eq({:a=>:b, :c=>:d, :basic=>{}}) }
+      end
+
+      context "hash of nils" do
+        let(:field_set) { {a: nil, c: :d} }
+        it { expect(subject).to eq({:a=>{}, :c=>:d, :basic=>{}}) }
+      end
+
+      context "mixed" do
+        let(:field_set) { [:a, [[:b, {c: nil, d: :e}]]] }
+        it { expect(subject).to eq({:a=>{}, :b=>{}, :c=>{}, :d=>{:e=>{}}, :basic=>{}}) }
+      end
+
+      context "nested field_sets" do
+        let(:field_set) { [:a, [[:b, {c: nil}, {d: :e}, {f: [{g: :h}, :i]}]]] }
+        it { expect(subject).to eq({:a=>{}, :b=>{}, :c=>{}, :d=>{:e=>{}}, :f=>{:g=>{:h=>{}}, :i=>{}}, :basic=>{}}) }
+      end
+
+      context "duplicates" do
+        let(:field_set) { [:a, [[:a, {a: nil}, {a: :e}]]] }
+        it { expect(subject).to eq({:a=>{:e=>{}}, :basic=>{}}) }
+      end
+
+      context "all" do
+        let(:field_set) { :all }
+        it { expect(subject).to eq({:basic=>{}}) }
+      end
+
+      context "basic & minimal" do
+        let(:prehook) {
+          instance.alias_field_set(:minimal, [:a, [[:b, {c: nil, d: :e}]]] )
+          instance.alias_field_set(:basic, [:A, [[:B, {C: nil, D: :E}]]] )
+          instance.alias_field_set(:foo, [:aa, [{bar: nil}]] )
+          instance.alias_field_set(:bar, [[:bb, {cc: nil, dd: :ee}]] )
+          instance.alias_field_set(:empty, [] )
+          instance.alias_field_set(:identity, :identity )
+          instance.compile!(serializer)
+        }
+
+        context "minimal" do
+          context "symbol" do
+            let(:field_set) { :minimal }
+            it { expect(subject).to eq({"a"=>{}, "b"=>{}, "c"=>{}, "d"=>{"e"=>{}}}) }
+          end
+
+          context "array" do
+            let(:field_set) { [:minimal] }
+            it { expect(subject).to eq({:a=>{}, :b=>{}, :c=>{}, :d=>{:e=>{}}}) }
+          end
+
+          context "hash" do
+            let(:field_set) { {minimal: nil} }
+            it { expect(subject).to eq({:a=>{}, :b=>{}, :c=>{}, :d=>:e}) }
+          end
+
+          context "mixed" do
+            let(:field_set) { [:a, :d, [:c, {minimal: nil}]] }
+            it { expect(subject).to eq({:a=>{}, :d=>{:e=>{}}, :c=>{}, :b=>{}}) }
+          end
+        end
+
+        context "aliased" do
+          let(:field_set) { nil }
+          it { expect(subject).to eq({"A"=>{}, "B"=>{}, "C"=>{}, "D"=>{"E"=>{}}}) }
+        end
+
+        context "nested aliases" do
+          let(:field_set) { :foo }
+          it { expect(subject).to eq({:aa=>{}, :bb=>{}, :cc=>{}, :dd=>{:ee=>{}}, :A=>{}, :B=>{}, :C=>{}, :D=>{:E=>{}}}) }
+        end
+
+        context "empty" do
+          let(:field_set) { :empty }
+          it { expect(subject).to eq({:A=>{}, :B=>{}, :C=>{}, :D=>{:E=>{}}}) }
+        end
+
+        context "identity" do
+          let(:field_set) { :identity }
+          it { expect(subject).to eq({:identity=>{}, :A=>{}, :B=>{}, :C=>{}, :D=>{:E=>{}}}) }
+        end
+      end
+    end
+
+    describe "private methods" do
+
+      describe "dealias_field_set!" do
+        subject { instance.send(:dealias_field_set!, field_set, field_set_alias) }
+        let(:field_set_alias) { nil }
+
+        let(:prehook) {
+          instance.alias_field_set(:a, :a)
+          instance.alias_field_set(:b, :b)
+          instance.alias_field_set(:c, [:a, :d])
+          instance.alias_field_set(:basic, [:c, :e])
+          instance.alias_field_set(:minimal, [:e, :f])
+          instance.compile!(serializer)
+        }
+
+        before do
+          allow(instance).to receive(:normalize_field_set).and_call_original
+          instance.send(:dealias_field_set!, field_set, field_set_alias)
+          subject
+        end
+
+        let(:field_set) { :unknown_attr }
+        it { expect(instance).to have_received(:normalize_field_set).once }
+        it { expect(instance.normalized_field_sets.keys).to include(field_set.to_s) }
+        it { expect(subject).to eq({"fields"=>{"unknown_attr"=>nil}}) }
+
+        context 'named' do
+          let(:field_set_alias) { :custom }
+          let(:field_set) { :unknown_attr }
+          before do
+            instance.send(:dealias_field_set!, field_set)
+          end
+          it { expect(instance).to have_received(:normalize_field_set).twice }
+          it { expect(instance.normalized_field_sets.keys).to include(field_set.to_s, field_set_alias.to_s) }
+          it { expect(subject).to eq({"fields"=>{"unknown_attr"=>nil}}) }
+        end
+
+        context "basic" do
+          let(:field_set) { :basic }
+          it { expect(subject).to eq({"fields"=>{"a"=>{}, "d"=>{}, "e"=>{}}, "attributes"=>{"a"=>{}, "d"=>{}, "e"=>{}}}) }
+        end
+
+        context "all" do
+          let(:field_set) { :all }
+          it { expect(subject).to eq({"fields"=>{"a"=>{}, "b"=>{}, "d"=>{}, "e"=>{}, "f"=>{}}, "attributes"=>{"a"=>{}, "b"=>{}, "d"=>{}, "e"=>{}, "f"=>{}}}) }
+        end
+
+        context "composite" do
+          let(:field_set) { [:foo, { :e => nil }, :basic] }
+          it { expect(subject).to eq({"fields"=>{"foo"=>{}, "e"=>{}, "a"=>{}, "d"=>{}}}) }
+        end
+      end
+
+      describe "dealias_field_set" do
+        subject { instance.send(:dealias_field_set, field_set) }
+        let(:prehook) {
+          instance.alias_field_set(:a, :a)
+          instance.alias_field_set(:b, :b)
+          instance.alias_field_set(:c, [:a, :d, :association_a, { association_b: :aliased } ])
+          instance.alias_field_set(:basic, [:c, :e])
+          instance.alias_field_set(:minimal, [:e, :f])
+          instance.compile!(serializer)
+        }
+
+        context "string" do
+          let(:field_set) { 'basic' }
+          it { expect(subject).to eq([[:a, :d, :association_a, {"association_b"=>:aliased}], :e]) }
+        end
+
         context "symbol" do
-          let(:field_set) { :minimal }
-          it { expect(subject[0]).to eq([:a, :b, :c, :d]) }
+          let(:field_set) { :basic }
+          it { expect(subject).to eq([[:a, :d, :association_a, {"association_b"=>:aliased}], :e]) }
+        end
+
+        context "all" do
+          let(:field_set) { :all }
+          it { expect(subject).to eq([:a, :association_a, :association_b, :b, :d, :e, :f]) }
+        end
+
+        context "all_attributes" do
+          let(:field_set) { 'all_attributes' }
+          it { expect(subject).to eq([:a, :association_a, :association_b, :b, :d, :e, :f]) }
+        end
+
+        context "composite" do
+          let(:field_set) { [:foo, { :e => nil }, :basic] }
+          it { expect(subject).to eq([:foo, {:e=>{}}, [[:a, :d, :association_a, {"association_b"=>:aliased}], :e]]) }
+        end
+      end
+
+      describe "normalize_field_set" do
+        subject { instance.send(:normalize_field_set, field_set) }
+
+        context "symbol" do
+          let(:field_set) { :foo }
+          it { expect(subject).to eq({ foo: nil }) }
+        end
+
+        context "string" do
+          let(:field_set) { 'foo' }
+          it { expect(subject).to eq({ foo: nil }) }
         end
 
         context "array" do
-          let(:field_set) { [:minimal] }
-          it { expect(subject[0]).to eq([:a, :b, :c, :d]) }
+          let(:field_set) { [:foo, :bar] }
+          it { expect(subject).to eq({ foo: {}, bar: {} }) }
         end
 
         context "hash" do
-          let(:field_set) { {minimal: nil} }
-          it { expect(subject[0]).to eq([:a, :b, :c, :d]) }
+          let(:field_set) { { foo: :nested, bar: :whatnot } }
+          it { expect(subject).to eq({ foo: :nested, bar: :whatnot }) }
         end
 
-        context "mixed" do
-          let(:field_set) { [:a, :d, [:c, {minimal: nil}]] }
-          it { expect(subject[0]).to eq([:a, :b, :c, :d]) }
+        context "composite" do
+          let(:field_set) { [:foo, { bar: :whatnot }] }
+          it { expect(subject).to eq({ foo: {}, bar: {whatnot: {} }}) }
         end
       end
 
-      context "aliased" do
-        let(:field_set) { nil }
-        it { expect(subject[0]).to eq([:A, :B, :C, :D]) }
+      describe "default_field_set" do
+        subject { instance.send(:default_field_set, field_set) }
+
+        context "nil" do
+          let(:field_set) { nil }
+          it { expect(subject).to eq(:basic) }
+        end
+
+        context "symbol" do
+          let(:field_set) { :foo }
+          it { expect(subject).to eq([:foo, :basic]) }
+
+          context "basic" do
+            let(:field_set) { :basic }
+            it { expect(subject).to eq([:basic, :basic]) }
+          end
+
+          context "minimal" do
+            let(:field_set) { :minimal }
+            it { expect(subject).to eq(:minimal) }
+          end
+        end
+
+        context "string" do
+          let(:field_set) { 'foo' }
+          it { expect(subject).to eq([:foo, :basic]) }
+
+          context "basic" do
+            let(:field_set) { 'basic' }
+            it { expect(subject).to eq([:basic, :basic]) }
+          end
+
+          context "minimal" do
+            let(:field_set) { 'minimal' }
+            it { expect(subject).to eq(:minimal) }
+          end
+        end
+
+        context "array" do
+          let(:field_set) { ['foo', :bar, { alpha: :centuri }] }
+          it { expect(subject).to eq(['foo', :bar, { alpha: :centuri }, :basic]) }
+
+          context "basic" do
+            let(:field_set) { ['foo', :basic, :bar, { alpha: :centuri }] }
+            it { expect(subject).to eq(['foo', :basic, :bar, { alpha: :centuri }, :basic]) }
+          end
+
+          context "embedded basic" do
+            let(:field_set) { ['foo', :bar, { alpha: :centuri, basic: nil }] }
+            it { expect(subject).to eq(["foo", :bar, {:alpha=>:centuri, :basic=>nil}, :basic]) }
+          end
+
+          context "nested basic" do
+            let(:field_set) { ['foo', :bar, { alpha: :basic }] }
+            it { expect(subject).to eq(["foo", :bar, {:alpha=>:basic}, :basic]) }
+          end
+
+          context "minimal" do
+            let(:field_set) { ['foo', :minimal, :bar, { alpha: :centuri }] }
+            it { expect(subject).to eq(['foo', :minimal, :bar, { alpha: :centuri }]) }
+          end
+
+          context "embedded minimal" do
+            let(:field_set) { ['foo', :bar, { alpha: :centuri, minimal: nil }] }
+            it { expect(subject).to eq(["foo", :bar, {:alpha=>:centuri, :minimal=>nil}]) }
+          end
+
+          context "nested minimal" do
+            let(:field_set) { ['foo', :bar, { alpha: :minimal }] }
+            it { expect(subject).to eq(["foo", :bar, {:alpha=>:minimal}, :basic]) }
+          end
+        end
+
+        context "hash" do
+          let(:field_set) { { alpha: :centuri } }
+          it { expect(subject).to eq({ alpha: :centuri, basic: nil}) }
+
+          context "basic" do
+            let(:field_set) { { alpha: :centuri, basic: nil } }
+            it { expect(subject).to eq({:alpha=>:centuri, :basic=>nil}) }
+          end
+
+          context "nested basic" do
+            let(:field_set) { { alpha: :basic } }
+            it { expect(subject).to eq({:alpha=>:basic, basic: nil}) }
+          end
+
+          context "minimal" do
+            let(:field_set) { { alpha: :centuri, minimal: nil } }
+            it { expect(subject).to eq({:alpha=>:centuri, :minimal=>nil}) }
+          end
+
+          context "nested minimal" do
+            let(:field_set) { { alpha: :minimal } }
+            it { expect(subject).to eq({:alpha=>:minimal, basic: nil}) }
+          end
+        end
+
+        context "other" do
+          let(:field_set) { Object.new }
+          let(:prehook) { }
+          it { expect{subject}.to raise_error(ActiveFacet::Errors::ConfigurationError::FIELD_SET_ERROR_MSG, ActiveFacet::Errors::ConfigurationError::FIELD_SET_ERROR_MSG)}
+        end
       end
 
-      context "nested aliases" do
-        let(:field_set) { :foo }
-        it { expect(subject[0]).to eq([:A, :B, :C, :D, :aa, :bb, :cc, :dd]) }
+      describe "detect_field_set" do
+        subject { !!instance.send(:detect_field_set, field_set, key) }
+        let(:key) { :key }
+
+        context 'object' do
+          let(:field_set) { Object.new }
+          let(:prehook) { }
+          it { expect{subject}.to raise_error(ActiveFacet::Errors::ConfigurationError::FIELD_SET_ERROR_MSG, ActiveFacet::Errors::ConfigurationError::FIELD_SET_ERROR_MSG)}
+        end
+
+        context "nil" do
+          let(:field_set) { nil }
+          it { expect(subject).to eq(false) }
+        end
+
+        context "symbol" do
+          let(:field_set) { :symbol }
+          it { expect(subject).to eq(false) }
+        end
+
+        context "key" do
+          let(:field_set) { :key }
+          it { expect(subject).to eq(true) }
+        end
+
+        context "string" do
+          let(:field_set) { 'string' }
+          it { expect(subject).to eq(false) }
+        end
+
+        context "key string" do
+          let(:field_set) { 'key' }
+          it { expect(subject).to eq(true) }
+        end
+
+        context "array" do
+          let(:field_set) { [:foo, :bar] }
+          it { expect(subject).to eq(false) }
+        end
+
+        context "key array" do
+          let(:field_set) { [:foo, :key, :bar] }
+          it { expect(subject).to eq(true) }
+        end
+
+        context "hash" do
+          let(:field_set) { {foo: :bar} }
+          it { expect(subject).to eq(false) }
+        end
+
+        context "key hash" do
+          let(:field_set) { {key: :bar} }
+          it { expect(subject).to eq(true) }
+        end
+
+        context "composite" do
+          let(:field_set) { [:foo, :bar, [{alpha: :centuri}]] }
+          it { expect(subject).to eq(false) }
+        end
+
+        context "key composite" do
+          let(:field_set) { [:foo, :bar, [{alpha: :centuri, key: :bar}]] }
+          it { expect(subject).to eq(true) }
+        end
       end
 
-      context "empty" do
-        let(:field_set) { :empty }
-        it { expect(subject[0]).to eq([:A, :B, :C, :D]) }
+      describe "internal_field_set_itterator" do
+        subject {
+          results = {}
+          instance.send(:internal_field_set_itterator, field_set, lambda{ |field, nested_field_set|
+            results[nested_field_set] = field
+          })
+          results
+        }
+
+        let(:field_set) { { foo: :bar } }
+        it { expect(subject).to eq({ bar: :foo }) }
       end
 
-      context "identity" do
-        let(:field_set) { :identity }
-        it { expect(subject[0]).to eq([:A, :B, :C, :D, :identity]) }
+      describe "inject_field_set" do
+        subject { instance.send(:inject_field_set, field_set, key) }
+        let(:field_set) { { foo: :bar } }
+
+        context 'symbol' do
+          let(:key) { :key }
+          it { expect(subject).to eq({ foo: :bar, key: {} }) }
+        end
+
+        context 'duplicate symbol' do
+          let(:key) { :foo }
+          it { expect(subject).to eq({ foo: {} }) }
+        end
+
+        context 'string' do
+          let(:key) { 'key' }
+          it { expect(subject).to eq({ foo: :bar, key: {} }) }
+        end
+
+        context 'duplicate string' do
+          let(:key) { 'foo' }
+          it { expect(subject).to eq({ foo: {} }) }
+        end
+
+        context 'hash' do
+          let(:key) { { alpha: :centuri, foo: :buzz } }
+          it { expect(subject).to eq({ foo: :buzz, alpha: :centuri }) }
+        end
+
+        context 'array' do
+          let(:key) { [ :cobalt, { alpha: :centuri, foo: :buzz }] }
+          it { expect(subject).to eq({:foo=>:buzz, :cobalt=>{}, :alpha=>:centuri}) }
+        end
+      end
+
+      describe "aliased_field_set?" do
+        subject { instance.send(:aliased_field_set?, field_set) }
+        let(:prehook) {
+          instance.alias_field_set(:a, :a)
+          instance.alias_field_set(:b, :a)
+          instance.alias_field_set(:c, [:a, :d, :association_a, { association_b: :aliased } ])
+          instance.compile!(serializer)
+        }
+
+        context 'not found' do
+          let(:field_set) { :foo }
+          it { expect(subject).to eq(false) }
+        end
+
+        context 'identity' do
+          let(:field_set) { :a }
+          it { expect(subject).to eq(false) }
+        end
+
+        context 'found' do
+          let(:field_set) { :b }
+          it { expect(subject).to eq(true) }
+        end
+
+        context 'compiled' do
+          let(:field_set) { :all }
+          it { expect(subject).to eq(false) }
+        end
+
+        context 'invalid' do
+          let(:field_set) { Object.new }
+          it { expect(subject).to eq(false) }
+        end
+      end
+
+      describe "merge_field_sets" do
+        subject { instance.send(:merge_field_sets, a, b) }
+        let(:a) { { foo: :bar } }
+        let(:b) { { alpha: :omega } }
+        it { expect(subject).to eq({:foo=>:bar, :alpha=>{:omega=>{}}}) }
+
+        context 'one level deep' do
+          let(:a) { { a: { foo: :bar } } }
+          let(:b) { { a: { alpha: :omega } } }
+          it { expect(subject).to eq({:a=>{:foo=>:bar, :alpha=>{:omega=>{}}}}) }
+        end
+
+        context 'two levels deep' do
+          let(:a) { { a: { b: { foo: :bar } } } }
+          let(:b) { { a: { b: { alpha: :omega } } } }
+          it { expect(subject).to eq({:a=>{:b=>{:foo=>:bar, :alpha=>{:omega=>{}}}}} ) }
+        end
       end
     end
-
   end
-
 end
