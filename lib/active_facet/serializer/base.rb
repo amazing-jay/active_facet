@@ -14,48 +14,48 @@ module ActiveFacet
         # ###
 
         # DSL Defines a transform to rename or reformat an attribute
-        # @param api_attribute [Symbol] name of the attribute
+        # @param facet [Symbol] name of the attribute
         # @param options [Hash]
         # @option options [Symbol] :as internal method name to call on the resource for serialization and hydration
         # @option options [Symbol] :from internal method name to call on the resource for serialization
         # @option options [Symbol] :to internal method name to call on the resource for hydration
         # @option options [Symbol] :with name of a CustomAttributeSerializer Class for serialization and hydration
         # @option options [Symbol] :within name of nested json attribute to serialize/hyrdrate within
-        def transform(api_attribute, options = {})
+        def transform(facet, options = {})
           if options[:as].present?
-            config.transforms_from[api_attribute]  = options[:as]
-            config.transforms_to[api_attribute] = options[:as]
+            config.transforms_from[facet]  = options[:as]
+            config.transforms_to[facet] = options[:as]
           end
           if options[:from].present?
-            config.transforms_from[api_attribute] = options[:from]
-            config.transforms_to[api_attribute] ||= options[:from]
+            config.transforms_from[facet] = options[:from]
+            config.transforms_to[facet] ||= options[:from]
           end
           if options[:to].present?
-            config.transforms_from[api_attribute] ||= options[:to]
-            config.transforms_to[api_attribute] = options[:to]
+            config.transforms_from[facet] ||= options[:to]
+            config.transforms_to[facet] = options[:to]
           end
-          config.serializers[api_attribute] = options[:with]    if options[:with].present?
-          config.namespaces[api_attribute]  = options[:within]  if options[:within].present?
-          expose api_attribute
+          config.serializers[facet] = options[:with]    if options[:with].present?
+          config.namespaces[facet]  = options[:within]  if options[:within].present?
+          expose facet
         end
 
-        # DSL Defines an attribute extension available for decoration and serialization
-        # @param api_attribute [Symbol] name of the attribute
-        def extension(api_attribute)
-          config.extensions[api_attribute] = true
-          config.serializers[api_attribute] = api_attribute.to_sym
-          expose api_attribute
+        # DSL Defines an extension for decoration of serialized output
+        # @param facet [Symbol] name of the attribute
+        def extension(facet)
+          config.extensions[facet] = true
+          config.serializers[facet] = facet.to_sym
+          expose facet
         end
 
-        # DSL Defines an alias that can be used instead of a Field Set
-        # @param field_set_name [Symbol] the alias name
+        # DSL Defines an alias that can be used in lieu of an explicit Facet
+        # @param facet [Symbol] the alias name
         # @param options [Hash]
-        # @option as [MIXED] a nested field_set collection
-        def expose(field_set_name, options = {})
-          field_set_name = field_set_name.to_sym
-          raise ActiveFacet::Errors::ConfigurationError.new(ActiveFacet::Errors::ConfigurationError::ALL_ATTRIBUTES_ERROR_MSG) if field_set_name == :all_attributes
-          raise ActiveFacet::Errors::ConfigurationError.new(ActiveFacet::Errors::ConfigurationError::ALL_FIELDS_ERROR_MSG) if field_set_name == :all
-          config.alias_field_set(field_set_name, options.key?(:as) ? options[:as] : field_set_name)
+        # @option as [MIXED] a nested facet collection
+        def expose(facet, options = {})
+          facet = facet.to_sym
+          raise ActiveFacet::Errors::ConfigurationError.new(ActiveFacet::Errors::ConfigurationError::ALL_ATTRIBUTES_ERROR_MSG) if facet == :all_attributes
+          raise ActiveFacet::Errors::ConfigurationError.new(ActiveFacet::Errors::ConfigurationError::ALL_FIELDS_ERROR_MSG) if facet == :all
+          config.alias_facet(facet, options.key?(:as) ? options[:as] : facet)
         end
 
         #DSL Defines an alias for common ActiveRecord attributes
@@ -65,7 +65,7 @@ module ActiveFacet
           expose :timestamps, as: [:id, :created_at, :updated_at]
         end
 
-        #DSL Registers the class type to be serialized
+        #DSL Registers the class type this serializer describes
         def resource_class(klass)
           config.resource_class = klass
         end
@@ -89,8 +89,9 @@ module ActiveFacet
 
       # INSTANCE METHODS
 
+      # TODO --jdc reimplement and rename
       # This method returns a hash suitable to pass into ActiveRecord.includes to avoid N+1
-      # @param field_set [Field Set] collections of fields to be serialized from this resource later
+      # @param facet [Facet] collections of fields to be serialized from this resource later
       # given:
       #  :basic is a defined collection
       #  :extended is a defined collection
@@ -107,10 +108,10 @@ module ActiveFacet
       #  [:basic, :extended, {orders: [:basic, :line_items]}]
       #  [:basic, :extended, {orders: [:basic, {line_items: :extended}]}]
       # @return [Hash]
-      def scoped_includes(field_set = nil, options = {})
+      def scoped_includes(facet = nil, options = {})
         result = {}
-        config.field_set_itterator(field_set) do |field, nested_field_set|
-          case value = scoped_include(field, nested_field_set, options)
+        config.facet_itterator(facet) do |field, nested_facet|
+          case value = scoped_include(field, nested_facet, options)
           when nil
           when Hash
             result.deep_merge! value
@@ -121,30 +122,32 @@ module ActiveFacet
         result
       end
 
-      # Gets flattened fields from a Field Set Alias
-      # @param field_set_alias [Symbol] to retrieve aliased field_sets for
+      # TODO --jdc reimplement and rename
+      # Gets flattened fields from a Facet Alias
+      # @param facet [Symbol] to retrieve fields for
       # @param include_relations [Boolean]
-      # @param include_nested_field_sets [Boolean]
+      # @param include_nested_facets [Boolean]
       # @return [Array] of symbols
-      def exposed_aliases(field_set_alias = :all, include_relations = false, include_nested_field_sets = false)
-        return include_nested_field_sets ? field_set_alias : [field_set_alias] unless normalized_field_sets = config.normalized_field_sets[field_set_alias]
-        result = normalized_field_sets[include_relations ? :fields : :attributes]
-        return result if include_nested_field_sets
+      def exposed_aliases(facet = :all, include_relations = false, include_nested_facets = false)
+        return include_nested_facets ? facet : [facet] unless normalized_facets = config.normalized_facets[facet]
+        result = normalized_facets[include_relations ? :fields : :attributes]
+        return result if include_nested_facets
         result.keys.map(&:to_sym).sort
       end
 
-      # This method returns a ActiveRecord model updated to match a JSON of hash values
-      # @param resource [ActiveRecord] to hydrate
-      # @param attribute [Hash] subset of the values returned by {resource.as_json}
-      # @return [ActiveRecord] resource
+      # Returns a resource instance updated with the attributes given
+      # @param resource [Class] to hydrate
+      # @param attributes [Hash] a subset of the values returned by {resource.as_json}
+      # @param options [Hash] collection of values required that are not available in lexical facet
+      # @return [Class] resource
       def from_hash(resource, attributes, options = {})
         ActiveFacet::Serializer::Facade.new(self, resource, options).from_hash(attributes)
       end
 
       # This method returns a JSON of hash values representing the resource(s)
-      # @param resource [ActiveRecord || Array] CollectionProxy object ::or:: a collection of resources
-      # @param options [Hash] collection of values required that are not available in lexical field_set
-      # @return [JSON] representing the resource
+      # @param resources [Class || Array] CollectionProxy object ::or:: a collection of resources
+      # @param options [Hash] collection of values required that are not available in lexical facet
+      # @return [JSON] fields defined by the facet
       def as_json(resources, options = {})
         resource_itterator(resources) do |resource|
           facade = ActiveFacet::Serializer::Facade.new(self, resource, options)
@@ -167,7 +170,7 @@ module ActiveFacet
         raise ActiveFacet::Errors::ConfigurationError.new(ActiveFacet::Errors::ConfigurationError::STACK_ERROR_MSG)
       end
 
-      # Itterates a resource collection invoking block
+      # Iterates a resource collection invoking block
       # @param resource [ActiveRecord || Array] to traverse
       # @param block [Block] to call for each resource
       def resource_itterator(resource)
@@ -180,16 +183,18 @@ module ActiveFacet
         end
       end
 
+      # TODO --jdc reimplement and rename
       # Returns fully normalized facet
       # @param field [Field]
-      # @param nested_field_set [Field]
-      # @return [Field Set]
-      def scoped_include(field, nested_field_set, options)
+      # @param nested_facet [Field]
+      # @param options [Hash] collection of values required that are not available in lexical facet
+      # @return [Facet]
+      def scoped_include(field, nested_facet, options)
         if is_association? field
           attribute = resource_attribute_name(field)
-          if nested_field_set
+          if nested_facet
             serializer_class = get_association_serializer_class(field, options)
-            attribute = { attribute => serializer_class.present? ? serializer_class.scoped_includes(nested_field_set, options) : nested_field_set }
+            attribute = { attribute => serializer_class.present? ? serializer_class.scoped_includes(nested_facet, options) : nested_facet }
           end
           attribute
         else
@@ -197,9 +202,11 @@ module ActiveFacet
         end
       end
 
+      # TODO --jdc reimplement and rename
       # Returns fully normalized facet for custom attribute serializers & extensions
       # @param field [Field]
-      # @return [Field Set]
+      # @param options [Hash] collection of values required that are not available in lexical facet
+      # @return [Facet]
       def custom_includes(field, options)
         attribute = resource_attribute_name(field)
         custom_serializer_name = config.serializers[attribute]

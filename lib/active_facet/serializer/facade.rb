@@ -8,7 +8,7 @@ module ActiveFacet
         :resource,                # Object to delegate to
         :options,                 # Options Hash passed to as_json
         :opts,                    # RCB specific options inside Options Hash
-        :fields,                  # Field Sets to apply
+        :fields,                  # Facets to apply
         :field_overrides,         # Field Overrides to apply
         :overrides,               # Field Overrides specific to resource
         :version,                 # Serializer version to apply
@@ -52,10 +52,9 @@ module ActiveFacet
         filters.to_s
       end
 
-      # This method returns a ActiveRecord model updated to match a JSON of hash values
-      # @param resource [ActiveRecord] to hydrate
-      # @param attribute [Hash] subset of the values returned by {resource.as_json}
-      # @return [ActiveRecord] resource
+      # Returns a resource instance updated with the attributes given
+      # @param attributes [Hash] a subset of the values returned by {resource.as_json}
+      # @return [Class] resource
       def from_hash(attributes)
         hydrate! ActiveFacet::Helper.deep_copy(attributes)
       end
@@ -72,14 +71,14 @@ module ActiveFacet
         overrides.blank? || overrides[field.to_sym]
       end
 
-      # Checks field to see if it is a relation that is valid have Field Sets applied to it
+      # Tells if expression is a relation that is valid have filters applied to it
       # @param expression [Symbol]
       # @return [Boolean]
       def is_expression_scopeable?(expression)
         resource.persisted? && is_active_relation?(expression) && is_relation_scopeable?(expression)
       end
 
-      # Checks field to see if expression is a relation
+      # Tells if expression is a relation
       # @return [Boolean]
       def is_active_relation?(expression)
         #NOTE -jdc let me know if anyone finds a better way to identify Proxy objects
@@ -87,17 +86,17 @@ module ActiveFacet
         expression.is_a?(ActiveRecord::Relation) || (expression.is_a?(Array) && expression.respond_to?(:scoped))
       end
 
-      # Checks expression to determine if filters are enabled
+      # Tells if filters are enabled for expression
       # @return [Boolean]
       def is_relation_scopeable?(expression)
         filters_enabled
       end
 
-      # This method returns a JSON of hash values representing the resource
+      # This method returns JSON of resource representing the facets provided
       # @return [JSON]
       def serialize!
         json = {}.with_indifferent_access
-        config.field_set_itterator(fields) do |scope, nested_scopes|
+        config.facet_itterator(fields) do |scope, nested_scopes|
           begin
             json[scope] = get_resource_attribute scope, nested_scopes if allowed_field?(scope)
           rescue ActiveFacet::Errors::AttributeError => e
@@ -109,9 +108,9 @@ module ActiveFacet
 
       # Gets serialized field from the resource
       # @param field [Symbol]
-      # @param nested_scope [Mixed] Field Set to pass for relations
+      # @param facet [Facet] to pass for relations
       # @return [Mixed]
-      def get_resource_attribute(field, nested_field_set)
+      def get_resource_attribute(field, facet)
         if config.namespaces.key? field
           if ns = get_resource_attribute!(config.namespaces[field])
             ns[serializer.resource_attribute_name(field).to_s]
@@ -120,15 +119,15 @@ module ActiveFacet
           end
         elsif config.extensions.key?(field)
           field
-        elsif serializer.is_association?(field)
-          get_association_attribute(field, nested_field_set)
+        elsif config.is_association?(field)
+          get_association_attribute(field, facet)
         else
           get_resource_attribute!(serializer.resource_attribute_name(field))
         end
       end
 
       # Invokes a method on the resource to retrieve the attribute value
-      # @param attribute [Symbol] identifies
+      # @param attribute [Symbol]
       # @return [Object]
       def get_resource_attribute!(attribute)
         raise ActiveFacet::Errors::AttributeError.new("#{resource.class.name}.#{attribute} missing") unless resource.respond_to?(attribute,true)
@@ -137,14 +136,15 @@ module ActiveFacet
 
       # Retrieves scoped association from cache or record
       # @param field [Symbol] attribute to get
+      # @param facet [Facet] to pass for relations
       # @return [Array | ActiveRelation] of ActiveRecord
-      def get_association_attribute(field, nested_field_set)
+      def get_association_attribute(field, facet)
         association = serializer.resource_attribute_name(field)
 
         ActiveFacet.document_cache.fetch_association(self, association, opts) do
           attribute = resource.send(association)
           attribute = attribute.scope_filters(filters) if is_expression_scopeable?(attribute)
-          ActiveFacet::Helper.restore_opts_after(options, ActiveFacet.fields_key, nested_field_set) do
+          ActiveFacet::Helper.restore_opts_after(options, ActiveFacet.fields_key, facet) do
             attribute.as_json(options)
           end
         end
@@ -164,20 +164,20 @@ module ActiveFacet
         json
       end
 
-      # This method returns a ActiveRecord model updated to match a JSON of hash values
-      # @param json [JSON] attributes identical to the values returned by {serialize}
+      # Returns the resource instance updated to match hash attibutes
+      # @param attributes [JSON] subset of the values returned by {serialize}
       # @return [ActiveRecord] resource
-      def hydrate!(json)
-        filter_allowed_keys! json, serializer.exposed_aliases
-        hydrate_scopes! json
-        json.each do |scope, value|
+      def hydrate!(attributes)
+        filter_allowed_keys! attributes, serializer.exposed_aliases
+        hydrate_scopes! attributes
+        attributes.each do |scope, value|
           set_resource_attribute scope, value
         end
 
         resource
       end
 
-      # Modifies json by reference to remove all attributes from json which aren't exposed
+      # Modifies json in place, removing all attributes which aren't explicitely exposed
       # @param json [JSON] structure
       # @param keys [Array] of attributes
       # @return [JSON]
@@ -189,7 +189,7 @@ module ActiveFacet
         } )
       end
 
-      # Modifies json by reference by applying custom hydration to all fields registered with custom serializers
+      # Modifies json in place, applying custom hydration to all fields registered with custom serializers
       # @param json [JSON] structure
       # @return [JSON]
       def hydrate_scopes!(json)

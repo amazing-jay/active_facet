@@ -41,8 +41,7 @@ module ActiveFacet
       receiver
     end
 
-    # Returns the list of filters the resource class implements
-    # Memoized
+    # (Memoized) Returns the list of filters the resource class implements
     # @param receiver [Class] resource class
     # @return [Hash] all filters registered on this resource (and superclass)
     def self.registered_filters_for(receiver)
@@ -54,6 +53,7 @@ module ActiveFacet
     end
 
     # Tells if any filters can be registered for the given resource class
+    # @param receiver [Class] resource class
     # @return [Boolean]
     def self.filterable?(receiver)
       receiver.ancestors.include? ActiveFacet::ActsAsActiveFacet

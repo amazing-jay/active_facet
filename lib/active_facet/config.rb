@@ -1,13 +1,16 @@
-#TODO --jdc rename field set to facet throughut project
-
-# Field = Symbol representing a json attribute that corresponds to resource attributes or extensions
-
-# Field Set = Nested, Mixed Collection of Fields, Aliases, and Relations (Strings, Symbols, Arrays and Hashes)
+### Legend ###
+# Attribute [Symbol] a getter/setter method defined on a resource
+# Relation [Symbol] an association defined on an ActiveRecord resource
+# Extension [Symbol] data that relates to a resource, but can not be accessed via Attribute
+# Field [Symbol] a json value that corresponds to a resource Attribute, Relation or Extension
+# Facet [Mixed] collection of Fields & nested Facets (Strings, Symbols, Arrays and Hashes)
 #  e.g. [:a, {b: "c"}]
-
-# Normalized Field Set = Field Set with all Strings converted to Symbols, Aliases dealiased, and Arrays converted to Hashes
-
-# Field Set Alias = Symbol representing a Field Set
+# Facet Alias [Facet] a Facet saved for later use
+# Normalized Facet [Facet] with
+#  Strings converted to Hashes of Symbols
+#  Aliases converted to Hashes of Fields
+#  Arrays converted to Hashes
+#  and Duplicate Fields merged
 
 module ActiveFacet
   class Config
@@ -16,12 +19,13 @@ module ActiveFacet
     # Boolean: state
     attr_accessor :compiled
 
-    # Hash: compiled field sets
-    attr_accessor :normalized_field_sets
+    # Hash: compiled Facets
+    attr_accessor :normalized_facets
 
     # Hash: keys are public API attribute names, values are resource attribute names
     attr_accessor :transforms_from, :transforms_to
 
+    # TODO --jdc rename to custom_serializers
     # Hash: API attribute names requiring custom serialization
     attr_accessor :serializers
 
@@ -35,11 +39,11 @@ module ActiveFacet
     attr_accessor :resource_class
 
     # Store Facet
-    # @param field_set_alias [Symbol]
-    # @param field_set_alias [Facet]
-    def alias_field_set(field_set_alias, field_set)
+    # @param facet_alias [Symbol]
+    # @param facet [Facet]
+    def alias_facet(facet_alias, facet)
       self.compiled = false
-      field_sets[field_set_alias] = field_set
+      facets[facet_alias] = facet
     end
 
     # Returns Field to resource attribute map
@@ -49,20 +53,20 @@ module ActiveFacet
       direction == :from ? transforms_from : transforms_to
     end
 
-    # (Memoized) Normalizes all Field Set Aliases
+    # (Memoized) Normalizes all Facet Aliases
     # @return [Config]
     def compile!
-      self.normalized_field_sets = { all: {} }.with_indifferent_access
+      self.normalized_facets = { all: {} }.with_indifferent_access
 
-      #aggregate all compiled field_sets into the all collection
-      normalized_field_sets[:all][:fields] = field_sets.inject({}) do |result, (field_set_alias, field_set)|
-        result = merge_field_sets(result, dealias_field_set!(field_set, field_set_alias)[:fields])
+      #aggregate all compiled facets into the all collection
+      normalized_facets[:all][:fields] = facets.inject({}) do |result, (facet_alias, facet)|
+        result = merge_facets(result, dealias_facet!(facet, facet_alias)[:fields])
       end
 
-      #filter all compiled field_sets into a corresponding attributes collection
-      normalized_field_sets.each do |field_set_alias, normalized_field_set|
-        normalized_field_set[:attributes] = normalized_field_set[:fields].reject { |field_set, nested_field_sets|
-          is_association?(field_set)
+      #filter all compiled facets into a corresponding attributes collection
+      normalized_facets.each do |facet_alias, normalized_facet|
+        normalized_facet[:attributes] = normalized_facet[:fields].reject { |facet, nested_facets|
+          is_association?(facet)
         }
       end
 
@@ -71,6 +75,7 @@ module ActiveFacet
     end
 
     # Merges all ancestor accessors into self
+    # @param config [Config]
     # @return [Config]
     def merge!(config)
       self.compiled = false
@@ -79,24 +84,26 @@ module ActiveFacet
       transforms_to.merge!    config.transforms_to
       serializers.merge!      config.serializers
       namespaces.merge!       config.namespaces
-      field_sets.merge!       config.field_sets
+      facets.merge!       config.facets
       extensions.merge!       config.extensions
 
       self
     end
 
-    # Invokes block on a Field Set with recursive, depth first traversal
-    # @param field_set [Field Set] to traverse
+    # Invokes block for each field in Normalized Facet
+    # Recursively evaluates all Aliases embedded within Facet
+    # - Does not recursively evalute associations
+    # @param facet [Facet]
     # @param block [Block] to call for each field
     # @return [Hash] injection of block results
-    def field_set_itterator(field_set)
+    def facet_itterator(facet)
       raise ActiveFacet::Errors::ConfigurationError.new(ActiveFacet::Errors::ConfigurationError::COMPILED_ERROR_MSG) unless compiled
-      internal_field_set_itterator(dealias_field_set!(default_field_set(field_set))[:fields], Proc.new)
+      internal_facet_itterator(dealias_facet!(default_facet(facet))[:fields], Proc.new)
     end
 
-    # Renames attribute between resource.attribute_name and json.attribute_name
-    # @param field [Symbol] attribute name
-    # @param direction [Symbol] to apply translation
+    # Translates Field into Attribute
+    # @param field [Symbol]
+    # @param direction [Symbol] (getter/setter)
     # @return [Symbol]
     def resource_attribute_name(field, direction = :from)
       (transforms(direction)[field] || field).to_sym
@@ -104,7 +111,7 @@ module ActiveFacet
 
     protected
 
-    attr_accessor :field_sets
+    attr_accessor :facets
 
     private
 
@@ -115,150 +122,155 @@ module ActiveFacet
       self.transforms_to    = {}.with_indifferent_access
       self.serializers      = {}.with_indifferent_access
       self.namespaces       = {}.with_indifferent_access
-      self.field_sets       = {}.with_indifferent_access
+      self.facets       = {}.with_indifferent_access
       self.extensions       = {}.with_indifferent_access
     end
 
-    # (Memoized) Convert all Field Set Aliases to their declarations and Normalize Field Set
-    # @param field_set [Symbol] to evaluate
-    # @param field_set_alias [String] key to associate the evaluated field set with
-    # @return [Normalized Field Set]
-    def dealias_field_set!(field_set, field_set_alias = nil)
-      field_set_alias ||= field_set.to_s.to_sym
-      normalized_field_sets[field_set_alias] ||= begin
-        { fields: normalize_field_set(dealias_field_set field_set) }
+    # (Memoized) Convert all Facet Aliases into Fields and Normalize Facet
+    # Recursively evaluates all Aliases embedded within Facet
+    # - Does not recursively evalute associations
+    # @param facet [Symbol] to evaluate
+    # @param facet_alias [String] key to memoize the Normalized Facet with
+    # @return [Normalized Facet]
+    def dealias_facet!(facet, facet_alias = nil)
+      facet_alias ||= facet.to_s.to_sym
+      normalized_facets[facet_alias] ||= begin
+        { fields: normalize_facet(dealias_facet facet) }
       end
     end
 
-    # Converts all Field Set Aliases in a Field Set into their declarations (see Serializer::Base DSL)
-    # Recursively evaluates all aliases embedded within declaration
+    # Convert all Facet Aliases into Fields
+    # Recursively evaluates all Aliases embedded within Facet
     # - Does not recursively evalute associations
-    # @param field_set [Symbol] to evaluate
+    # @param facet [Facet]
     # @return [Mixed]
-    def dealias_field_set(field_set)
-      case field_set
+    def dealias_facet(facet)
+      case facet
       when :all, 'all'
-        dealias_field_set normalized_field_sets[:all][:fields]
+        dealias_facet normalized_facets[:all][:fields]
       when :all_attributes, 'all_attributes'
-        dealias_field_set normalized_field_sets[:all][:attributes].keys.map(&:to_sym).sort
+        dealias_facet normalized_facets[:all][:attributes].keys.map(&:to_sym).sort
       when Symbol, String
-        field_set = field_set.to_sym
-        aliased_field_set?(field_set) ? dealias_field_set(field_sets[field_set]) : field_set
+        facet = facet.to_sym
+        aliased_facet?(facet) ? dealias_facet(facets[facet]) : facet
       when Array
-        field_set.map do |s|
-          dealias_field_set(s)
+        facet.map do |s|
+          dealias_facet(s)
         end
       when Hash
-        field_set.inject({}) { |result, (k,v)|
-          v.blank? ? inject_field_set(result, dealias_field_set(k)) : result[k] = v #todo: symbolize
+        facet.inject({}) { |result, (k,v)|
+          v.blank? ? inject_facet(result, dealias_facet(k)) : result[k] = v #todo: symbolize
           result
         }
       end
     end
 
-    # Converts Field Set into a Normalized Field Set that can be idempotently itterated
-    # @param field_set [Symbol] to normalize
-    # @return [Normalized Field Set]
-    def normalize_field_set(field_set)
-      case field_set
+    # Converts Facet into a Normalized Facet that can be itterated easily
+    # @param facet [Symbol]
+    # @return [Normalized Facet]
+    def normalize_facet(facet)
+      case facet
       when nil
         {}
       when Symbol, String
-        {field_set.to_sym => nil}
+        {facet.to_sym => nil}
       when Array
-        field_set.flatten.compact.inject({}) do |result, s|
-          result = merge_field_sets(result, s)
+        facet.flatten.compact.inject({}) do |result, s|
+          result = merge_facets(result, s)
         end
       when Hash
-        field_set.inject({}) { |result, (k,v)| result[k.to_sym] = v; result }
+        facet.inject({}) { |result, (k,v)| result[k.to_sym] = v; result }
       end
     end
 
-    # Adds :basic to a Field Set unless minimal is specified
-    # @param field_set [Field Set] field set to be serialized
-    # @return [Field Set]
-    def default_field_set(field_set)
-      minimal = detect_field_set(field_set, :minimal)
-      case field_set
+    # TODO --jdc add configuration for this
+    # Adds :basic to a Facet unless minimal is specified
+    # @param facet [Facet]
+    # @return [Facet]
+    def default_facet(facet)
+      minimal = detect_facet(facet, :minimal)
+      case facet
       when nil
         :basic
       when Symbol, String
-        minimal ? field_set.to_sym : [field_set.to_sym] | [:basic]
+        minimal ? facet.to_sym : [facet.to_sym] | [:basic]
       when Array
-        minimal ? field_set : field_set | [:basic]
+        minimal ? facet : facet | [:basic]
       when Hash
-        field_set[:basic] = nil unless minimal
-        field_set
+        facet[:basic] = nil unless minimal
+        facet
       else
-        raise ActiveFacet::Errors::ConfigurationError.new(ActiveFacet::Errors::ConfigurationError::FIELD_SET_ERROR_MSG)
+        raise ActiveFacet::Errors::ConfigurationError.new(ActiveFacet::Errors::ConfigurationError::FACET_ERROR_MSG)
       end
     end
 
-    # Iterrates the first level of Field Set checking for key
-    # @param field_set [Field Set]
+    # Tells if a Facets containts a Field or Alias
+    # Recursively evaluates all Aliases embedded within Facet
+    # - Does not recursively evalute associations
+    # @param facet [Facet]
+    # @param key [Symbol]
     # @return [Boolean]
-    def detect_field_set(field_set, key)
-      case field_set
+    def detect_facet(facet, key)
+      case facet
       when nil
         false
       when Symbol
-        field_set == key
+        facet == key
       when String
-        field_set.to_sym == key
+        facet.to_sym == key
       when Array
-        field_set.detect { |s| detect_field_set(s, key) }
+        facet.detect { |s| detect_facet(s, key) }
       when Hash
-        field_set.detect { |s, n| detect_field_set(s, key) }.try(:[], 0)
+        facet.detect { |s, n| detect_facet(s, key) }.try(:[], 0)
       else
-        raise ActiveFacet::Errors::ConfigurationError.new(ActiveFacet::Errors::ConfigurationError::FIELD_SET_ERROR_MSG)
+        raise ActiveFacet::Errors::ConfigurationError.new(ActiveFacet::Errors::ConfigurationError::FACET_ERROR_MSG)
       end
     end
 
-    # Invokes block on Fields in a Field Set with recursive, depth first traversal
-    # Skips fields already processed
-    # @param field_set [Field Set] to traverse
-    # @param block [Block] to call for each field_set
+    # Invokes block for each Field in a Facet
+    # @param facet [Facet] to traverse
+    # @param block [Block] to call for each facet
     # @return [Hash] injection of block results
-    def internal_field_set_itterator(field_set, block)
-      field_set.each do |field, nested_field_set|
-        block.call(field, nested_field_set)
+    def internal_facet_itterator(facet, block)
+      facet.each do |field, nested_facet|
+        block.call(field, nested_facet)
       end
     end
 
-    # Adds a Field into a Normalized Field Set
-    # @param field_set [Normalized Field Set]
-    # @param key [Field Set]
-    # @return [Hash]
-    def inject_field_set(field_set, key)
+    # Adds a Field to a Normalized Facet
+    # @param facet [Normalized Facet]
+    # @param key [Facet]
+    # @return [Normalized Facet]
+    def inject_facet(facet, key)
       case key
       when Symbol, String
-        field_set[key.to_sym] = {}
+        facet[key.to_sym] = {}
       when Hash
-        field_set.merge! key
+        facet.merge! key
       when Array
-        key.each { |k| inject_field_set(field_set, k) }
+        key.each { |k| inject_facet(facet, k) }
       end
-      field_set
+      facet
     end
 
-    # Tells if the Field is a Field Set Alias
-    # @param field_set [Symbol] to evaluate
+    # Tells if the Field is a Facet Alias
+    # @param facet [Symbol] to evaluate
     # @return [Boolean]
-    def aliased_field_set?(field_set)
-      return false unless field_sets.key? field_set
-      v = field_sets[field_set]
-      !v.is_a?(Symbol) || v != field_set
+    def aliased_facet?(facet)
+      return false unless facets.key? facet
+      v = facets[facet]
+      !v.is_a?(Symbol) || v != facet
     end
 
-    # Recursively merges two Field Sets
-    # @param a [Symbol] to merge
-    # @param b [Symbol] to merge
-    # @return [Field Set]
-    def merge_field_sets(a, b)
-      na = normalize_field_set(a)
-      nb = normalize_field_set(b)
-      nb.inject(na.dup) do |result, (field_set, nested_field_sets)|
-        result[field_set] = merge_field_sets(na[field_set], nested_field_sets)
+    # Recursively merges two Normalized Facets (deep)
+    # @param a [Normalized Facet] to merge
+    # @param b [Normalized Facet] to merge
+    # @return [Normalized Facet]
+    def merge_facets(a, b)
+      na = normalize_facet(a)
+      nb = normalize_facet(b)
+      nb.inject(na.dup) do |result, (facet, nested_facets)|
+        result[facet] = merge_facets(na[facet], nested_facets)
         result
       end
     end

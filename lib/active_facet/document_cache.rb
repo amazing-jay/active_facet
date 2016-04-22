@@ -1,14 +1,14 @@
-# A really dump cache interface that caches everything when enabled.
-# Extend and conditionally cache documents.
+# A really dumb cache interface that caches everything when enabled.
+# Extend and conditionally cache.
 module ActiveFacet
   class DocumentCache
     CACHE_PREFIX = 'af_doc_cache'
 
     # Fetches a JSON document representing the facade
-    # @param facade [Object] to cache
+    # @param facade [Facade] to cache
     # @param options [Hash] for Rails.cache.fetch
     # @param &block [Proc] for cache miss
-    # @return [Object]
+    # @return [JSON]
     def self.fetch(facade, options = {})
       return yield unless cacheable?(facade)
 
@@ -24,10 +24,10 @@ module ActiveFacet
     end
 
     # Fetches a JSON document representing the association specified for the resource in the facade
-    # @param facade [Object] to cache
+    # @param facade [Facade] to cache
     # @param options [Hash] for Rails.cache.fetch
     # @param &block [Proc] for cache miss
-    # @return [Object]
+    # @return [JSON]
     def self.fetch_association(facade, association, options = {})
       # override and implement
       yield

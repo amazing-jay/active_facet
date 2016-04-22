@@ -25,8 +25,7 @@ module ActiveFacet
     cattr_accessor :resource_mapper
     self.resource_mapper = method(:default_resource_mapper)
 
-    # Fetches the set of keys the resource_class might appear as for Filters and Fields
-    # Memoized
+    # (Memoized) Fetches the set of keys the resource_class might appear as for Filters and Fields
     # @param resource_class [Object]
     # @return [Array] of Strings
     def self.resource_map(resource_class)
@@ -35,14 +34,17 @@ module ActiveFacet
       end
     end
 
-    # Default serializer mapping scheme, can be overrided with config
-    # Memoized
+    # (Memoized) Default serializer mapping scheme, can be overrided with config
     # @param resource_class [Class]
+    # @param serializer_name [String]
+    # @param type [Symbol] :serializer | :attribute_serializer
+    # @param version [Numeric]
+    # @param options [Hash] context
     # @return [Serializer::Base | Class]
-    def self.default_serializer_mapper(resource_class, serializer, type, version, options)
-      key = [resource_class.name, serializer.to_s, type.to_s.camelcase, version].join(".")
+    def self.default_serializer_mapper(resource_class, serializer_name, type, version, options)
+      key = [resource_class.name, serializer_name.to_s, type.to_s.camelcase, version].join(".")
       return memoized_serializers[key] if memoized_serializers.key?(key)
-      memoized_serializers[key] = internal_serializer_mapper(resource_class, serializer, type, version, options)
+      memoized_serializers[key] = internal_serializer_mapper(resource_class, serializer_name, type, version, options)
     end
 
     # Holds reference to serializer_mapper method (configurable)
@@ -52,6 +54,10 @@ module ActiveFacet
     # TODO --jdc implement recursive superclass/parentclass lookup
     # Default serializer mapping scheme, can be overrided with config
     # @param resource_class [Class]
+    # @param serializer_name [String]
+    # @param type [Symbol] :serializer | :attribute_serializer
+    # @param version [Numeric]
+    # @param options [Hash] context
     # @return [Serializer::Base | Class]
     def self.internal_serializer_mapper(resource_class, serializer, type, version, options)
       case type
@@ -108,21 +114,21 @@ module ActiveFacet
     end
 
     # Safely extracts version from options hash
-    # @param options [Hast] including opts
+    # @param options [Hast] context including opts
     # @return [Numeric]
     def self.extract_version_from_opts(options)
       ((options.try(:[], ActiveFacet.opts_key) || {})[ActiveFacet.version_key] || ActiveFacet.default_version).to_f
     end
 
     # Safely extracts fields from options hash
-    # @param options [Hast] including opts
+    # @param options [Hast] context including opts
     # @return [Facet]
     def self.fields_from_options(options)
       (options[ActiveFacet.opts_key] || {})[ActiveFacet.fields_key]
     end
 
     # Safely injects fields into options hash
-    # @param options [Hast] including opts
+    # @param options [Hast] context including opts
     # @param fields [Symbol]
     # @return [Hash]
     def self.options_with_fields(options, fields)
@@ -132,7 +138,7 @@ module ActiveFacet
 
     # Resets the given key in options[opts_key] to original value after
     # injecting value provided and executing block
-    # @param options [Hast] including opts
+    # @param options [Hast] contextincluding opts
     # @param key [Symbol]
     # @param value [Object]
     # @return [Hash]

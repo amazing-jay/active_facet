@@ -285,9 +285,9 @@ describe ActiveFacet::Serializer::Facade do
   end
 
   describe ".get_resource_attribute" do
-    subject { instance.send(:get_resource_attribute, field, nested_field_set) }
+    subject { instance.send(:get_resource_attribute, field, nested_facet) }
     let(:resource) { create :resource_a, :with_children }
-    let(:nested_field_set) { :basic }
+    let(:nested_facet) { :basic }
     let(:filters) { {} }
     before do
       allow(instance).to receive(:get_resource_attribute!).and_call_original
@@ -350,8 +350,8 @@ describe ActiveFacet::Serializer::Facade do
   describe ".get_association_attribute" do
     let(:field) { :children }
     let(:resource) { create :resource_a, :with_children }
-    let(:nested_field_set) { :basic }
-    subject { instance.send(:get_association_attribute, field, nested_field_set ) }
+    let(:nested_facet) { :basic }
+    subject { instance.send(:get_association_attribute, field, nested_facet ) }
 
     context 'default' do
       let(:filters) { {} }

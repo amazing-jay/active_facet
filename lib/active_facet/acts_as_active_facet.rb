@@ -1,6 +1,5 @@
-#NOTE:: strive for minimal method footprint because this mixes into ActiveRecord
-
 # Adds interface methods to resource classes
+# NOTE:: methods are dynamically defined to achieve minimal method footprint because this mixes into ActiveRecord
 module ActiveFacet
   module ActsAsActiveFacet
     extend ActiveSupport::Concern
@@ -25,20 +24,20 @@ module ActiveFacet
 
         (class << self; self; end).instance_eval do
 
-          # Translates a Field Set into a deeply nested hash of included associations suitable for use by includes
-          # @param facets [Object]
+          # Translates a Facet into a deeply nested hash of included associations suitable for use by includes
+          # @param facet [Object]
           # @param options [Hash]
           # @return [Hash]
-          define_method(acts_as_active_facet_options[:includes_method_name]) do |facets = :basic, options = {}|
-            ActiveFacet::Helper.serializer_for(self, options).scoped_includes(facets)
+          define_method(acts_as_active_facet_options[:includes_method_name]) do |facet = :basic, options = {}|
+            ActiveFacet::Helper.serializer_for(self, options).scoped_includes(facet)
           end
 
-          # Invokes includes with all deeply nested associations found in the given Field Set
-          # @param field_set [Object]
+          # Invokes includes with all deeply nested associations found in the given Facet
+          # @param facet [Object]
           # @param options [Hash]
           # @return [ProxyCollection]
-          define_method(acts_as_active_facet_options[:apply_includes_method_name]) do |facets = :basic, options = {}|
-            includes(self.send(acts_as_active_facet_options[:includes_method_name], facets, options))
+          define_method(acts_as_active_facet_options[:apply_includes_method_name]) do |facet = :basic, options = {}|
+            includes(self.send(acts_as_active_facet_options[:includes_method_name], facet, options))
           end
 
           # Registers a Filter for this resource

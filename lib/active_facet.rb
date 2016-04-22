@@ -50,21 +50,25 @@ module ActiveFacet
   self.acts_as_active_facet_enabled   = false
   self.default_cache_options          = { expires_in: 5.minutes }
   self.document_cache                 = ActiveFacet::DocumentCache
-  #TODO --jdc implement dependency injection for all classes
+  #TODO --jdc implement dependency injection for all classes?
 
+  # Self referencing syntax for initializer
   def self.configure
     yield(self)
     ActiveRecord::Base.acts_as_active_facet if ActiveFacet.acts_as_active_facet_enabled
   end
 
+  # Register global filter to apply to resources later
   def self.global_filter(name)
     ActiveFacet::Filter.register_global(name, Proc.new)
   end
 
+  # Tell which filters and field_overrides apply to a given resource
   def self.resource_mapper
     ActiveFacet::Helper.resource_mapper = Proc.new
   end
 
+  # Tell which serializer to apply for a given resource
   def self.serializer_mapper
     ActiveFacet::Helper.serializer_mapper = Proc.new
   end

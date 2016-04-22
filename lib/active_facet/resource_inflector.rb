@@ -2,13 +2,15 @@ module ActiveFacet
   module ResourceInflector
     extend ActiveSupport::Concern
 
-    def resource_class
-      raise 'abstract method (implement me!)'
-    end
+    # Abstract method, ensure target implements
+    # def resource_class
+    #   raise 'abstract method (implement me!)'
+    # end
 
-    def resource_attribute_name(field)
-      raise 'abstract method (implement me!)'
-    end
+    # Abstract method, ensure target implements
+    # def resource_attribute_name(field)
+    #   raise 'abstract method (implement me!)'
+    # end
 
     # Constantizes an appropriate resource serializer class for relations
     # @param field [Symbol] to find relation reflection for
@@ -20,6 +22,7 @@ module ActiveFacet
 
     # Constantizes an appropriate resource serializer class
     # @param field [Symbol] to test as relation and find serializer class for
+    # @param options [Hash]
     # @return [Class | nil]
     def get_association_serializer_class(field, options)
       @association_serializers ||= {}

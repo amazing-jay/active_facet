@@ -147,11 +147,11 @@ describe ActiveFacet::Serializer::Base do
   end
 
   describe "#expose" do
-    subject { resource_serializer_class.expose(field_set_name, options) }
+    subject { resource_serializer_class.expose(facet_name, options) }
     let(:config) { resource_serializer_class.config }
-    let(:field_set_name) { :foo }
-    let(:field_set) { :bar }
-    let(:options) { { as: field_set } }
+    let(:facet_name) { :foo }
+    let(:facet) { :bar }
+    let(:options) { { as: facet } }
 
     context 'valid' do
       before do
@@ -159,22 +159,22 @@ describe ActiveFacet::Serializer::Base do
         instance
       end
 
-      it { expect(config.normalized_field_sets[field_set_name]["fields"].keys).to match_array([field_set.to_s]) }
-      it { expect(instance.config.normalized_field_sets[field_set_name]["fields"].keys).to match_array([field_set.to_s]) }
+      it { expect(config.normalized_facets[facet_name]["fields"].keys).to match_array([facet.to_s]) }
+      it { expect(instance.config.normalized_facets[facet_name]["fields"].keys).to match_array([facet.to_s]) }
 
       context "none" do
-        subject { resource_serializer_class.expose(field_set_name) }
-        it { expect(config.normalized_field_sets[field_set_name]["fields"].keys).to match_array([field_set_name.to_s]) }
-        it { expect(instance.config.normalized_field_sets[field_set_name]["fields"].keys).to match_array([field_set_name.to_s]) }
+        subject { resource_serializer_class.expose(facet_name) }
+        it { expect(config.normalized_facets[facet_name]["fields"].keys).to match_array([facet_name.to_s]) }
+        it { expect(instance.config.normalized_facets[facet_name]["fields"].keys).to match_array([facet_name.to_s]) }
       end
     end
 
     context "all" do
-      let(:field_set_name) { :all }
+      let(:facet_name) { :all }
       it { expect{subject}.to raise_error(ActiveFacet::Errors::ConfigurationError,ActiveFacet::Errors::ConfigurationError::ALL_FIELDS_ERROR_MSG) }
     end
     context "all_attributes" do
-      let(:field_set_name) { :all_attributes }
+      let(:facet_name) { :all_attributes }
       it { expect{subject}.to raise_error(ActiveFacet::Errors::ConfigurationError,ActiveFacet::Errors::ConfigurationError::ALL_ATTRIBUTES_ERROR_MSG) }
     end
   end
@@ -190,7 +190,7 @@ describe ActiveFacet::Serializer::Base do
 
     it { expect(config.serializers[:created_at]).to eq(:time) }
     it { expect(config.serializers[:updated_at]).to eq(:time) }
-    it { expect(config.normalized_field_sets[:timestamps]["fields"].keys).to match_array(['id', 'created_at', 'updated_at']) }
+    it { expect(config.normalized_facets[:timestamps]["fields"].keys).to match_array(['id', 'created_at', 'updated_at']) }
   end
 
   describe "instance methods" do
@@ -203,16 +203,16 @@ describe ActiveFacet::Serializer::Base do
     describe ".scoped_includes" do
       skip "todo: fix so that relations get dealiased (others should be in this set)"
 
-      subject { instance.scoped_includes(field_set) }
-      let(:field_set) { [{children: :one, alias_relation: :one}, :deep_relations, :extras] }
+      subject { instance.scoped_includes(facet) }
+      let(:facet) { [{children: :one, alias_relation: :one}, :deep_relations, :extras] }
       it { expect(subject).to eq({:children=>{}, :parent=>{:children=>{}}, :master=>{}, :extras=>{}}) }
     end
 
     describe ".exposed_aliases" do
-      subject { instance.exposed_aliases(field_set_alias, include_relations, include_nested_field_sets) }
-      let(:field_set_alias) { :all }
+      subject { instance.exposed_aliases(facet_alias, include_relations, include_nested_facets) }
+      let(:facet_alias) { :all }
       let(:include_relations) { false }
-      let(:include_nested_field_sets) { false }
+      let(:include_nested_facets) { false }
 
       context "all attributes" do
         it { expect(subject).to eq([:alias_attr, :alias_relation, :compound_attr, :custom_attr, :dynamic_attr, :explicit_attr, :extension_attr, :from_attr, :implicit_attr, :nested_attr, :nested_compound_attr, :private_attr, :to_attr]) }
@@ -226,18 +226,18 @@ describe ActiveFacet::Serializer::Base do
 
       context "all nested" do
         let(:include_relations) { true }
-        let(:include_nested_field_sets) { true }
+        let(:include_nested_facets) { true }
         it { expect(subject).to eq({"explicit_attr"=>{}, "alias_attr"=>{}, "from_attr"=>{}, "to_attr"=>{}, "nested_attr"=>{}, "custom_attr"=>{}, "compound_attr"=>{}, "nested_compound_attr"=>{}, "extension_attr"=>{}, "implicit_attr"=>{}, "dynamic_attr"=>{}, "private_attr"=>{}, "parent"=>{"children"=>{"attr"=>{}}}, "master"=>{}, "leader"=>{}, "children"=>{"nested"=>{}}, "others"=>{}, "extras"=>{"minimal"=>{}}, "alias_relation"=>{"implicit_attr"=>{}}}) }
       end
 
       context "named attributes" do
-        let(:field_set_alias) { :attrs }
+        let(:facet_alias) { :attrs }
         it { expect(subject).to eq([:alias_attr, :dynamic_attr, :explicit_attr, :from_attr, :implicit_attr, :private_attr, :to_attr]) }
       end
 
       context "named nested" do
-        let(:field_set_alias) { :attrs }
-        let(:include_nested_field_sets) { true }
+        let(:facet_alias) { :attrs }
+        let(:include_nested_facets) { true }
         it { expect(subject).to eq({"explicit_attr"=>{}, "implicit_attr"=>{}, "dynamic_attr"=>{}, "private_attr"=>{}, "alias_attr"=>{}, "to_attr"=>{}, "from_attr"=>{}}) }
       end
     end
@@ -278,9 +278,9 @@ describe ActiveFacet::Serializer::Base do
     end
 
     describe ".scoped_include" do
-      subject { instance.send(:scoped_include, field_set, nested_field_set, options) }
-      let(:field_set) { :parent }
-      let(:nested_field_set) { :children }
+      subject { instance.send(:scoped_include, facet, nested_facet, options) }
+      let(:facet) { :parent }
+      let(:nested_facet) { :children }
       let(:options) { {} }
       it { expect(subject).to eq({:parent=>{:children=>{}}}) }
     end
