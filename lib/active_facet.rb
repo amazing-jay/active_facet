@@ -1,17 +1,18 @@
-require 'w_g'
 require 'active_support/all'
 require 'active_record'
+require 'w_g'
 
 require 'active_facet/errors/attribute_error'
 require 'active_facet/errors/configuration_error'
 require 'active_facet/errors/lookup_error'
+require 'active_facet/helper'
+require 'active_facet/resource_inflector'
 require 'active_facet/filter'
 require 'active_facet/acts_as_active_facet'
 require 'active_facet/serializer/base'
 require 'active_facet/serializer/facade'
 require 'active_facet/config'
 require 'active_facet/document_cache'
-require 'active_facet/helper'
 require 'active_facet/version'
 
 module ActiveFacet

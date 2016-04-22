@@ -403,5 +403,41 @@ describe ActiveFacet::Serializer::Base do
         it { expect(subject).to eq(:bar) }
       end
     end
+
+    describe ".resource_attribute_name" do
+      subject { instance.resource_attribute_name(field, direction) }
+
+      context "from" do
+        let(:direction) { :from }
+        let(:field) { :from_attr }
+        it { expect(subject).to eq(:from_accessor) }
+
+        context "as" do
+          let(:field) { :alias_attr }
+          it { expect(subject).to eq(:aliased_accessor) }
+        end
+
+        context "none" do
+          let(:field) { :explicit_attr }
+          it { expect(subject).to eq(:explicit_attr) }
+        end
+      end
+
+      context "to" do
+        let(:direction) { :to }
+        let(:field) { :to_attr }
+        it { expect(subject).to eq(:to_accessor) }
+
+        context "as" do
+          let(:field) { :aliased_accessor }
+          it { expect(subject).to eq(:aliased_accessor) }
+        end
+
+        context "none" do
+          let(:field) { :explicit_attr }
+          it { expect(subject).to eq(:explicit_attr) }
+        end
+      end
+    end
   end
 end

@@ -3,14 +3,15 @@ module ActiveFacet
   module Serializer
     module Base
       extend ActiveSupport::Concern
+      included do
+        include ActiveFacet::ResourceInflector
+        delegate :resource_class, :resource_attribute_name, to: :config
+      end
 
       module ClassMethods
-
         # ###
         # DSL
         # ###
-
-        # See Readme.md
 
         # DSL Defines a transform to rename or reformat an attribute
         # @param api_attribute [Symbol] name of the attribute
@@ -157,70 +158,11 @@ module ActiveFacet
         @config ||= self.class.config
       end
 
-      # ^^ START REFLECTOR
-      ### TODO --jdc move all this to a reflector class, instance holding resource_class, and store in config
-
-      # Constantizes the appropriate resource serializer class
-      # @return [Class]
-      def resource_class
-        @resource_class ||= config.resource_class
-      end
-
-      # Constantizes an appropriate resource serializer class for relations
-      # @param field [Symbol] to find relation reflection for
-      # @return [Reflection | nil]
-      def get_association_reflection(field)
-        @association_reflections ||= {}
-        @association_reflections[field] ||= resource_class.reflect_on_association(resource_attribute_name(field).to_sym)
-      end
-
-      # Constantizes an appropriate resource serializer class
-      # @param field [Symbol] to test as relation and find serializer class for
-      # @return [Class | nil]
-      def get_association_serializer_class(field, options)
-        @association_serializers ||= {}
-        unless @association_serializers.key? field
-          @association_serializers[field] = nil
-          #return nil if field isn't an association
-          if reflection = get_association_reflection(field)
-            #return nil if association doesn't have a custom class
-            @association_serializers[field] = ActiveFacet::Helper.serializer_for(reflection.klass, options)
-          end
-        end
-        @association_serializers[field]
-      end
-
-      # Constantizes an appropriate attribute serializer class
-      # @param attribute [Symbol] base_name of attribute serializer class to find
-      # @param options [Hash]
-      # @return [Class | nil]
-      def get_custom_serializer_class(attribute, options)
-        @custom_serializers ||= {}
-        @custom_serializers[attribute] ||= ActiveFacet::Helper.attribute_serializer_class_for(resource_class, attribute, options)
-      end
-
-      # Determines if public attribute maps to a private relation
-      # @param field [Symbol] public attribute name
-      # @return [Boolean]
-      def is_association?(field)
-        !!get_association_reflection(field)
-      end
-
-      # Renames attribute between resource.attribute_name and json.attribute_name
-      # @param field [Symbol] attribute name
-      # @param direction [Symbol] to apply translation
-      # @return [Symbol]
-      def resource_attribute_name(field, direction = :from)
-        (config.transforms(direction)[field] || field).to_sym
-      end
-
-      ### TODO ^^ END REFLECTOR
-
       protected
 
       # @return [Serializer::Base]
       def initialize
-        config.compile! self
+        config.compile!
       rescue SystemStackError => e
         raise ActiveFacet::Errors::ConfigurationError.new(ActiveFacet::Errors::ConfigurationError::STACK_ERROR_MSG)
       end
@@ -238,17 +180,18 @@ module ActiveFacet
         end
       end
 
+      # TODO --jdc remove this after greening
       # Removes self.class_name from the end of self.module_name
       # @return [String]
-      def module_base_name
-        @module_base_name ||= module_name.deconstantize
-      end
+      # def module_base_name
+      #   @module_base_name ||= module_name.deconstantize
+      # end
 
-      # Removes self.class_name from the end of self.class.name
-      # @return [String]
-      def module_name
-        @module_name ||= self.class.name.deconstantize
-      end
+      # # Removes self.class_name from the end of self.class.name
+      # # @return [String]
+      # def module_name
+      #   @module_name ||= self.class.name.deconstantize
+      # end
 
       # Returns fully normalized facet
       # @param field [Field]

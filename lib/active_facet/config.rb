@@ -11,8 +11,7 @@
 
 module ActiveFacet
   class Config
-
-    #TODO --decouple this class completely from serializer by moving reflection to resource_manager
+    include ActiveFacet::ResourceInflector
 
     # Boolean: state
     attr_reader :compiled
@@ -54,9 +53,8 @@ module ActiveFacet
     end
 
     # (Memoized) Normalizes all Field Set Aliases
-    # @param serializer [Serializer::Base]
     # @return [Config]
-    def compile!(serializer)
+    def compile!
       self.serializer = serializer
       self.normalized_field_sets = { all: {} }.with_indifferent_access
 
@@ -68,7 +66,7 @@ module ActiveFacet
       #filter all compiled field_sets into a corresponding attributes collection
       normalized_field_sets.each do |field_set_alias, normalized_field_set|
         normalized_field_set[:attributes] = normalized_field_set[:fields].reject { |field_set, nested_field_sets|
-          serializer.send :is_association?, field_set
+          is_association?(field_set)
         }
       end
 
@@ -139,9 +137,9 @@ module ActiveFacet
     def dealias_field_set(field_set)
       case field_set
       when :all, 'all'
-        dealias_field_set serializer.exposed_aliases(:all, true, true)
+        dealias_field_set normalized_field_sets[:all][:fields]
       when :all_attributes, 'all_attributes'
-        dealias_field_set serializer.exposed_aliases
+        dealias_field_set normalized_field_sets[:all][:attributes].keys.map(&:to_sym).sort
       when Symbol, String
         field_set = field_set.to_sym
         aliased_field_set?(field_set) ? dealias_field_set(field_sets[field_set]) : field_set
@@ -184,9 +182,9 @@ module ActiveFacet
       when nil
         :basic
       when Symbol, String
-        minimal ? field_set.to_sym : [field_set.to_sym, :basic]
+        minimal ? field_set.to_sym : [field_set.to_sym] | [:basic]
       when Array
-        minimal ? field_set : field_set + [:basic]
+        minimal ? field_set : field_set | [:basic]
       when Hash
         field_set[:basic] = nil unless minimal
         field_set
@@ -264,5 +262,12 @@ module ActiveFacet
       end
     end
 
+    # Renames attribute between resource.attribute_name and json.attribute_name
+    # @param field [Symbol] attribute name
+    # @param direction [Symbol] to apply translation
+    # @return [Symbol]
+    def resource_attribute_name(field, direction = :from)
+      (transforms(direction)[field] || field).to_sym
+    end
   end
 end

@@ -3,19 +3,12 @@ require 'spec_helper'
 describe ActiveFacet::Config do
   subject { instance }
   before do
-    allow(serializer).to receive(:is_association?) { |attribute| attribute.to_s.start_with?('assocation') }
-    allow(serializer).to receive(:exposed_aliases) { |field_set_alias = :all, include_relations = false, include_nested_field_sets = false|
-      return include_nested_field_sets ? field_set_alias : [field_set_alias] unless normalized_field_sets = instance.normalized_field_sets[field_set_alias]
-      result = normalized_field_sets[include_relations ? :fields : :attributes]
-      return result if include_nested_field_sets
-      result.keys.map(&:to_sym).sort
-    }
     prehook
   end
 
   let(:prehook) { }
   let(:instance) { described_class.new }
-  let(:serializer) { double('serializer') }
+  let(:resource_class) { ResourceA }
   let(:attrs) { [
     :transforms_from,
     :transforms_to,
@@ -26,7 +19,7 @@ describe ActiveFacet::Config do
 
   describe "public attributes" do
     it { expect(described_class.instance_methods).to include(
-      :serializer,
+      :resource_class,
       :normalized_field_sets,
       :transforms_from,
       :transforms_to,
@@ -38,7 +31,7 @@ describe ActiveFacet::Config do
 
   describe ".initialize" do
     it { expect(subject.compiled).to              be false }
-    it { expect(subject.serializer).to            be nil }
+    it { expect(subject.resource_class).to        be nil }
     it { expect(subject.normalized_field_sets).to be nil }
     it { expect(subject.transforms_from).to       eq({}) }
     it { expect(subject.transforms_to).to         eq({}) }
@@ -66,14 +59,14 @@ describe ActiveFacet::Config do
   end
 
   describe ".compile!" do
-    subject { instance.compile!(serializer) }
+    subject { instance.compile! }
 
     before do
       instance.alias_field_set :test, [:a, {b: :c}, {d: :e}]
+      instance.resource_class = resource_class
     end
 
     it { expect(subject.compiled).to be true }
-    it { expect(subject.serializer).to eq(serializer) }
     it { expect(subject.normalized_field_sets).to eq({"all"=>{"fields"=>{"a"=>{}, "b"=>{"c"=>{}}, "d"=>{"e"=>{}}}, "attributes"=>{"a"=>{}, "b"=>{"c"=>{}}, "d"=>{"e"=>{}}}}, "test"=>{"fields"=>{"a"=>{}, "b"=>{"c"=>{}}, "d"=>{"e"=>{}}}, "attributes"=>{"a"=>{}, "b"=>{"c"=>{}}, "d"=>{"e"=>{}}}}}) }
   end
 
@@ -97,7 +90,10 @@ describe ActiveFacet::Config do
   end
 
   describe "post compile methods" do
-    let(:prehook) { instance.compile!(serializer) }
+    let(:prehook) {
+      instance.resource_class = resource_class
+      instance.compile!
+    }
 
     describe ".field_set_itterator" do
       subject {
@@ -117,7 +113,8 @@ describe ActiveFacet::Config do
       context "dirty compiled" do
         let(:field_set) { :a }
         let(:prehook) {
-          instance.compile!(serializer)
+          instance.resource_class = resource_class
+          instance.compile!
           instance.alias_field_set(:bar, :bar )
         }
         it { expect{subject}.to raise_error(ActiveFacet::Errors::ConfigurationError, ActiveFacet::Errors::ConfigurationError::COMPILED_ERROR_MSG)}
@@ -176,7 +173,8 @@ describe ActiveFacet::Config do
           instance.alias_field_set(:bar, [[:bb, {cc: nil, dd: :ee}]] )
           instance.alias_field_set(:empty, [] )
           instance.alias_field_set(:identity, :identity )
-          instance.compile!(serializer)
+          instance.resource_class = resource_class
+          instance.compile!
         }
 
         context "minimal" do
@@ -235,7 +233,8 @@ describe ActiveFacet::Config do
           instance.alias_field_set(:c, [:a, :d])
           instance.alias_field_set(:basic, [:c, :e])
           instance.alias_field_set(:minimal, [:e, :f])
-          instance.compile!(serializer)
+          instance.resource_class = resource_class
+          instance.compile!
         }
 
         before do
@@ -284,7 +283,8 @@ describe ActiveFacet::Config do
           instance.alias_field_set(:c, [:a, :d, :association_a, { association_b: :aliased } ])
           instance.alias_field_set(:basic, [:c, :e])
           instance.alias_field_set(:minimal, [:e, :f])
-          instance.compile!(serializer)
+          instance.resource_class = resource_class
+          instance.compile!
         }
 
         context "string" do
@@ -299,7 +299,7 @@ describe ActiveFacet::Config do
 
         context "all" do
           let(:field_set) { :all }
-          it { expect(subject).to eq([:a, :association_a, :association_b, :b, :d, :e, :f]) }
+          it { expect(subject).to eq({:a=>{}, :b=>{}, :d=>{}, :association_a=>{}, "association_b"=>{"aliased"=>{}}, :e=>{}, :f=>{}}) }
         end
 
         context "all_attributes" do
@@ -356,7 +356,7 @@ describe ActiveFacet::Config do
 
           context "basic" do
             let(:field_set) { :basic }
-            it { expect(subject).to eq([:basic, :basic]) }
+            it { expect(subject).to eq([:basic]) }
           end
 
           context "minimal" do
@@ -371,7 +371,7 @@ describe ActiveFacet::Config do
 
           context "basic" do
             let(:field_set) { 'basic' }
-            it { expect(subject).to eq([:basic, :basic]) }
+            it { expect(subject).to eq([:basic]) }
           end
 
           context "minimal" do
@@ -386,7 +386,7 @@ describe ActiveFacet::Config do
 
           context "basic" do
             let(:field_set) { ['foo', :basic, :bar, { alpha: :centuri }] }
-            it { expect(subject).to eq(['foo', :basic, :bar, { alpha: :centuri }, :basic]) }
+            it { expect(subject).to eq(['foo', :basic, :bar, { alpha: :centuri }]) }
           end
 
           context "embedded basic" do
@@ -567,7 +567,8 @@ describe ActiveFacet::Config do
           instance.alias_field_set(:a, :a)
           instance.alias_field_set(:b, :a)
           instance.alias_field_set(:c, [:a, :d, :association_a, { association_b: :aliased } ])
-          instance.compile!(serializer)
+          instance.resource_class = resource_class
+          instance.compile!
         }
 
         context 'not found' do
