@@ -67,30 +67,6 @@ module ActiveFacet
   def self.serializer_mapper
     ActiveFacet::Helper.serializer_mapper = Proc.new
   end
-
-  #TODO --jdc move the below into helper
-
-  def self.fields_from_options(options)
-    (options[ActiveFacet.opts_key] || {})[ActiveFacet.fields_key]
-  end
-
-  def self.options_with_fields(options, fields)
-    (options[ActiveFacet.opts_key] ||= {})[ActiveFacet.fields_key] = fields
-    options
-  end
-
-  def self.restore_opts_after(options, key, value)
-    opts = (options[ActiveFacet.opts_key] ||= {})
-    old = opts[key]
-    opts[key] = value
-    yield
-  ensure
-    opts[key] = old
-  end
-
-  def self.deep_copy(o)
-    Marshal.load(Marshal.dump(o))
-  end
 end
 
 ActiveRecord::Base.send :include, ActiveFacet::ActsAsActiveFacet

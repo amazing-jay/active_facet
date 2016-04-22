@@ -108,9 +108,49 @@ module ActiveFacet
     end
 
     # Safely extracts version from options hash
+    # @param options [Hast] including opts
     # @return [Numeric]
     def self.extract_version_from_opts(options)
       ((options.try(:[], ActiveFacet.opts_key) || {})[ActiveFacet.version_key] || ActiveFacet.default_version).to_f
     end
+
+    # Safely extracts fields from options hash
+    # @param options [Hast] including opts
+    # @return [Facet]
+    def self.fields_from_options(options)
+      (options[ActiveFacet.opts_key] || {})[ActiveFacet.fields_key]
+    end
+
+    # Safely injects fields into options hash
+    # @param options [Hast] including opts
+    # @param fields [Symbol]
+    # @return [Hash]
+    def self.options_with_fields(options, fields)
+      (options[ActiveFacet.opts_key] ||= {})[ActiveFacet.fields_key] = fields
+      options
+    end
+
+    # Resets the given key in options[opts_key] to original value after
+    # injecting value provided and executing block
+    # @param options [Hast] including opts
+    # @param key [Symbol]
+    # @param value [Object]
+    # @return [Hash]
+    def self.restore_opts_after(options, key, value)
+      opts = (options[ActiveFacet.opts_key] ||= {})
+      old = opts[key]
+      opts[key] = value
+      yield
+    ensure
+      opts[key] = old
+    end
+
+    # Safe alternative to dup!
+    # @param o [Object]
+    # @return [o] full memory copy of o
+    def self.deep_copy(o)
+      Marshal.load(Marshal.dump(o))
+    end
+
   end
 end

@@ -55,7 +55,7 @@ module ActiveFacet
       # @param attribute [Hash] subset of the values returned by {resource.as_json}
       # @return [ActiveRecord] resource
       def from_hash(attributes)
-        hydrate! ActiveFacet.deep_copy(attributes)
+        hydrate! ActiveFacet::Helper.deep_copy(attributes)
       end
 
       private
@@ -150,7 +150,7 @@ module ActiveFacet
         ActiveFacet.document_cache.fetch_association(self, association, opts) do
           attribute = resource.send(association)
           attribute = attribute.scope_filters(filters) if is_expression_scopeable?(attribute)
-          ActiveFacet.restore_opts_after(options, ActiveFacet.fields_key, nested_field_set) do
+          ActiveFacet::Helper.restore_opts_after(options, ActiveFacet.fields_key, nested_field_set) do
             attribute.as_json(options)
           end
         end
@@ -162,7 +162,7 @@ module ActiveFacet
       def apply_custom_serializers!(json)
         config.serializers.each do |scope, type|
           scope_s = scope
-          json[scope_s] = ActiveFacet.restore_opts_after(options, ActiveFacet.fields_key, fields) do
+          json[scope_s] = ActiveFacet::Helper.restore_opts_after(options, ActiveFacet.fields_key, fields) do
             serializer.get_custom_serializer_class(type, options).serialize(json[scope_s], resource, options)
           end if json.key? scope_s
         end

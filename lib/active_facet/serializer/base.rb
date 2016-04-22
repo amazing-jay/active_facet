@@ -1,4 +1,3 @@
-#TODO --jdc rebuild this class to either use an explicit singleton pattern or use a factory pattern
 # Mixin providing DSL for ActiveFacet Serializers and a handful of public methods which reflect on the DSL
 module ActiveFacet
   module Serializer

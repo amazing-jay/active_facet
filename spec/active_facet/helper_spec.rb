@@ -218,4 +218,69 @@ describe ActiveFacet::Helper do
       it { expect(subject).to eq(2.0) }
     end
   end
+
+
+  describe 'fields_from_options' do
+    subject { described_class.fields_from_options(options) }
+    let(:fields) { :hello }
+
+    context "empty" do
+      let(:options) { {} }
+      it { expect(subject).to eq(nil) }
+    end
+
+    context "nested empty" do
+      let(:options) { make_options({}) }
+      it { expect(subject).to eq(nil) }
+    end
+
+    context "present" do
+      let(:options) { make_options fields: fields }
+      it { expect(subject).to eq(:hello) }
+    end
+  end
+
+  describe 'options_with_fields' do
+    subject { described_class.options_with_fields(options, fields) }
+    let(:fields) { :hello }
+
+    context "empty" do
+      let(:options) { {} }
+      it { expect(subject).to eq({:af_opts=>{:fields=>:hello}}) }
+    end
+
+    context "nested empty" do
+      let(:options) { make_options({}) }
+      it { expect(subject).to eq({:af_opts=>{:fields=>:hello, :field_overrides=>nil, :version=>nil, :filters=>nil}}) }
+    end
+
+    context "present" do
+      let(:options) { make_options fields: :whatnot }
+      it { expect(subject).to eq({:af_opts=>{:fields=>:hello, :field_overrides=>nil, :version=>nil, :filters=>nil}}) }
+    end
+  end
+
+  describe 'restore_opts_after' do
+    subject { described_class.restore_opts_after(options, key, value) {
+      options[ActiveFacet.opts_key][key] = value
+      :return_value
+    } }
+    let(:options) { make_options(key => original_value) }
+    let(:key) { :fields }
+    let(:value) { :bar }
+    let(:original_value) { :foo }
+
+    it { expect(subject).to eq(:return_value) }
+    it { expect(options[ActiveFacet.opts_key][key]).to eq(original_value) }
+  end
+
+  describe ".deep_copy" do
+    let(:obj) { { a: [:b,:c], d: { e: :f } } }
+    subject { described_class.deep_copy(obj) }
+    before do
+      subject[:d][:e] = :g
+    end
+    it { expect(obj).to eq({ a: [:b,:c], d: { e: :f } }) }
+    it { expect(subject).to eq({ a: [:b,:c], d: { e: :g } }) }
+  end
 end
