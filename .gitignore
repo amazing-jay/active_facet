@@ -11,3 +11,4 @@
 /spec/dummy/db/test.sqlite3
 /spec/dummy/tmp/cache
 /todos
+/.idea/
