@@ -33,17 +33,7 @@ module ActiveFacet
         self.filters_enabled  = opts.key?(ActiveFacet.filters_force_key) ? opts[ActiveFacet.filters_force_key] : ActiveFacet.filters_enabled
       end
 
-      # This method returns a JSON of hash values representing the resource
-      # @param resource [ActiveRecord || Array] CollectionProxy object ::or:: a collection of resources
-      # @param opts [Hash] collection of values required that are not available in lexical scope
-      # @return [JSON] representing the values returned by {resource.serialize} method
-      def as_json
-        ActiveFacet.document_cache.fetch(self) {
-          serialize!
-        }
-      end
-
-      # @return [String] a cache key that can be used to identify this resource
+      # @return [String] a cache key that identify the facets of this resource
       def cache_key
         version.to_s +
         resource.cache_key +
@@ -52,26 +42,37 @@ module ActiveFacet
         filters.to_s
       end
 
+
+      # @return [JSON] representing the facets of resource
+      def serialize
+        ActiveFacet.document_cache.fetch(self) {
+          serialize!
+        }
+      end
+
       # Returns a resource instance updated with the attributes given
-      # @param attributes [Hash] a subset of the values returned by {resource.as_json}
+      # @param attributes [Hash] a subset of the values returned by `resource.serialize`
       # @return [Class] resource
-      def from_hash(attributes)
-        hydrate! ActiveFacet::Helper.deep_copy(attributes)
+      def unserialize(attributes)
+        unserialize! ActiveFacet::Helper.deep_copy(attributes)
       end
 
       private
 
+      # Memoized
       # @return [Config]
       def config
         @config ||= serializer.config
       end
 
+      # Tells if field should be serialized
+      # @param field [Symbol]
       # @return [Boolean]
       def allowed_field?(field)
         overrides.blank? || overrides[field.to_sym]
       end
 
-      # Tells if expression is a relation that is valid have filters applied to it
+      # Tells if expression is a relation that can have filters applied to it
       # @param expression [Symbol]
       # @return [Boolean]
       def is_expression_scopeable?(expression)
@@ -79,6 +80,7 @@ module ActiveFacet
       end
 
       # Tells if expression is a relation
+      # @param expression [Symbol]
       # @return [Boolean]
       def is_active_relation?(expression)
         #NOTE -jdc let me know if anyone finds a better way to identify Proxy objects
@@ -87,6 +89,7 @@ module ActiveFacet
       end
 
       # Tells if filters are enabled for expression
+      # @param expression [Symbol]
       # @return [Boolean]
       def is_relation_scopeable?(expression)
         filters_enabled
@@ -108,9 +111,9 @@ module ActiveFacet
 
       # Gets serialized field from the resource
       # @param field [Symbol]
-      # @param facet [Facet] to pass for relations
+      # @param nested_facet [Facet] for relations
       # @return [Mixed]
-      def get_resource_attribute(field, facet)
+      def get_resource_attribute(field, nested_facet)
         if config.namespaces.key? field
           if ns = get_resource_attribute!(config.namespaces[field])
             ns[serializer.resource_attribute_name(field).to_s]
@@ -120,7 +123,7 @@ module ActiveFacet
         elsif config.extensions.key?(field)
           field
         elsif config.is_association?(field)
-          get_association_attribute(field, facet)
+          get_association_attribute(field, nested_facet)
         else
           get_resource_attribute!(serializer.resource_attribute_name(field))
         end
@@ -136,29 +139,29 @@ module ActiveFacet
 
       # Retrieves scoped association from cache or record
       # @param field [Symbol] attribute to get
-      # @param facet [Facet] to pass for relations
+      # @param nested_facet [Facet] to pass for relations
       # @return [Array | ActiveRelation] of ActiveRecord
-      def get_association_attribute(field, facet)
+      def get_association_attribute(field, nested_facet)
         association = serializer.resource_attribute_name(field)
 
         ActiveFacet.document_cache.fetch_association(self, association, opts) do
           attribute = resource.send(association)
           attribute = attribute.scope_filters(filters) if is_expression_scopeable?(attribute)
-          ActiveFacet::Helper.restore_opts_after(options, ActiveFacet.fields_key, facet) do
+          ActiveFacet::Helper.restore_opts_after(options, ActiveFacet.fields_key, nested_facet) do
+            #TODO --jdc extend this to allow for other kinds of serialization
             attribute.as_json(options)
           end
         end
       end
 
-      # Modifies json by reference by applying custom serializers to all attributes registered with custom serializers
+      # Modifies json by reference by applying custom serializers to all fields registered with custom serializers
       # @param json [JSON] structure
       # @return [JSON]
       def apply_custom_serializers!(json)
-        config.serializers.each do |scope, type|
-          scope_s = scope
-          json[scope_s] = ActiveFacet::Helper.restore_opts_after(options, ActiveFacet.fields_key, fields) do
-            serializer.get_custom_serializer_class(type, options).serialize(json[scope_s], resource, options)
-          end if json.key? scope_s
+        config.serializers.each do |field, type|
+          json[field] = ActiveFacet::Helper.restore_opts_after(options, ActiveFacet.fields_key, fields) do
+            serializer.get_custom_serializer_class(type, options).serialize(json[field], resource, options)
+          end if json.key? field
         end
 
         json
@@ -167,9 +170,9 @@ module ActiveFacet
       # Returns the resource instance updated to match hash attibutes
       # @param attributes [JSON] subset of the values returned by {serialize}
       # @return [ActiveRecord] resource
-      def hydrate!(attributes)
-        filter_allowed_keys! attributes, serializer.exposed_aliases
-        hydrate_scopes! attributes
+      def unserialize!(attributes)
+        filter_allowed_keys! attributes, config.normalized_facets[:all][:attributes].keys
+        apply_custom_unserializers! attributes
         attributes.each do |scope, value|
           set_resource_attribute scope, value
         end
@@ -192,10 +195,9 @@ module ActiveFacet
       # Modifies json in place, applying custom hydration to all fields registered with custom serializers
       # @param json [JSON] structure
       # @return [JSON]
-      def hydrate_scopes!(json)
-        config.serializers.each do |scope, type|
-          scope_s = scope
-          json[scope_s] = serializer.get_custom_serializer_class(type, options).hydrate(json[scope], resource, options) if json.key? scope_s
+      def apply_custom_unserializers!(json)
+        config.serializers.each do |field, type|
+          json[field] = serializer.get_custom_serializer_class(type, options).unserialize(json[field], resource, options) if json.key? field
         end
         json
       end

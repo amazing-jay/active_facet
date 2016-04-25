@@ -2,11 +2,6 @@ require 'spec_helper'
 
 describe ActiveFacet::Serializer::Base do
 
-  skip "make scoped_includes, as_json & from_hash generic"
-  # TODO --jdc, change serializer scoped_includes, as_json & from_hash to be generic and add voerrides in initializer for www
-  #  when serializing, access cattr to determine method name to invoke
-  # add tests for the this module
-
   include TestHarnessHelper
 
   let(:resource_serializer_class) { build_resource_serializer_class }
@@ -200,63 +195,44 @@ describe ActiveFacet::Serializer::Base do
       reset_serializer_classes
     end
 
-    describe ".scoped_includes" do
+    describe ".includes" do
       skip "todo: fix so that relations get dealiased (others should be in this set)"
 
-      subject { instance.scoped_includes(facet) }
+      subject { instance.includes(facet) }
       let(:facet) { [{children: :one, alias_relation: :one}, :deep_relations, :extras] }
       it { expect(subject).to eq({:children=>{}, :parent=>{:children=>{}}, :master=>{}, :extras=>{}}) }
     end
 
-    describe ".exposed_aliases" do
-      subject { instance.exposed_aliases(facet_alias, include_relations, include_nested_facets) }
+    describe ".explode" do
+      subject { instance.explode(facet_alias) }
       let(:facet_alias) { :all }
-      let(:include_relations) { false }
-      let(:include_nested_facets) { false }
 
       context "all attributes" do
-        it { expect(subject).to eq([:alias_attr, :alias_relation, :compound_attr, :custom_attr, :dynamic_attr, :explicit_attr, :extension_attr, :from_attr, :implicit_attr, :nested_attr, :nested_compound_attr, :private_attr, :to_attr]) }
-      end
-
-      context "all fields" do
         skip "todo: fix so that relations get dealiased (alias_relation should not be in this set)"
-        let(:include_relations) { true }
-        it { expect(subject).to eq([:alias_attr, :alias_relation, :children, :compound_attr, :custom_attr, :dynamic_attr, :explicit_attr, :extension_attr, :extras, :from_attr, :implicit_attr, :leader, :master, :nested_attr, :nested_compound_attr, :others, :parent, :private_attr, :to_attr]) }
-      end
-
-      context "all nested" do
-        let(:include_relations) { true }
-        let(:include_nested_facets) { true }
-        it { expect(subject).to eq({"explicit_attr"=>{}, "alias_attr"=>{}, "from_attr"=>{}, "to_attr"=>{}, "nested_attr"=>{}, "custom_attr"=>{}, "compound_attr"=>{}, "nested_compound_attr"=>{}, "extension_attr"=>{}, "implicit_attr"=>{}, "dynamic_attr"=>{}, "private_attr"=>{}, "parent"=>{"children"=>{"attr"=>{}}}, "master"=>{}, "leader"=>{}, "children"=>{"nested"=>{}}, "others"=>{}, "extras"=>{"minimal"=>{}}, "alias_relation"=>{"implicit_attr"=>{}}}) }
-      end
-
-      context "named attributes" do
-        let(:facet_alias) { :attrs }
-        it { expect(subject).to eq([:alias_attr, :dynamic_attr, :explicit_attr, :from_attr, :implicit_attr, :private_attr, :to_attr]) }
+        it { expect(subject).to eq({:explicit_attr=>nil, :alias_attr=>nil, :from_attr=>nil, :to_attr=>nil, :nested_attr=>nil, :custom_attr=>nil, :compound_attr=>nil, :nested_compound_attr=>nil, :extension_attr=>nil, :implicit_attr=>nil, :dynamic_attr=>nil, :private_attr=>nil, :parent=>{:children=>{:attr=>nil, :explicit_attr=>nil, :nested_attr=>nil}, :explicit_attr=>nil, :nested_attr=>nil}, :master=>{:basic=>nil}, :leader=>{"basic"=>nil}, :children=>{:nested_attr=>nil, :nested_compound_attr=>nil, :explicit_attr=>nil}, :others=>{"basic"=>nil}, :extras=>{:minimal=>nil}, :alias_relation=>nil}) }
       end
 
       context "named nested" do
         let(:facet_alias) { :attrs }
         let(:include_nested_facets) { true }
-        it { expect(subject).to eq({"explicit_attr"=>{}, "implicit_attr"=>{}, "dynamic_attr"=>{}, "private_attr"=>{}, "alias_attr"=>{}, "to_attr"=>{}, "from_attr"=>{}}) }
+        it { expect(subject).to eq({:explicit_attr=>nil, :implicit_attr=>nil, :dynamic_attr=>nil, :private_attr=>nil, :alias_attr=>nil, :to_attr=>nil, :from_attr=>nil, :nested_attr=>nil}) }
       end
     end
 
-    describe ".from_hash" do
+    describe ".unserialize" do
       before do
-        allow_any_instance_of(ActiveFacet::Serializer::Facade).to receive(:from_hash) { |attributes| attributes }
+        allow_any_instance_of(ActiveFacet::Serializer::Facade).to receive(:unserialize) { |attributes| attributes }
       end
-      subject { instance.from_hash(resource, { foo: :bar }) }
+      subject { instance.unserialize(resource, { foo: :bar }) }
       it { expect(subject).to eq({ foo: :bar }) }
-      #TODO fix all of these
       it { expect(ActiveFacet::Serializer::Facade).to receive(:new).once }
     end
 
-    describe ".as_json" do
+    describe ".serialize" do
       before do
-        allow_any_instance_of(ActiveFacet::Serializer::Facade).to receive(:as_json) { { foo: :bar } }
+        allow_any_instance_of(ActiveFacet::Serializer::Facade).to receive(:serialize) { { foo: :bar } }
       end
-      subject { instance.as_json(resources, options) }
+      subject { instance.serialize(resources, options) }
       let(:options) { {a: :b} }
       let(:resources) { resource }
       it { expect(subject).to eq({ foo: :bar }) }
@@ -277,31 +253,33 @@ describe ActiveFacet::Serializer::Base do
       end
     end
 
-    describe ".scoped_include" do
-      subject { instance.send(:scoped_include, facet, nested_facet, options) }
+    skip "test explode_field"
+
+    describe ".field_includes" do
+      subject { instance.send(:field_includes, facet, nested_facet, options) }
       let(:facet) { :parent }
       let(:nested_facet) { :children }
       let(:options) { {} }
       it { expect(subject).to eq({:parent=>{:children=>{}}}) }
     end
 
-    describe ".custom_includes" do
-      subject { instance.send(:custom_includes, field, options) }
+    describe ".custom_field_includes" do
+      subject { instance.send(:custom_field_includes, field, options) }
       let(:field) { :custom_attr }
       let(:options) { {} }
 
       context "not implemented" do
-        it { expect(subject).to eq(nil) }
+        it { expect(subject).to eq({}) }
       end
 
       context "not found" do
         let(:field) { :foo }
-        it { expect(subject).to eq(nil) }
+        it { expect(subject).to eq({}) }
       end
 
       context "implemented" do
         before do
-          attribute_serializer_class.class_eval { def self.custom_scope; :bar; end }
+          attribute_serializer_class.class_eval { def self.includes(options); :bar; end }
         end
         it { expect(subject).to eq(:bar) }
       end

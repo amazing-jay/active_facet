@@ -29,7 +29,7 @@ module ActiveFacet
           # @param options [Hash]
           # @return [Hash]
           define_method(acts_as_active_facet_options[:includes_method_name]) do |facet = :basic, options = {}|
-            ActiveFacet::Helper.serializer_for(self, options).scoped_includes(facet)
+            ActiveFacet::Helper.serializer_for(self, options).includes(facet)
           end
 
           # Invokes includes with all deeply nested associations found in the given Facet
@@ -80,7 +80,7 @@ module ActiveFacet
         # @param options [Hash]
         # @return [Resource]
         define_method(acts_as_active_facet_options[:unserialize_method_name]) do |attributes, options = {}|
-          ActiveFacet::Helper.serializer_for(self.class, options).from_hash(self, attributes)
+          ActiveFacet::Helper.serializer_for(self.class, options).unserialize(self, attributes)
         end
 
         # Serializes a resource with given Facets
@@ -90,7 +90,7 @@ module ActiveFacet
         define_method(acts_as_active_facet_options[:serialize_method_name]) do |options = nil|
           if options.present? && options.key?(ActiveFacet.opts_key) &&
               (serializer = ActiveFacet::Helper.serializer_for(self.class, options)).present?
-            serializer.as_json(self, options)
+            serializer.serialize(self, options)
           else
             super(options)
           end

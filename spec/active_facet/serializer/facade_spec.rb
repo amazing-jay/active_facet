@@ -52,8 +52,8 @@ describe ActiveFacet::Serializer::Facade do
        )}
   end
 
-  describe ".as_json" do
-    subject { instance.send(:as_json) }
+  describe ".serialize" do
+    subject { instance.send(:serialize) }
 
     before do
       allow(ActiveFacet.document_cache).to receive(:fetch).and_call_original
@@ -65,22 +65,22 @@ describe ActiveFacet::Serializer::Facade do
     it { expect(instance).to have_received(:serialize!) }
   end
 
-  describe ".from_hash" do
-    subject { instance.from_hash(attributes) }
+  describe ".unserialize" do
+    subject { instance.unserialize(attributes) }
     let(:attributes) {
       {"explicit_attr"=>"explicit_attr", "implicit_attr"=>"implicit_attr", "private_attr"=>"private_accessor", "alias_attr"=>"aliased_accessor", "to_attr"=>"to_accessor", "from_attr"=>"from_accessor", "nested_attr"=>"nested_attr", "nested_compound_attr"=>"nested_compound_attr", "custom_attr"=>"custom_attr", "compound_attr"=>"serialized_compound_accessor", "parent"=>nil, "master"=>{}, "leader"=>nil, "children"=>[{"nested_attr"=>"nested_attr", "nested_compound_attr"=>"serialized_compound_accessor", "explicit_attr"=>"explicit_attr"}, {"nested_attr"=>"nested_attr", "nested_compound_attr"=>"serialized_compound_accessor", "explicit_attr"=>"explicit_attr"}, {"nested_attr"=>"nested_attr", "nested_compound_attr"=>"serialized_compound_accessor", "explicit_attr"=>"explicit_attr"}], "others"=>[], "extras"=>[]}
     }
     let(:other_resource) { create :resource_a }
     it { expect(subject.explicit_attr).to eq(other_resource.explicit_attr) }
     it { expect(subject.implicit_attr).to eq(other_resource.implicit_attr) }
-    it { expect(subject.custom_attr).to eq('hydrated_custom_attr') }
+    it { expect(subject.custom_attr).to eq('unserialized_custom_attr') }
     it { expect(subject.nested_accessor).to eq(other_resource.nested_accessor) }
     it { expect(subject.dynamic_accessor).to be_blank }
     it { expect(subject.private_accessor).to eq(other_resource.private_accessor) }
     it { expect(subject.aliased_accessor).to eq(other_resource.aliased_accessor) }
     it { expect(subject.from_accessor).to eq(other_resource.from_accessor) }
     it { expect(subject.to_accessor).to eq(other_resource.to_accessor) }
-    it { expect(subject.nested_compound_accessor).to eq({'compound_accessor' => 'hydrated_nested_compound_attr'}) }
+    it { expect(subject.nested_compound_accessor).to eq({'compound_accessor' => 'unserialized_nested_compound_attr'}) }
     it { expect(subject.unexposed_attr).to_not eq(other_resource.unexposed_attr) }
 
   end
@@ -386,8 +386,8 @@ describe ActiveFacet::Serializer::Facade do
     it { expect(subject).to eq({'custom_attr' => 'serialized_hello', 'explicit_attr' => 'world'}) }
   end
 
-  describe ".hydrate!" do
-    subject { instance.send(:hydrate!, json) }
+  describe ".unserialize!" do
+    subject { instance.send(:unserialize!, json) }
     let(:valid_attrs) {
       {
         explicit_attr: :explicit_attr,
@@ -414,9 +414,9 @@ describe ActiveFacet::Serializer::Facade do
     it { expect(subject.from_accessor).to eq(:from_attr) }
     it { expect(subject.to_accessor).to eq(:to_attr) }
     it { expect(subject.nested_accessor['nested_attr']).to eq(:nested_attr) }
-    it { expect(subject.custom_attr).to eq('hydrated_custom_attr') }
-    it { expect(subject.compound_accessor).to eq('hydrated_compound_attr') }
-    it { expect(subject.nested_compound_accessor['compound_accessor']).to eq('hydrated_nested_compound_attr') }
+    it { expect(subject.custom_attr).to eq('unserialized_custom_attr') }
+    it { expect(subject.compound_accessor).to eq('unserialized_compound_attr') }
+    it { expect(subject.nested_compound_accessor['compound_accessor']).to eq('unserialized_nested_compound_attr') }
     it { expect(subject.implicit_attr).to eq(:implicit_attr) }
     it { expect(subject.unexposed_attr).to be nil }
     it { expect(subject.extras).to be_empty }
@@ -430,16 +430,16 @@ describe ActiveFacet::Serializer::Facade do
     it { expect(json).to eq({'a' => :foo, 'b' => :foo}) }
   end
 
-  describe ".hydrate_scopes!" do
-    subject { instance.send(:hydrate_scopes!, {'custom_attr' => 'hello', 'explicit_attr' => 'world'}) }
+  describe ".apply_custom_unserializers!" do
+    subject { instance.send(:apply_custom_unserializers!, {'custom_attr' => 'hello', 'explicit_attr' => 'world'}) }
     before do
-      allow(customizer_attribute_serializer_class).to receive(:hydrate) { |attribute, resource, options| "hydrated_#{attribute}" }
-      allow(extension_attr_attribute_serializer_class).to receive(:hydrate) { |attribute, resource, options| "serialized_#{attribute}" }
+      allow(customizer_attribute_serializer_class).to receive(:unserialize) { |attribute, resource, options| "unserialized_#{attribute}" }
+      allow(extension_attr_attribute_serializer_class).to receive(:unserialize) { |attribute, resource, options| "serialized_#{attribute}" }
       subject
     end
-    it { expect(customizer_attribute_serializer_class).to have_received(:hydrate).with('hello', resource, options) }
-    it { expect(extension_attr_attribute_serializer_class).to_not have_received(:hydrate).with('hello', resource, options) }
-    it { expect(subject).to eq({'custom_attr' => 'hydrated_hello', 'explicit_attr' => 'world'}) }
+    it { expect(customizer_attribute_serializer_class).to have_received(:unserialize).with('hello', resource, options) }
+    it { expect(extension_attr_attribute_serializer_class).to_not have_received(:unserialize).with('hello', resource, options) }
+    it { expect(subject).to eq({'custom_attr' => 'unserialized_hello', 'explicit_attr' => 'world'}) }
   end
 
   describe ".set_resource_attribute" do

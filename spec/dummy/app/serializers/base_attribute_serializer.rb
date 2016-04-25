@@ -7,8 +7,8 @@ module BaseAttributeSerializer
       "serialized_#{attribute}"
     end
 
-    def hydrate(attribute, resource, options)
-      "hydrated_#{attribute}"
+    def unserialize(attribute, resource, options)
+      "unserialized_#{attribute}"
     end
   end
 end

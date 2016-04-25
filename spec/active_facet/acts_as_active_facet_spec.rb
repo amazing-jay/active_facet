@@ -94,23 +94,23 @@ describe ActiveFacet::ActsAsActiveFacet do
       let(:options) { {} }
       let(:facets) { :all }
       before do
-        allow(serializer).to receive(:scoped_includes).and_call_original
-        allow(serializer2).to receive(:scoped_includes).and_call_original
+        allow(serializer).to receive(:includes).and_call_original
+        allow(serializer2).to receive(:includes).and_call_original
         subject
       end
-      it { expect(serializer).to have_received(:scoped_includes).with(facets) }
-      it { expect(serializer2).to_not have_received(:scoped_includes).with(facets) }
+      it { expect(serializer).to have_received(:includes).with(facets) }
+      it { expect(serializer2).to_not have_received(:includes).with(facets) }
 
       context "options" do
         let(:options) { make_options version: 2 }
-        it { expect(serializer).to_not have_received(:scoped_includes).with(facets) }
-        it { expect(serializer2).to have_received(:scoped_includes).with(facets) }
+        it { expect(serializer).to_not have_received(:includes).with(facets) }
+        it { expect(serializer2).to have_received(:includes).with(facets) }
       end
     end
 
     describe "apply_facet_includes" do
       subject { receiver.apply_facet_includes(facets, options) }
-      let(:scoped_includes) { serializer.scoped_includes(facets) }
+      let(:includes) { serializer.includes(facets) }
       let(:options) { { foo: :bar } }
       let(:facets) { :all }
       before do
@@ -119,7 +119,7 @@ describe ActiveFacet::ActsAsActiveFacet do
         subject
       end
       it { expect(receiver).to have_received(:facet_includes).with(facets, options) }
-      it { expect(receiver).to have_received(:includes).with(scoped_includes) }
+      it { expect(receiver).to have_received(:includes).with(includes) }
     end
 
     describe "facet_filter" do
@@ -256,21 +256,21 @@ describe ActiveFacet::ActsAsActiveFacet do
     let(:attributes) { { foo: :bar } }
     let(:options) { {} }
     before do
-      allow(serializer).to receive(:from_hash).and_call_original
-      allow(serializer2).to receive(:from_hash).and_call_original
+      allow(serializer).to receive(:unserialize).and_call_original
+      allow(serializer2).to receive(:unserialize).and_call_original
       subject
     end
-    it { expect(serializer).to have_received(:from_hash).with(instance, attributes) }
-    it { expect(serializer2).to_not have_received(:from_hash) }
+    it { expect(serializer).to have_received(:unserialize).with(instance, attributes) }
+    it { expect(serializer2).to_not have_received(:unserialize) }
 
     context "options" do
       let(:options) { make_options version: 2 }
-      it { expect(serializer).to_not have_received(:from_hash) }
-      it { expect(serializer2).to have_received(:from_hash).with(instance, attributes) }
+      it { expect(serializer).to_not have_received(:unserialize) }
+      it { expect(serializer2).to have_received(:unserialize).with(instance, attributes) }
     end
   end
 
-  describe "to_json" do
+  describe "as_json" do
     subject { instance.as_json(options) }
     let(:instance) { create :resource_a, :with_master, :with_children }
     let(:options) { {} }
@@ -278,20 +278,20 @@ describe ActiveFacet::ActsAsActiveFacet do
 
     before do
       allow(resource_manager).to receive(:serializer_for).and_call_original
-      allow(serializer).to receive(:as_json).and_call_original
+      allow(serializer).to receive(:serialize).and_call_original
       subject
     end
 
     context "default" do
       it { expect(resource_manager).to_not have_received(:serializer_for) }
-      it { expect(serializer).to_not have_received(:as_json) }
+      it { expect(serializer).to_not have_received(:serialize) }
       it { expect(subject).to be_a Hash }
     end
 
     context "override" do
       let(:options) { make_options fields: :all }
       it { expect(resource_manager).to have_received(:serializer_for).exactly(5).times }
-      it { expect(serializer).to have_received(:as_json).exactly(4).times }
+      it { expect(serializer).to have_received(:serialize).exactly(4).times }
       it { expect(subject).to be_a Hash }
     end
   end
