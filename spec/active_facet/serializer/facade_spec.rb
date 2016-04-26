@@ -214,7 +214,7 @@ describe ActiveFacet::Serializer::Facade do
     context "all_attributes" do
       let(:fields) { :all_attributes }
       let(:filters) { {} }
-      it { expect(subject).to eq({"alias_attr"=>"aliased_accessor", "others"=>[], "compound_attr"=>"serialized_compound_accessor", "custom_attr"=>"serialized_custom_attr", "explicit_attr"=>"explicit_attr", "extension_attr"=>"serialized_extension_attr", "from_attr"=>"from_accessor", "implicit_attr"=>"implicit_attr", "nested_attr"=>"nested_attr", "nested_compound_attr"=>"serialized_compound_accessor", "private_attr"=>"private_accessor", "to_attr"=>"to_accessor"}) }
+      it { expect(subject).to eq({"explicit_attr"=>"explicit_attr", "alias_attr"=>"aliased_accessor", "from_attr"=>"from_accessor", "to_attr"=>"to_accessor", "nested_attr"=>"nested_attr", "custom_attr"=>"serialized_custom_attr", "compound_attr"=>"serialized_compound_accessor", "nested_compound_attr"=>"serialized_compound_accessor", "extension_attr"=>"serialized_extension_attr", "implicit_attr"=>"implicit_attr", "private_attr"=>"private_accessor"}) }
     end
 
     context "composite" do
@@ -268,7 +268,7 @@ describe ActiveFacet::Serializer::Facade do
     context "deep_relations" do
       let(:fields) { :deep_relations }
       let(:filters) { {} }
-      it { expect(subject).to eq({"parent"=>nil, "children"=>[{"nested_attr"=>"nested_attr", "nested_compound_attr"=>"serialized_compound_accessor", "explicit_attr"=>"explicit_attr"}, {"nested_attr"=>"nested_attr", "nested_compound_attr"=>"serialized_compound_accessor", "explicit_attr"=>"explicit_attr"}, {"nested_attr"=>"nested_attr", "nested_compound_attr"=>"serialized_compound_accessor", "explicit_attr"=>"explicit_attr"}], "master"=>{}, "extras"=>[], "explicit_attr"=>"explicit_attr", "nested_attr"=>"nested_attr"}) }
+      it { expect(subject).to eq({"parent"=>nil, "children"=>[{"nested_attr"=>"nested_attr", "nested_compound_attr"=>"serialized_compound_accessor", "explicit_attr"=>"explicit_attr"}, {"nested_attr"=>"nested_attr", "nested_compound_attr"=>"serialized_compound_accessor", "explicit_attr"=>"explicit_attr"}, {"nested_attr"=>"nested_attr", "nested_compound_attr"=>"serialized_compound_accessor", "explicit_attr"=>"explicit_attr"}], "master"=>{}, "extras"=>[], "others"=>[], "explicit_attr"=>"explicit_attr", "nested_attr"=>"nested_attr"}) }
     end
 
     context "explicit_attr" do
@@ -362,8 +362,28 @@ describe ActiveFacet::Serializer::Facade do
 
     context 'filtered' do
       let(:filters) { {} }
-      skip 'todo: define a filter'
-      it { expect(subject).to eq(resource.children.as_json(options)) }
+      let(:apply_filters_method_name) { resource.class.acts_as_active_facet_options[:apply_filters_method_name] }
+      around do |example|
+        ActiveFacet.filters_enabled = true
+        example.run
+        ActiveFacet.filters_enabled = false
+      end
+      before do
+        resource.save
+        allow(resource.class).to receive(apply_filters_method_name)
+        subject
+      end
+
+      context "defaults" do
+        it { expect(subject).to eq(resource.children.send(apply_filters_method_name, filters).as_json(options)) }
+        it { expect(resource.class).to have_received(apply_filters_method_name).with(filters).twice }
+      end
+
+      context "explicit" do
+        let(:filters) { { foo: :bar } }
+        it { expect(subject).to eq(resource.children.send(apply_filters_method_name, filters).as_json(options)) }
+        it { expect(resource.class).to have_received(apply_filters_method_name).with(filters).twice }
+      end
     end
 
     context 'nil' do

@@ -34,7 +34,7 @@ module ActiveFacet
             config.transforms_from[facet] ||= options[:to]
             config.transforms_to[facet] = options[:to]
           end
-          config.serializers[facet] = options[:with]    if options[:with].present?
+          config.custom_serializers[facet] = options[:with]    if options[:with].present?
           config.namespaces[facet]  = options[:within]  if options[:within].present?
           expose facet
         end
@@ -43,7 +43,7 @@ module ActiveFacet
         # @param facet [Symbol] name of the attribute
         def extension(facet)
           config.extensions[facet] = true
-          config.serializers[facet] = facet.to_sym
+          config.custom_serializers[facet] = facet.to_sym
           expose facet
         end
 
@@ -198,7 +198,7 @@ module ActiveFacet
       # @param options [Hash] collection of values required that are not available in lexical facet
       # @return [Facet]
       def custom_field_includes(field, options)
-        if custom_serializer_name = config.serializers[field]
+        if custom_serializer_name = config.custom_serializers[field]
           custom_serializer = get_custom_serializer_class(custom_serializer_name, options)
           if custom_serializer.respond_to? :includes
             custom_serializer.includes(options)

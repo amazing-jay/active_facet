@@ -58,7 +58,7 @@ describe ActiveFacet::Serializer::Base do
       let(:options) { {as: :bar} }
       it { expect(config.transforms(:to)).to eq({attribute.to_s => :bar}) }
       it { expect(config.transforms(:from)).to eq({attribute.to_s => :bar}) }
-      it { expect(config.serializers[attribute]).to be_blank }
+      it { expect(config.custom_serializers[attribute]).to be_blank }
       it { expect(config.namespaces[attribute]).to be_blank }
     end
 
@@ -66,7 +66,7 @@ describe ActiveFacet::Serializer::Base do
       let(:options) { {from: :bar} }
       it { expect(config.transforms(:to)).to eq({attribute.to_s => :bar}) }
       it { expect(config.transforms(:from)).to eq({attribute.to_s => :bar}) }
-      it { expect(config.serializers[attribute]).to be_blank }
+      it { expect(config.custom_serializers[attribute]).to be_blank }
       it { expect(config.namespaces[attribute]).to be_blank }
     end
 
@@ -74,13 +74,13 @@ describe ActiveFacet::Serializer::Base do
       let(:options) { {to: :bar} }
       it { expect(config.transforms(:to)).to eq({attribute.to_s => :bar}) }
       it { expect(config.transforms(:from)).to eq({attribute.to_s => :bar}) }
-      it { expect(config.serializers[attribute]).to be_blank }
+      it { expect(config.custom_serializers[attribute]).to be_blank }
       it { expect(config.namespaces[attribute]).to be_blank }
     end
 
     context("with") do
       let(:options) { {with: :bar} }
-      it { expect(config.serializers[attribute]).to eq(:bar) }
+      it { expect(config.custom_serializers[attribute]).to eq(:bar) }
       it { expect(config.namespaces[attribute]).to be_blank }
     end
 
@@ -88,7 +88,7 @@ describe ActiveFacet::Serializer::Base do
       let(:options) { {within: :bar} }
       it { expect(config.transforms(:to)).to eq({}) }
       it { expect(config.transforms(:from)).to eq({}) }
-      it { expect(config.serializers[attribute]).to be_blank }
+      it { expect(config.custom_serializers[attribute]).to be_blank }
       it { expect(config.namespaces[attribute]).to eq(:bar) }
     end
 
@@ -96,7 +96,7 @@ describe ActiveFacet::Serializer::Base do
       let(:options) { {as: :bar, from: :barbar} }
       it { expect(config.transforms(:to)).to eq({attribute.to_s => :bar}) }
       it { expect(config.transforms(:from)).to eq({attribute.to_s => :barbar}) }
-      it { expect(config.serializers[attribute]).to be_blank }
+      it { expect(config.custom_serializers[attribute]).to be_blank }
       it { expect(config.namespaces[attribute]).to be_blank }
     end
 
@@ -104,7 +104,7 @@ describe ActiveFacet::Serializer::Base do
       let(:options) { {as: :bar, to: :barbar} }
       it { expect(config.transforms(:to)).to eq({attribute.to_s => :barbar}) }
       it { expect(config.transforms(:from)).to eq({attribute.to_s => :bar}) }
-      it { expect(config.serializers[attribute]).to be_blank }
+      it { expect(config.custom_serializers[attribute]).to be_blank }
       it { expect(config.namespaces[attribute]).to be_blank }
     end
 
@@ -112,7 +112,7 @@ describe ActiveFacet::Serializer::Base do
       let(:options) { {from: :bar, to: :barbar} }
       it { expect(config.transforms(:to)).to eq({attribute.to_s => :barbar}) }
       it { expect(config.transforms(:from)).to eq({attribute.to_s => :bar}) }
-      it { expect(config.serializers[attribute]).to be_blank }
+      it { expect(config.custom_serializers[attribute]).to be_blank }
       it { expect(config.namespaces[attribute]).to be_blank }
     end
 
@@ -120,12 +120,17 @@ describe ActiveFacet::Serializer::Base do
       let(:options) { {as: :bar, to: :barto, from: :barfrom, with: :with, within: :within} }
       it { expect(config.transforms(:to)).to eq({attribute.to_s => :barto}) }
       it { expect(config.transforms(:from)).to eq({attribute.to_s => :barfrom}) }
-      it { expect(config.serializers[attribute]).to eq(:with) }
+      it { expect(config.custom_serializers[attribute]).to eq(:with) }
       it { expect(config.namespaces[attribute]).to eq(:within) }
     end
 
     context("relations") do
-      skip "should work if envoked on a relation"
+      let(:attribute) { :parent }
+      let(:options) { {as: :bar, to: :barto, from: :barfrom, with: :with, within: :within} }
+      it { expect(config.transforms(:to)).to eq({attribute.to_s => :barto}) }
+      it { expect(config.transforms(:from)).to eq({attribute.to_s => :barfrom}) }
+      it { expect(config.custom_serializers[attribute]).to eq(:with) }
+      it { expect(config.namespaces[attribute]).to eq(:within) }
     end
   end
 
@@ -138,7 +143,7 @@ describe ActiveFacet::Serializer::Base do
     end
 
     it { expect(config.extensions[attribute]).to be true }
-    it { expect(config.serializers[attribute]).to eq(attribute.to_sym) }
+    it { expect(config.custom_serializers[attribute]).to eq(attribute.to_sym) }
   end
 
   describe "#expose" do
@@ -183,8 +188,8 @@ describe ActiveFacet::Serializer::Base do
       instance
     end
 
-    it { expect(config.serializers[:created_at]).to eq(:time) }
-    it { expect(config.serializers[:updated_at]).to eq(:time) }
+    it { expect(config.custom_serializers[:created_at]).to eq(:time) }
+    it { expect(config.custom_serializers[:updated_at]).to eq(:time) }
     it { expect(config.normalized_facets[:timestamps]["fields"].keys).to match_array(['id', 'created_at', 'updated_at']) }
   end
 
@@ -196,11 +201,9 @@ describe ActiveFacet::Serializer::Base do
     end
 
     describe ".includes" do
-      skip "todo: fix so that relations get dealiased (others should be in this set)"
-
       subject { instance.includes(facet) }
       let(:facet) { [{children: :one, alias_relation: :one}, :deep_relations, :extras] }
-      it { expect(subject).to eq({:children=>{}, :parent=>{:children=>{}}, :master=>{}, :extras=>{}}) }
+      it { expect(subject).to eq({:children=>{}, :others=>{}, :parent=>{:children=>{}}, :master=>{}, :extras=>{}}) }
     end
 
     describe ".explode" do
@@ -208,8 +211,7 @@ describe ActiveFacet::Serializer::Base do
       let(:facet_alias) { :all }
 
       context "all attributes" do
-        skip "todo: fix so that relations get dealiased (alias_relation should not be in this set)"
-        it { expect(subject).to eq({:explicit_attr=>nil, :alias_attr=>nil, :from_attr=>nil, :to_attr=>nil, :nested_attr=>nil, :custom_attr=>nil, :compound_attr=>nil, :nested_compound_attr=>nil, :extension_attr=>nil, :implicit_attr=>nil, :dynamic_attr=>nil, :private_attr=>nil, :parent=>{:children=>{:attr=>nil, :explicit_attr=>nil, :nested_attr=>nil}, :explicit_attr=>nil, :nested_attr=>nil}, :master=>{:basic=>nil}, :leader=>{"basic"=>nil}, :children=>{:nested_attr=>nil, :nested_compound_attr=>nil, :explicit_attr=>nil}, :others=>{"basic"=>nil}, :extras=>{:minimal=>nil}, :alias_relation=>nil}) }
+        it { expect(subject).to eq({"explicit_attr"=>nil, "alias_attr"=>nil, "from_attr"=>nil, "to_attr"=>nil, "nested_attr"=>nil, "custom_attr"=>nil, "compound_attr"=>nil, "nested_compound_attr"=>nil, "extension_attr"=>nil, "implicit_attr"=>nil, "dynamic_attr"=>nil, "private_attr"=>nil, "parent"=>{:children=>{:attr=>nil, :explicit_attr=>nil, :nested_attr=>nil}, :explicit_attr=>nil, :nested_attr=>nil}, "master"=>{:basic=>nil}, "leader"=>{"basic"=>nil}, "children"=>{:nested_attr=>nil, :nested_compound_attr=>nil, :explicit_attr=>nil}, "others"=>{:implicit_attr=>nil, :basic=>nil}, "extras"=>{:minimal=>nil}, :explicit_attr=>nil, :nested_attr=>nil}) }
       end
 
       context "named nested" do
@@ -253,7 +255,23 @@ describe ActiveFacet::Serializer::Base do
       end
     end
 
-    skip "test explode_field"
+    describe ".explode_field" do
+      subject { instance.send(:explode_field, facet, nested_facet, options) }
+      let(:facet) { :parent }
+      let(:nested_facet) { :children }
+      let(:options) { {} }
+      it { expect(subject).to eq({:parent=>{:children=>{:explicit_attr=>nil, :nested_attr=>nil}, :explicit_attr=>nil, :nested_attr=>nil}}) }
+
+      context "attribute" do
+        let(:facet) { :foo }
+        it { expect(subject).to eq({:foo=>nil}) }
+      end
+
+      context "custom attribute" do
+        let(:facet) { :custom_attr }
+        it { expect(subject).to eq({:custom_attr=>nil}) }
+      end
+    end
 
     describe ".field_includes" do
       subject { instance.send(:field_includes, facet, nested_facet, options) }
@@ -261,6 +279,16 @@ describe ActiveFacet::Serializer::Base do
       let(:nested_facet) { :children }
       let(:options) { {} }
       it { expect(subject).to eq({:parent=>{:children=>{}}}) }
+
+      context "attribute" do
+        let(:facet) { :custom_attr }
+        it { expect(subject).to eq({}) }
+      end
+
+      context "custom attribute" do
+        let(:facet) { :custom_attr }
+        it { expect(subject).to eq({}) }
+      end
     end
 
     describe ".custom_field_includes" do

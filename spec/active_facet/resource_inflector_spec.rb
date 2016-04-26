@@ -47,7 +47,17 @@ describe ActiveFacet::ResourceInflector do
       it { expect(subject).to be nil }
     end
 
-    skip "todo: test version impact in lookups"
+    context "versioned" do
+      let(:options) { make_options( version: version) }
+      let(:field) { :parent }
+      let(:version) { 1 }
+      it { expect(subject).to be(V1::ResourceA::ResourceASerializer.instance) }
+
+      context "v2" do
+        let(:version) { 2 }
+        it { expect(subject).to be(V2::ResourceA::ResourceASerializer.instance) }
+      end
+    end
   end
 
   describe ".get_custom_serializer_class" do
