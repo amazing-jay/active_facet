@@ -158,7 +158,7 @@ module ActiveFacet
       # @param json [JSON] structure
       # @return [JSON]
       def apply_custom_serializers!(json)
-        config.serializers.each do |field, type|
+        config.custom_serializers.each do |field, type|
           json[field] = ActiveFacet::Helper.restore_opts_after(options, ActiveFacet.fields_key, fields) do
             serializer.get_custom_serializer_class(type, options).serialize(json[field], resource, options)
           end if json.key? field
@@ -196,7 +196,7 @@ module ActiveFacet
       # @param json [JSON] structure
       # @return [JSON]
       def apply_custom_unserializers!(json)
-        config.serializers.each do |field, type|
+        config.custom_serializers.each do |field, type|
           json[field] = serializer.get_custom_serializer_class(type, options).unserialize(json[field], resource, options) if json.key? field
         end
         json

@@ -50,7 +50,6 @@ module ActiveFacet
   self.acts_as_active_facet_enabled   = false
   self.default_cache_options          = { expires_in: 5.minutes }
   self.document_cache                 = ActiveFacet::DocumentCache
-  #TODO --jdc implement dependency injection for all classes?
 
   # Self referencing syntax for initializer
   def self.configure

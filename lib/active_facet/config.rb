@@ -25,9 +25,8 @@ module ActiveFacet
     # Hash: keys are public API attribute names, values are resource attribute names
     attr_accessor :transforms_from, :transforms_to
 
-    # TODO --jdc rename to custom_serializers
     # Hash: API attribute names requiring custom serialization
-    attr_accessor :serializers
+    attr_accessor :custom_serializers
 
     # Hash: keys are resource attribute names storing nested JSON, values are nested attribute names
     attr_accessor :namespaces
@@ -82,7 +81,7 @@ module ActiveFacet
       self.resource_class ||= config.resource_class
       transforms_from.merge!  config.transforms_from
       transforms_to.merge!    config.transforms_to
-      serializers.merge!      config.serializers
+      custom_serializers.merge!      config.custom_serializers
       namespaces.merge!       config.namespaces
       facets.merge!       config.facets
       extensions.merge!       config.extensions
@@ -120,7 +119,7 @@ module ActiveFacet
       self.compiled = false
       self.transforms_from  = {}.with_indifferent_access
       self.transforms_to    = {}.with_indifferent_access
-      self.serializers      = {}.with_indifferent_access
+      self.custom_serializers      = {}.with_indifferent_access
       self.namespaces       = {}.with_indifferent_access
       self.facets       = {}.with_indifferent_access
       self.extensions       = {}.with_indifferent_access

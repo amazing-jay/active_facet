@@ -12,7 +12,7 @@ describe ActiveFacet::Config do
   let(:attrs) { [
     :transforms_from,
     :transforms_to,
-    :serializers,
+    :custom_serializers,
     :namespaces,
     :extensions
   ] }
@@ -23,7 +23,7 @@ describe ActiveFacet::Config do
       :normalized_facets,
       :transforms_from,
       :transforms_to,
-      :serializers,
+      :custom_serializers,
       :namespaces,
       :extensions
     )}
@@ -35,7 +35,7 @@ describe ActiveFacet::Config do
     it { expect(subject.normalized_facets).to be nil }
     it { expect(subject.transforms_from).to       eq({}) }
     it { expect(subject.transforms_to).to         eq({}) }
-    it { expect(subject.serializers).to           eq({}) }
+    it { expect(subject.custom_serializers).to    eq({}) }
     it { expect(subject.namespaces).to            eq({}) }
     it { expect(subject.extensions).to            eq({}) }
   end

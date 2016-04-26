@@ -58,7 +58,7 @@ describe ActiveFacet::Serializer::Base do
       let(:options) { {as: :bar} }
       it { expect(config.transforms(:to)).to eq({attribute.to_s => :bar}) }
       it { expect(config.transforms(:from)).to eq({attribute.to_s => :bar}) }
-      it { expect(config.serializers[attribute]).to be_blank }
+      it { expect(config.custom_serializers[attribute]).to be_blank }
       it { expect(config.namespaces[attribute]).to be_blank }
     end
 
@@ -66,7 +66,7 @@ describe ActiveFacet::Serializer::Base do
       let(:options) { {from: :bar} }
       it { expect(config.transforms(:to)).to eq({attribute.to_s => :bar}) }
       it { expect(config.transforms(:from)).to eq({attribute.to_s => :bar}) }
-      it { expect(config.serializers[attribute]).to be_blank }
+      it { expect(config.custom_serializers[attribute]).to be_blank }
       it { expect(config.namespaces[attribute]).to be_blank }
     end
 
@@ -74,13 +74,13 @@ describe ActiveFacet::Serializer::Base do
       let(:options) { {to: :bar} }
       it { expect(config.transforms(:to)).to eq({attribute.to_s => :bar}) }
       it { expect(config.transforms(:from)).to eq({attribute.to_s => :bar}) }
-      it { expect(config.serializers[attribute]).to be_blank }
+      it { expect(config.custom_serializers[attribute]).to be_blank }
       it { expect(config.namespaces[attribute]).to be_blank }
     end
 
     context("with") do
       let(:options) { {with: :bar} }
-      it { expect(config.serializers[attribute]).to eq(:bar) }
+      it { expect(config.custom_serializers[attribute]).to eq(:bar) }
       it { expect(config.namespaces[attribute]).to be_blank }
     end
 
@@ -88,7 +88,7 @@ describe ActiveFacet::Serializer::Base do
       let(:options) { {within: :bar} }
       it { expect(config.transforms(:to)).to eq({}) }
       it { expect(config.transforms(:from)).to eq({}) }
-      it { expect(config.serializers[attribute]).to be_blank }
+      it { expect(config.custom_serializers[attribute]).to be_blank }
       it { expect(config.namespaces[attribute]).to eq(:bar) }
     end
 
@@ -96,7 +96,7 @@ describe ActiveFacet::Serializer::Base do
       let(:options) { {as: :bar, from: :barbar} }
       it { expect(config.transforms(:to)).to eq({attribute.to_s => :bar}) }
       it { expect(config.transforms(:from)).to eq({attribute.to_s => :barbar}) }
-      it { expect(config.serializers[attribute]).to be_blank }
+      it { expect(config.custom_serializers[attribute]).to be_blank }
       it { expect(config.namespaces[attribute]).to be_blank }
     end
 
@@ -104,7 +104,7 @@ describe ActiveFacet::Serializer::Base do
       let(:options) { {as: :bar, to: :barbar} }
       it { expect(config.transforms(:to)).to eq({attribute.to_s => :barbar}) }
       it { expect(config.transforms(:from)).to eq({attribute.to_s => :bar}) }
-      it { expect(config.serializers[attribute]).to be_blank }
+      it { expect(config.custom_serializers[attribute]).to be_blank }
       it { expect(config.namespaces[attribute]).to be_blank }
     end
 
@@ -112,7 +112,7 @@ describe ActiveFacet::Serializer::Base do
       let(:options) { {from: :bar, to: :barbar} }
       it { expect(config.transforms(:to)).to eq({attribute.to_s => :barbar}) }
       it { expect(config.transforms(:from)).to eq({attribute.to_s => :bar}) }
-      it { expect(config.serializers[attribute]).to be_blank }
+      it { expect(config.custom_serializers[attribute]).to be_blank }
       it { expect(config.namespaces[attribute]).to be_blank }
     end
 
@@ -120,7 +120,7 @@ describe ActiveFacet::Serializer::Base do
       let(:options) { {as: :bar, to: :barto, from: :barfrom, with: :with, within: :within} }
       it { expect(config.transforms(:to)).to eq({attribute.to_s => :barto}) }
       it { expect(config.transforms(:from)).to eq({attribute.to_s => :barfrom}) }
-      it { expect(config.serializers[attribute]).to eq(:with) }
+      it { expect(config.custom_serializers[attribute]).to eq(:with) }
       it { expect(config.namespaces[attribute]).to eq(:within) }
     end
 
@@ -138,7 +138,7 @@ describe ActiveFacet::Serializer::Base do
     end
 
     it { expect(config.extensions[attribute]).to be true }
-    it { expect(config.serializers[attribute]).to eq(attribute.to_sym) }
+    it { expect(config.custom_serializers[attribute]).to eq(attribute.to_sym) }
   end
 
   describe "#expose" do
@@ -183,8 +183,8 @@ describe ActiveFacet::Serializer::Base do
       instance
     end
 
-    it { expect(config.serializers[:created_at]).to eq(:time) }
-    it { expect(config.serializers[:updated_at]).to eq(:time) }
+    it { expect(config.custom_serializers[:created_at]).to eq(:time) }
+    it { expect(config.custom_serializers[:updated_at]).to eq(:time) }
     it { expect(config.normalized_facets[:timestamps]["fields"].keys).to match_array(['id', 'created_at', 'updated_at']) }
   end
 
