@@ -125,7 +125,12 @@ describe ActiveFacet::Serializer::Base do
     end
 
     context("relations") do
-      skip "should work if envoked on a relation"
+      let(:attribute) { :parent }
+      let(:options) { {as: :bar, to: :barto, from: :barfrom, with: :with, within: :within} }
+      it { expect(config.transforms(:to)).to eq({attribute.to_s => :barto}) }
+      it { expect(config.transforms(:from)).to eq({attribute.to_s => :barfrom}) }
+      it { expect(config.custom_serializers[attribute]).to eq(:with) }
+      it { expect(config.namespaces[attribute]).to eq(:within) }
     end
   end
 
@@ -196,11 +201,9 @@ describe ActiveFacet::Serializer::Base do
     end
 
     describe ".includes" do
-      skip "todo: fix so that relations get dealiased (others should be in this set)"
-
       subject { instance.includes(facet) }
       let(:facet) { [{children: :one, alias_relation: :one}, :deep_relations, :extras] }
-      it { expect(subject).to eq({:children=>{}, :parent=>{:children=>{}}, :master=>{}, :extras=>{}}) }
+      it { expect(subject).to eq({:children=>{}, :others=>{}, :parent=>{:children=>{}}, :master=>{}, :extras=>{}}) }
     end
 
     describe ".explode" do
@@ -208,8 +211,7 @@ describe ActiveFacet::Serializer::Base do
       let(:facet_alias) { :all }
 
       context "all attributes" do
-        skip "todo: fix so that relations get dealiased (alias_relation should not be in this set)"
-        it { expect(subject).to eq({:explicit_attr=>nil, :alias_attr=>nil, :from_attr=>nil, :to_attr=>nil, :nested_attr=>nil, :custom_attr=>nil, :compound_attr=>nil, :nested_compound_attr=>nil, :extension_attr=>nil, :implicit_attr=>nil, :dynamic_attr=>nil, :private_attr=>nil, :parent=>{:children=>{:attr=>nil, :explicit_attr=>nil, :nested_attr=>nil}, :explicit_attr=>nil, :nested_attr=>nil}, :master=>{:basic=>nil}, :leader=>{"basic"=>nil}, :children=>{:nested_attr=>nil, :nested_compound_attr=>nil, :explicit_attr=>nil}, :others=>{"basic"=>nil}, :extras=>{:minimal=>nil}, :alias_relation=>nil}) }
+        it { expect(subject).to eq({"explicit_attr"=>nil, "alias_attr"=>nil, "from_attr"=>nil, "to_attr"=>nil, "nested_attr"=>nil, "custom_attr"=>nil, "compound_attr"=>nil, "nested_compound_attr"=>nil, "extension_attr"=>nil, "implicit_attr"=>nil, "dynamic_attr"=>nil, "private_attr"=>nil, "parent"=>{:children=>{:attr=>nil, :explicit_attr=>nil, :nested_attr=>nil}, :explicit_attr=>nil, :nested_attr=>nil}, "master"=>{:basic=>nil}, "leader"=>{"basic"=>nil}, "children"=>{:nested_attr=>nil, :nested_compound_attr=>nil, :explicit_attr=>nil}, "others"=>{:implicit_attr=>nil, :basic=>nil}, "extras"=>{:minimal=>nil}, :explicit_attr=>nil, :nested_attr=>nil}) }
       end
 
       context "named nested" do

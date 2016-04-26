@@ -137,12 +137,12 @@ describe ActiveFacet::Config do
 
       context "hash" do
         let(:facet) { {a: :b, c: :d} }
-        it { expect(subject).to eq({:a=>:b, :c=>:d, :basic=>{}}) }
+        it { expect(subject).to eq({:a=>{:b=>{}}, :c=>{:d=>{}}, :basic=>{}}) }
       end
 
       context "hash of nils" do
         let(:facet) { {a: nil, c: :d} }
-        it { expect(subject).to eq({:a=>{}, :c=>:d, :basic=>{}}) }
+        it { expect(subject).to eq({:a=>{}, :c=>{:d=>{}}, :basic=>{}}) }
       end
 
       context "mixed" do
@@ -190,7 +190,7 @@ describe ActiveFacet::Config do
 
           context "hash" do
             let(:facet) { {minimal: nil} }
-            it { expect(subject).to eq({:a=>{}, :b=>{}, :c=>{}, :d=>:e}) }
+            it { expect(subject).to eq({:a=>{}, :b=>{}, :c=>{}, :d=>{:e=>{}}}) }
           end
 
           context "mixed" do
@@ -280,15 +280,13 @@ describe ActiveFacet::Config do
         }
 
         before do
-          allow(instance).to receive(:normalize_facet).and_call_original
           instance.send(:dealias_facet!, facet, facet_alias)
           subject
         end
 
         let(:facet) { :unknown_attr }
-        it { expect(instance).to have_received(:normalize_facet).once }
         it { expect(instance.normalized_facets.keys).to include(facet.to_s) }
-        it { expect(subject).to eq({"fields"=>{"unknown_attr"=>nil}}) }
+        it { expect(subject).to eq({"fields"=>{"unknown_attr"=>{}}}) }
 
         context 'named' do
           let(:facet_alias) { :custom }
@@ -296,9 +294,8 @@ describe ActiveFacet::Config do
           before do
             instance.send(:dealias_facet!, facet)
           end
-          it { expect(instance).to have_received(:normalize_facet).twice }
           it { expect(instance.normalized_facets.keys).to include(facet.to_s, facet_alias.to_s) }
-          it { expect(subject).to eq({"fields"=>{"unknown_attr"=>nil}}) }
+          it { expect(subject).to eq({"fields"=>{"unknown_attr"=>{}}}) }
         end
 
         context "basic" do
@@ -331,27 +328,27 @@ describe ActiveFacet::Config do
 
         context "string" do
           let(:facet) { 'basic' }
-          it { expect(subject).to eq([[:a, :d, :association_a, {"association_b"=>:aliased}], :e]) }
+          it { expect(subject).to eq({:a=>{}, :d=>{}, :association_a=>{}, :association_b=>{:aliased=>{}}, :e=>{}}) }
         end
 
         context "symbol" do
           let(:facet) { :basic }
-          it { expect(subject).to eq([[:a, :d, :association_a, {"association_b"=>:aliased}], :e]) }
+          it { expect(subject).to eq({:a=>{}, :d=>{}, :association_a=>{}, :association_b=>{:aliased=>{}}, :e=>{}}) }
         end
 
         context "all" do
           let(:facet) { :all }
-          it { expect(subject).to eq({:a=>{}, :b=>{}, :d=>{}, :association_a=>{}, "association_b"=>{"aliased"=>{}}, :e=>{}, :f=>{}}) }
+          it { expect(subject).to eq({"a"=>{}, "b"=>{}, "d"=>{}, "association_a"=>{}, "association_b"=>{"aliased"=>{}}, "e"=>{}, "f"=>{}}) }
         end
 
         context "all_attributes" do
           let(:facet) { 'all_attributes' }
-          it { expect(subject).to eq([:a, :association_a, :association_b, :b, :d, :e, :f]) }
+          it { expect(subject).to eq({"a"=>{}, "b"=>{}, "d"=>{}, "association_a"=>{}, "association_b"=>{"aliased"=>{}}, "e"=>{}, "f"=>{}}) }
         end
 
         context "composite" do
           let(:facet) { [:foo, { :e => nil }, :basic] }
-          it { expect(subject).to eq([:foo, {:e=>{}}, [[:a, :d, :association_a, {"association_b"=>:aliased}], :e]]) }
+          it { expect(subject).to eq({:foo=>{}, :e=>{}, :a=>{}, :d=>{}, :association_a=>{}, :association_b=>{:aliased=>{}}}) }
         end
       end
 

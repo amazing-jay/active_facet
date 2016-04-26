@@ -37,12 +37,14 @@ module ActiveFacet
     # Class: Resource Class to serialize
     attr_accessor :resource_class
 
+    #TODO --jdc make setters for all config above symbolize
+    #TODO --jdc iterate over facet and symbolize all strings
     # Store Facet
     # @param facet_alias [Symbol]
     # @param facet [Facet]
     def alias_facet(facet_alias, facet)
       self.compiled = false
-      facets[facet_alias] = facet
+      facets[facet_alias.to_sym] = facet
     end
 
     # Returns Field to resource attribute map
@@ -59,7 +61,7 @@ module ActiveFacet
 
       #aggregate all compiled facets into the all collection
       normalized_facets[:all][:fields] = facets.inject({}) do |result, (facet_alias, facet)|
-        result = merge_facets(result, dealias_facet!(facet, facet_alias)[:fields])
+        result.deep_merge! dealias_facet!(facet, facet_alias)[:fields]
       end
 
       #filter all compiled facets into a corresponding attributes collection
@@ -78,13 +80,13 @@ module ActiveFacet
     # @return [Config]
     def merge!(config)
       self.compiled = false
-      self.resource_class ||= config.resource_class
-      transforms_from.merge!  config.transforms_from
-      transforms_to.merge!    config.transforms_to
-      custom_serializers.merge!      config.custom_serializers
-      namespaces.merge!       config.namespaces
-      facets.merge!       config.facets
-      extensions.merge!       config.extensions
+      self.resource_class     ||= config.resource_class
+      transforms_from.merge!      config.transforms_from
+      transforms_to.merge!        config.transforms_to
+      custom_serializers.merge!   config.custom_serializers
+      namespaces.merge!           config.namespaces
+      facets.merge!               config.facets #TODO --jdc change to a deep_merge!
+      extensions.merge!           config.extensions
 
       self
     end
@@ -117,12 +119,12 @@ module ActiveFacet
     #TODO --jdc change Serializer::Base to convert all Strings to Symbols and remove indifferent_access
     def initialize
       self.compiled = false
-      self.transforms_from  = {}.with_indifferent_access
-      self.transforms_to    = {}.with_indifferent_access
-      self.custom_serializers      = {}.with_indifferent_access
-      self.namespaces       = {}.with_indifferent_access
-      self.facets       = {}.with_indifferent_access
-      self.extensions       = {}.with_indifferent_access
+      self.transforms_from          = {}.with_indifferent_access
+      self.transforms_to            = {}.with_indifferent_access
+      self.custom_serializers       = {}.with_indifferent_access
+      self.namespaces               = {}.with_indifferent_access
+      self.facets                   = {}.with_indifferent_access
+      self.extensions               = {}.with_indifferent_access
     end
 
     # (Memoized) Convert all Facet Aliases into Fields and Normalize Facet
@@ -134,31 +136,33 @@ module ActiveFacet
     def dealias_facet!(facet, facet_alias = nil)
       facet_alias ||= facet.to_s.to_sym
       normalized_facets[facet_alias] ||= begin
-        { fields: normalize_facet(dealias_facet facet) }
+        { fields: dealias_facet(facet) }
       end
     end
 
-    # Convert all Facet Aliases into Fields
+    # Convert all Facet Aliases into Fields and Normalize Facet
     # Recursively evaluates all Aliases embedded within Facet
     # - Does not recursively evalute associations
     # @param facet [Facet]
-    # @return [Mixed]
+    # @return [Normalized Facet]
     def dealias_facet(facet)
       case facet
       when :all, 'all'
-        dealias_facet normalized_facets[:all][:fields]
+        normalized_facets[:all][:fields]
       when :all_attributes, 'all_attributes'
-        dealias_facet normalized_facets[:all][:attributes].keys.map(&:to_sym).sort
+        normalized_facets[:all][:attributes]
       when Symbol, String
         facet = facet.to_sym
-        aliased_facet?(facet) ? dealias_facet(facets[facet]) : facet
+        aliased_facet?(facet) ? dealias_facet(facets[facet]) : { facet => {} }
       when Array
-        facet.map do |s|
-          dealias_facet(s)
+        facet.inject({}) do |result, f|
+          result.deep_merge! dealias_facet(f)
         end
       when Hash
-        facet.inject({}) { |result, (k,v)|
-          v.blank? ? inject_facet(result, dealias_facet(k)) : result[k] = v #todo: symbolize
+        facet.inject({}) { |result, (f, nf)|
+          dealias_facet(f).each { |i_f, i_nf|
+            result.deep_merge!({ i_f => merge_facets(i_nf, nf) })
+          }
           result
         }
       end
@@ -245,7 +249,7 @@ module ActiveFacet
       when Symbol, String
         facet[key.to_sym] = {}
       when Hash
-        facet.merge! key
+        facet.deep_merge! key
       when Array
         key.each { |k| inject_facet(facet, k) }
       end
