@@ -253,7 +253,23 @@ describe ActiveFacet::Serializer::Base do
       end
     end
 
-    skip "test explode_field"
+    describe ".explode_field" do
+      subject { instance.send(:explode_field, facet, nested_facet, options) }
+      let(:facet) { :parent }
+      let(:nested_facet) { :children }
+      let(:options) { {} }
+      it { expect(subject).to eq({:parent=>{:children=>{:explicit_attr=>nil, :nested_attr=>nil}, :explicit_attr=>nil, :nested_attr=>nil}}) }
+
+      context "attribute" do
+        let(:facet) { :foo }
+        it { expect(subject).to eq({:foo=>nil}) }
+      end
+
+      context "custom attribute" do
+        let(:facet) { :custom_attr }
+        it { expect(subject).to eq({:custom_attr=>nil}) }
+      end
+    end
 
     describe ".field_includes" do
       subject { instance.send(:field_includes, facet, nested_facet, options) }
@@ -261,6 +277,16 @@ describe ActiveFacet::Serializer::Base do
       let(:nested_facet) { :children }
       let(:options) { {} }
       it { expect(subject).to eq({:parent=>{:children=>{}}}) }
+
+      context "attribute" do
+        let(:facet) { :custom_attr }
+        it { expect(subject).to eq({}) }
+      end
+
+      context "custom attribute" do
+        let(:facet) { :custom_attr }
+        it { expect(subject).to eq({}) }
+      end
     end
 
     describe ".custom_field_includes" do

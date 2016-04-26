@@ -146,7 +146,11 @@ module ActiveFacet
 
         ActiveFacet.document_cache.fetch_association(self, association, opts) do
           attribute = resource.send(association)
-          attribute = attribute.scope_filters(filters) if is_expression_scopeable?(attribute)
+          if is_expression_scopeable?(attribute)
+            target_class = config.get_association_reflection(field).klass
+            apply_filter_method_name = target_class.acts_as_active_facet_options[:apply_filters_method_name]
+            attribute = attribute.send(apply_filter_method_name, filters)
+          end
           ActiveFacet::Helper.restore_opts_after(options, ActiveFacet.fields_key, nested_facet) do
             #TODO --jdc extend this to allow for other kinds of serialization
             attribute.as_json(options)

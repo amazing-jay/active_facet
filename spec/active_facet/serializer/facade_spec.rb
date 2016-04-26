@@ -362,8 +362,28 @@ describe ActiveFacet::Serializer::Facade do
 
     context 'filtered' do
       let(:filters) { {} }
-      skip 'todo: define a filter'
-      it { expect(subject).to eq(resource.children.as_json(options)) }
+      let(:apply_filters_method_name) { resource.class.acts_as_active_facet_options[:apply_filters_method_name] }
+      around do |example|
+        ActiveFacet.filters_enabled = true
+        example.run
+        ActiveFacet.filters_enabled = false
+      end
+      before do
+        resource.save
+        allow(resource.class).to receive(apply_filters_method_name)
+        subject
+      end
+
+      context "defaults" do
+        it { expect(subject).to eq(resource.children.send(apply_filters_method_name, filters).as_json(options)) }
+        it { expect(resource.class).to have_received(apply_filters_method_name).with(filters).twice }
+      end
+
+      context "explicit" do
+        let(:filters) { { foo: :bar } }
+        it { expect(subject).to eq(resource.children.send(apply_filters_method_name, filters).as_json(options)) }
+        it { expect(resource.class).to have_received(apply_filters_method_name).with(filters).twice }
+      end
     end
 
     context 'nil' do
