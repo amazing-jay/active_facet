@@ -1,6 +1,6 @@
 # ActiveFacet
 
-ActiveFacet is a Rails plugin that enables custom as_json serialization intended for APIs. It is designed for speed, and is magnitudes of order faster than jbuilder.
+ActiveFacet is a Rails plugin that enables custom as_json serialization intended for APIs. It is designed for speed, and is orders of magnitude faster than jbuilder.
 
 The framework supports:
 * fields - define the fields you want to serialize, by resource type
